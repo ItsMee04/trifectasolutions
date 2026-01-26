@@ -24,7 +24,7 @@
                                             class="form-control pass-input" :class="{'is-invalid': errors.password}" :disabled="loading">
 
                                         <span class="profile-views toggle-password" @click="togglePasswordVisibility">
-                                            <i :class="isPasswordVisible ? 'feather-eye' : 'feather-eye-off'"></i>
+                                            <i :class="isPasswordVisible ? 'fas fa-eye' : 'fas fa-eye-slash'"></i>
                                         </span>
                                     </div>
                                 </div>

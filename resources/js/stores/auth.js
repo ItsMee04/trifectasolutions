@@ -1,33 +1,36 @@
 import { defineStore } from 'pinia'
 import router from '@/router'
-import { AuthService } from '@/modules/auth/services/AuthService'
+import { AuthService } from '../modules/auth/services/authService'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
     isAuthenticated: false,
     isLoading: false,
-    // Tambahkan state ini untuk melacak pilihan user
-    rememberMe: false
+    rememberMe: false,
+    // Kita simpan authToken juga di sini sesuai respons controller Anda
+    authToken: null
   }),
 
   actions: {
     async loginUser(credentials) {
-      this.isLoading = true
+      this.isLoading = true // Memicu "Memuat data..." di UI [cite: 2025-10-25]
       try {
-        await AuthService.getCsrfCookie();
+        // 1. Simpan flag remember_me ke localStorage SEBELUM login agar persist mendeteksi storage yang benar
+        localStorage.setItem('remember_me', credentials.remember ? 'true' : 'false');
 
-        // Kirim credentials (termasuk field 'remember') ke API Laravel
         const response = await AuthService.login(credentials);
 
+        // 2. Mapping data dari controller Laravel Anda
+        this.authToken = response.data.access_token;
         this.user = response.data.user;
         this.isAuthenticated = true;
-
-        // Simpan preferensi remember me ke state
         this.rememberMe = credentials.remember;
 
         router.push('/dashboard');
       } catch (error) {
+        // Bersihkan flag jika login gagal
+        localStorage.removeItem('remember_me');
         throw error;
       } finally {
         this.isLoading = false;
@@ -41,7 +44,9 @@ export const useAuthStore = defineStore('auth', {
         this.user = null;
         this.isAuthenticated = false;
         this.rememberMe = false;
-        // Bersihkan storage
+        this.authToken = null;
+
+        localStorage.removeItem('remember_me');
         localStorage.removeItem('auth');
         sessionStorage.removeItem('auth');
         router.push('/login');
@@ -50,19 +55,8 @@ export const useAuthStore = defineStore('auth', {
   },
 
   persist: {
-    // LOGIC DYNAMIC STORAGE
-    // Kita cek apakah di localStorage ada tanda 'remember'
-    // Jika ya, gunakan localStorage agar tahan lama. Jika tidak, sessionStorage.
+    // Memilih storage secara dinamis berdasarkan flag 'remember_me'
     storage: localStorage.getItem('remember_me') === 'true' ? localStorage : sessionStorage,
-    paths: ['user', 'isAuthenticated', 'rememberMe'],
-    // Fungsi ini dijalankan setelah state disimpan ke storage
-    afterRestore: (context) => {
-        // Sinkronisasi ulang jika diperlukan saat app di-refresh
-        if (context.store.rememberMe) {
-            localStorage.setItem('remember_me', 'true');
-        } else {
-            localStorage.setItem('remember_me', 'false');
-        }
-    }
+    paths: ['user', 'isAuthenticated', 'rememberMe', 'authToken'],
   },
 })

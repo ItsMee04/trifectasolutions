@@ -1,13 +1,9 @@
 import apiClient from '@/Helper/apiClient';
 
 export const AuthService = {
-    // Wajib dipanggil untuk SPA (Sanctum)
-    async getCsrfCookie() {
-        return await apiClient.get('/../sanctum/csrf-cookie');
-    },
-
     async login(credentials) {
-        // credentials berisi { email, password, remember }
+        // Jangan hanya return response.data, kembalikan seluruh response
+        // agar Store bisa membaca response.data.access_token
         return await apiClient.post('/login', credentials);
     },
 

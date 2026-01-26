@@ -31,7 +31,7 @@
         </a>
 
         <ul class="nav user-menu">
-            <li class="nav-item dropdown noti-dropdown me-2">
+            <!-- <li class="nav-item dropdown noti-dropdown me-2">
                 <a href="#" class="dropdown-toggle nav-link header-nav-list" data-bs-toggle="dropdown">
                     <img src="/public/assets/img/icons/header-icon-05.svg" alt="">
                 </a>
@@ -63,7 +63,7 @@
                         <a href="#">View all Notifications</a>
                     </div>
                 </div>
-            </li>
+            </li> -->
 
             <li class="nav-item zoom-screen me-2">
                 <a href="javascript:void(0);" class="nav-link header-nav-list" @click="handleFullscreen">
@@ -74,30 +74,27 @@
             <li class="nav-item dropdown has-arrow new-user-menus" :class="{ show: isProfileOpen }">
                 <a href="javascript:void(0);" class="dropdown-toggle nav-link" @click.stop="toggleProfile">
                     <span class="user-img">
-                        <img class="rounded-circle" src="/public/assets/img/profiles/avatar-01.jpg" width="31"
-                            alt="Soeng Souy">
+                        <img class="rounded-circle" :src="userAvatar" width="31" :alt="authStore.user?.nama">
+
                         <div class="user-text">
-                            <h6>Soeng Souy</h6>
-                            <p class="text-muted mb-0">Administrator</p>
+                            <h6>{{ authStore.user?.nama || 'Memuat...' }}</h6>
+                            <p class="text-muted mb-0">{{ authStore.user?.role || 'User' }}</p>
                         </div>
                     </span>
                 </a>
+
                 <div class="dropdown-menu dropdown-menu-end" :class="{ show: isProfileOpen }"
                     style="position: absolute; inset: 0px 0px auto auto; margin: 0px; transform: translate3d(0px, 60px, 0px);">
                     <div class="user-header">
                         <div class="avatar avatar-sm">
-                            <img src="/public/assets/img/profiles/avatar-01.jpg" alt="User Image"
-                                class="avatar-img rounded-circle">
+                            <img :src="userAvatar" alt="User Image" class="avatar-img rounded-circle">
                         </div>
                         <div class="user-text">
-                            <h6>Soeng Souy</h6>
-                            <p class="text-muted mb-0">Administrator</p>
+                            <h6>{{ authStore.user?.nama }}</h6>
+                            <p class="text-muted mb-0">{{ authStore.user?.role }}</p>
                         </div>
                     </div>
-                    <router-link class="dropdown-item" to="/profile" @click="isProfileOpen = false">My
-                        Profile</router-link>
-                    <router-link class="dropdown-item" to="/inbox" @click="isProfileOpen = false">Inbox</router-link>
-                    <router-link class="dropdown-item" to="/login" @click="isProfileOpen = false">Logout</router-link>
+                    <a class="dropdown-item" @click="handleLogout">Logout</a>
                 </div>
             </li>
         </ul>
@@ -105,7 +102,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
+import { useAuthStore } from '../../stores/auth';
+
+const authStore = useAuthStore();
 
 const currentDateTime = ref('');
 // Logic untuk dropdown profile
@@ -113,6 +113,17 @@ const isProfileOpen = ref(false);
 const toggleProfile = () => {
     isProfileOpen.value = !isProfileOpen.value;
 };
+const userAvatar = computed(() => {
+    const image = authStore.user?.image;
+
+    // Jika image null, undefined, kosong, atau string 'default.png'
+    if (!image || image === 'default.png') {
+        return '/assets/img/profiles/avatar-01.jpg';
+    }
+
+    // Pastikan path storage sesuai dengan backend (tanpa /public di depan)
+    return `/storage/pegawai/image/${image}`;
+});
 // Menutup dropdown saat klik di luar elemen
 const handleClickOutside = (event) => {
     const dropdown = document.querySelector('.new-user-menus');
@@ -164,9 +175,15 @@ const handleFullscreen = () => {
     }
 };
 
-const handleLogout = () => {
+const handleLogout = async () => {
     // Implementasi logic logout Anda di sini
-    console.log("Logging out...");
+    isProfileOpen.value = false;
+    try {
+        await authStore.logout(); // Memanggil action logout di Pinia Store
+        router.push('/login');    // Redirect ke halaman login
+    } catch (error) {
+        console.error("Gagal Logout:", error);
+    }
 };
 
 // Fungsi untuk memformat waktu (Hari, Tanggal Bulan Tahun - Jam:Menit:Detik)

@@ -9,6 +9,9 @@ import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'; // Import plugin persist
 import router from './router'; // <-- Import router ini
 
+import * as bootstrap from 'bootstrap'; // Import JS
+window.bootstrap = bootstrap; // Jadikan global agar useRole.js bisa baca
+
 const app = createApp(App);
 // --- Konfigurasi Pinia ---
 const pinia = createPinia();

@@ -6,11 +6,13 @@ const routes = [
     {
         path: "/",
         redirect: "/login",
+        meta: { guestOnly: true } // Tandai bahwa ini hanya untuk yang belum login
     },
     {
         path: "/login",
         name: "login",
         component: LoginView,
+        meta: { guestOnly: true } // Tandai bahwa ini hanya untuk yang belum login
     },
     {
         path: "/",
@@ -47,24 +49,19 @@ const router = createRouter({
 
 // Navigation Guard
 router.beforeEach((to, from, next) => {
-    const authStore = useAuthStore();
-    const isAuthenticated = authStore.isAuthenticated;
+  const authStore = useAuthStore()
 
-    const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
-    const requiresGuest = to.matched.some(
-        (record) => record.meta.requiresGuest,
-    );
-
-    // 1. Redirect jika sudah login
-    if (requiresGuest && isAuthenticated) {
-        return next({ name: "dashboard" });
-    }
-
-    // 2. Redirect jika belum login
-    if (requiresAuth && !isAuthenticated) {
-        return next({ name: "login" });
-    }
-
-    next();
-});
+  // Kasus 1: User sudah login tapi mencoba akses halaman Login (/)
+  if (to.meta.guestOnly && authStore.isAuthenticated) {
+    next('/dashboard')
+  }
+  // Kasus 2: User belum login tapi mencoba akses halaman internal (Dashboard/Role)
+  else if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+    next('/')
+  }
+  // Kasus lainnya: Bebas akses
+  else {
+    next()
+  }
+})
 export default router;

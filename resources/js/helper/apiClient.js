@@ -4,13 +4,14 @@ import { useAuthStore } from '@/stores/auth';
 
 const apiClient = axios.create({
     baseURL: '/api',
-    withCredentials: true // Tetap gunakan ini agar cookie session aman
+    withCredentials: true
 });
 
 apiClient.interceptors.request.use(config => {
     const authStore = useAuthStore();
-    if (authStore.token) {
-        config.headers.Authorization = `Bearer ${authStore.token}`;
+    // Gunakan authToken yang disimpan di Pinia (baik dari local/session storage)
+    if (authStore.authToken) {
+        config.headers.Authorization = `Bearer ${authStore.authToken}`;
     }
     return config;
 });

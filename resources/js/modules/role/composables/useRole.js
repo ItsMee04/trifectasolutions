@@ -1,0 +1,158 @@
+import { ref, computed, reactive } from 'vue';
+import { roleService } from '../services/roleService';
+import { notify } from '../../../helper/notification';
+import Swal from 'sweetalert2';
+
+// Shared State
+const roles = ref([]);
+const isLoading = ref(false);
+const searchQuery = ref('');
+const currentPage = ref(1);
+const itemsPerPage = 10;
+const isEdit = ref(false);
+const errors = ref({}); // Error ditaruh di shared state agar sinkron dengan modal
+
+const formRole = reactive({
+    id: null,
+    role: ''
+});
+
+export function useRole() {
+
+    const fetchRoles = async () => {
+        isLoading.value = true;
+        try {
+            const response = await roleService.getRoles();
+            roles.value = Array.isArray(response) ? response : (response.data || []);
+        } catch (error) {
+            roles.value = [];
+        } finally {
+            isLoading.value = false;
+        }
+    };
+
+    // --- LOGIKA VALIDASI ---
+    const validateForm = () => {
+        errors.value = {}; // Reset error
+        if (!formRole.role || formRole.role.trim() === '') {
+            errors.value.role = 'Nama Role tidak boleh kosong.';
+        }
+        return Object.keys(errors.value).length === 0;
+    };
+
+    // --- LOGIKA SUBMIT (STORE & UPDATE) ---
+    const submitRole = async () => {
+        if (!validateForm()) return false;
+
+        isLoading.value = true;
+        try {
+            // 📦 Siapkan Payload
+            const payload = {
+                role: formRole.role,
+            };
+
+            let response;
+            if (isEdit.value) {
+                // Mode Edit: Kirim ID dan Payload
+                payload.id = formRole.id;
+                response = await roleService.updateRoles(payload);
+            } else {
+                // Mode Tambah: Kirim Payload saja
+                response = await roleService.storeRoles(payload);
+            }
+
+            notify.success(response.message || 'Data berhasil disimpan');
+
+            // Tutup Modal
+            const modalElement = document.getElementById('modalRole');
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+            if (modalInstance) modalInstance.hide();
+
+            // Refresh tabel tanpa reload halaman [cite: 2025-10-25]
+            await fetchRoles();
+
+            return true;
+        } catch (error) {
+            if (error.response?.status === 422) {
+                // Error validasi dari Laravel otomatis masuk ke state errors
+                errors.value = error.response.data.errors;
+            } else {
+                notify.error(error.response?.data?.message || 'Gagal menyimpan data.');
+            }
+            return false;
+        } finally {
+            isLoading.value = false;
+        }
+    };
+
+    const handleCreate = () => {
+        isEdit.value = false;
+        formRole.id = null;
+        formRole.role = '';
+        errors.value = {};
+        const modal = new bootstrap.Modal(document.getElementById('modalRole'));
+        modal.show();
+    };
+
+    const handleEdit = (item) => {
+        isEdit.value = true;
+        errors.value = {};
+        formRole.id = item.id;
+        formRole.role = item.role;
+        const modal = new bootstrap.Modal(document.getElementById('modalRole'));
+        modal.show();
+    };
+
+    const handleDelete = async (item) => {
+        const result = await Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: `Data Role "${item.role}" yang dihapus tidak dapat dikembalikan!`,
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal',
+            reverseButtons: true // Opsional: menukar posisi tombol Batal & Hapus
+        });
+
+        if (result.isConfirmed) {
+            isLoading.value = true; // Set loading agar UI tetap konsisten [cite: 2025-10-25]
+            try {
+                // 📦 Siapkan Payload
+                const payload = {
+                    id: item.id,
+                };
+                // Mengirim payload id sesuai kebutuhan service Anda
+                await roleService.deleteRoles(payload);
+
+                notify.success('Role berhasil dihapus.');
+
+                // Memanggil fetchRoles agar tabel terupdate otomatis tanpa reload
+                await fetchRoles();
+            } catch (error) {
+                console.error('Gagal menghapus data Role:', error);
+                notify.error('Gagal menghapus data Role.');
+            } finally {
+                isLoading.value = false;
+            }
+        }
+    };
+
+    const handleRefresh = async () => {
+        await fetchRoles();
+    }
+
+    return {
+        roles, isLoading, searchQuery, currentPage, isEdit, formRole, errors,
+        filteredRoles: computed(() => {
+            const query = searchQuery.value.toLowerCase();
+            return roles.value.filter(item => (item.role || '').toLowerCase().includes(query));
+        }),
+        paginatedRoles: computed(() => {
+            const start = (currentPage.value - 1) * itemsPerPage;
+            return (roles.value.filter(item => (item.role || '').toLowerCase().includes(searchQuery.value.toLowerCase())))
+                .slice(start, start + itemsPerPage);
+        }),
+        fetchRoles, handleCreate, handleEdit, handleDelete, handleRefresh, submitRole
+    };
+}

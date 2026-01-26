@@ -2,6 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Master\RoleController;
+use App\Http\Controllers\Authentication\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +16,20 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::middleware(['guest'])->group(function () {
+    Route::post('/login', [AuthController::class, 'login']);
 });
+
+Route::middleware(['auth:sanctum'])->group(function(){
+    //API ROLE
+    Route::get('role/getRole', [RoleController::class, 'getRole']);
+    Route::post('role/storeRole', [RoleController::class, 'storeRole']);
+    Route::post('role/updateRole', [RoleController::class, 'updateRole']);
+    Route::post('role/deleteRole', [RoleController::class, 'deleteRole']);
+});
+
+// Route::get('role/getRole', [RoleController::class, 'getRole']);
+// Route::post('role/storeRole', [RoleController::class, 'storeRole']);
+// Route::get('role/getRoleByID/{id}', [RoleController::class, 'getRoleByID']);
+// Route::put('role/updateRole/{id}', [RoleController::class, 'updateRole']);
+// Route::post('role/deleteRole', [RoleController::class, 'deleteRole']);
