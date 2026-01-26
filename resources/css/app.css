@@ -1,0 +1,7 @@
+/* Contoh mapping sederhana jika ingin warna identik */
+.Vue-Toastification__toast--success {
+    background-color: #39da8a !important; /* Warna success dari toatr.css Anda */
+}
+.Vue-Toastification__toast--error {
+    background-color: #ff5b5c !important; /* Warna error dari toatr.css Anda */
+}
