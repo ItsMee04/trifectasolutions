@@ -37,6 +37,12 @@ const routes = [
                 component: () =>
                     import("@/modules/role/views/RoleView.vue"),
             },
+            {
+                path: "pegawai",
+                name: "pegawai",
+                component: () =>
+                    import("@/modules/pegawai/views/PegawaiView.vue"),
+            },
             // Tambahkan rute modular lainnya di sini
         ],
     },

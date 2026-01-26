@@ -50,7 +50,7 @@ class AuthController extends Controller
             'email' => $user->email,
             'nama' => $user->pegawai->nama ?? '-',
             'role' => $user->role->role ?? '-',
-            'image' => $user->pegawai->image_pegawai ?? 'default.png',
+            'image' => $user->pegawai->image ?? 'default.png',
         ];
 
         return response()->json([
@@ -81,7 +81,7 @@ class AuthController extends Controller
             'email' => $user->email,
             'nama' => $user->pegawai->nama ?? '-',
             'role' => $user->role->role ?? '-',
-            'image' => $user->pegawai->image_pegawai ?? 'default.png',
+            'image' => $user->pegawai->image ?? 'default.png',
         ];
 
         return response()->json([

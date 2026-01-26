@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Master\RoleController;
 use App\Http\Controllers\Authentication\AuthController;
+use App\Http\Controllers\Master\PegawaiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,10 +27,12 @@ Route::middleware(['auth:sanctum'])->group(function(){
     Route::post('role/storeRole', [RoleController::class, 'storeRole']);
     Route::post('role/updateRole', [RoleController::class, 'updateRole']);
     Route::post('role/deleteRole', [RoleController::class, 'deleteRole']);
-});
 
-// Route::get('role/getRole', [RoleController::class, 'getRole']);
-// Route::post('role/storeRole', [RoleController::class, 'storeRole']);
-// Route::get('role/getRoleByID/{id}', [RoleController::class, 'getRoleByID']);
-// Route::put('role/updateRole/{id}', [RoleController::class, 'updateRole']);
-// Route::post('role/deleteRole', [RoleController::class, 'deleteRole']);
+    //API PEGAWAI
+    Route::get('pegawai/getPegawai', [PegawaiController::class, 'getPegawai']);
+    Route::post('pegawai/storePegawai', [PegawaiController::class, 'storePegawai']);
+    Route::post('pegawai/updatePegawai', [PegawaiController::class, 'updatePegawai']);
+    Route::post('pegawai/deletePegawai', [PegawaiController::class, 'deletePegawai']);
+
+    Route::post('/logout', [AuthController::class, 'logout']);
+});

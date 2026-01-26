@@ -104,6 +104,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useAuthStore } from '../../stores/auth';
+import router from '../../router';
 
 const authStore = useAuthStore();
 
@@ -113,16 +114,18 @@ const isProfileOpen = ref(false);
 const toggleProfile = () => {
     isProfileOpen.value = !isProfileOpen.value;
 };
+// Di Header.vue
 const userAvatar = computed(() => {
     const image = authStore.user?.image;
 
-    // Jika image null, undefined, kosong, atau string 'default.png'
+    // Jika image null, undefined, atau 'default.png'
     if (!image || image === 'default.png') {
         return '/assets/img/profiles/avatar-01.jpg';
     }
 
-    // Pastikan path storage sesuai dengan backend (tanpa /public di depan)
-    return `/storage/pegawai/image/${image}`;
+    const timestamp = new Date().getTime();
+    // Gunakan path yang Anda tes di browser tadi
+    return `/storage/pegawai/image/${image}?t=${timestamp}`;
 });
 // Menutup dropdown saat klik di luar elemen
 const handleClickOutside = (event) => {
