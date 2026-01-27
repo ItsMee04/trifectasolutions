@@ -168,8 +168,20 @@ export function useKendaraan() {
         await fetchKendaraan();
     }
 
+    const totalPages = computed(() => {
+        const query = searchQuery.value.toLowerCase(); // Ambil string pencarian
+        const filteredCount = kendaraans.value.filter(item =>
+            (item.kode || '').toLowerCase().includes(query) ||
+            (item.kendaraan || '').toLowerCase().includes(query) ||
+            (item.jenis || '').toLowerCase().includes(query) ||
+            (item.nomor || '').toLowerCase().includes(query)
+        ).length;
+
+        return Math.ceil(filteredCount / itemsPerPage) || 1;
+    });
+
     return {
-        kendaraans, isLoading, searchQuery, currentPage, isEdit, formKendaraan, errors,
+        kendaraans, isLoading, searchQuery, currentPage, isEdit, formKendaraan, errors, totalPages,
         filteredKendaraan: computed(() => {
             const query = searchQuery.value.toLowerCase();
             return kendaraans.value.filter(item => {

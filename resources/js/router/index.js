@@ -79,6 +79,12 @@ const routes = [
                 component: () =>
                     import("@/modules/material/views/MaterialView.vue"),
             },
+            {
+                path: "stonecrusher",
+                name: "stonecrusher",
+                component: () =>
+                    import("@/modules/sc/views/SCView.vue"),
+            },
             // Tambahkan rute modular lainnya di sini
         ],
     },

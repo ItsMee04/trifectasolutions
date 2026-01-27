@@ -161,8 +161,17 @@ export function useSuplier() {
         await fetchSuplier();
     }
 
+    const totalPages = computed(() => {
+        const query = searchQuery.value.toLowerCase(); // Ambil string pencarian
+        const filteredCount = supliers.value.filter(item =>
+            (item.nama || '').toLowerCase().includes(query)
+        ).length;
+
+        return Math.ceil(filteredCount / itemsPerPage) || 1;
+    });
+
     return {
-        supliers, isLoading, searchQuery, currentPage, isEdit, formSuplier, errors,
+        supliers, isLoading, searchQuery, currentPage, isEdit, formSuplier, errors, totalPages,
         filteredSuplier: computed(() => {
             const query = searchQuery.value.toLowerCase();
             return supliers.value.filter(item => (item.nama || '').toLowerCase().includes(query));

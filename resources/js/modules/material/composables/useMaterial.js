@@ -168,8 +168,18 @@ export function useMaterial() {
         await fetchMaterial();
     }
 
+    const totalPages = computed(() => {
+        const query = searchQuery.value.toLowerCase(); // Ambil string pencarian
+        const filteredCount = materials.value.filter(item =>
+            (item.kategori?.kategori || '').toLowerCase().includes(query) ||
+            (item.material || '').toLowerCase().includes(query)
+        ).length;
+
+        return Math.ceil(filteredCount / itemsPerPage) || 1;
+    });
+
     return {
-        materials, kategori, isLoading, searchQuery, currentPage, isEdit, formMaterial, errors,
+        materials, kategori, isLoading, searchQuery, currentPage, isEdit, formMaterial, errors, totalPages,
         filteredMaterial: computed(() => {
             const query = searchQuery.value.toLowerCase();
             return materials.value.filter(item => {

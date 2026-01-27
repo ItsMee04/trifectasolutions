@@ -121,8 +121,20 @@ export function useUsers() {
         await fetchUsers();
     }
 
+    // --- Tambahkan Logic Pagination ---
+    const totalPages = computed(() => {
+        const query = searchQuery.value.toLowerCase(); // Ambil string pencarian
+        const filteredCount = users.value.filter(item =>
+            (item.pegawai?.nama || '').toLowerCase().includes(query) || // Gunakan query
+            (item.email || '').toLowerCase().includes(query) ||         // Gunakan query
+            (item.role?.role || '').toLowerCase().includes(query)
+        ).length;
+
+        return Math.ceil(filteredCount / itemsPerPage) || 1;
+    });
+
     return {
-        users, roles, isLoading, searchQuery, currentPage, isEdit, formUsers, errors,
+        users, roles, isLoading, searchQuery, currentPage, isEdit, formUsers, errors, totalPages,
         filteredUsers: computed(() => {
             const query = searchQuery.value.toLowerCase();
             return users.value.filter(item => {

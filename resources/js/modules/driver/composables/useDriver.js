@@ -168,8 +168,17 @@ export function useDrivers() {
         await fetchDriver();
     }
 
+    const totalPages = computed(() => {
+        const query = searchQuery.value.toLowerCase(); // Ambil string pencarian
+        const filteredCount = drivers.value.filter(item =>
+            (item.nama || '').toLowerCase().includes(query)
+        ).length;
+
+        return Math.ceil(filteredCount / itemsPerPage) || 1;
+    });
+
     return {
-        drivers, isLoading, searchQuery, currentPage, isEdit, formDriver, errors,
+        drivers, isLoading, searchQuery, currentPage, isEdit, formDriver, errors, totalPages,
         filteredDriver: computed(() => {
             const query = searchQuery.value.toLowerCase();
             return drivers.value.filter(item => (item.nama || '').toLowerCase().includes(query));

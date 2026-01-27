@@ -197,8 +197,18 @@ export function usePegawai() {
         errors.value = {}; // Bersihkan pesan error juga
     };
 
+    // --- Tambahkan Logic Pagination ---
+    const totalPages = computed(() => {
+        const filteredCount = pegawai.value.filter(item =>
+            (item.nama || '').toLowerCase().includes(searchQuery.value.toLowerCase())
+        ).length;
+
+        // Hitung total halaman, minimal 1 halaman
+        return Math.ceil(filteredCount / itemsPerPage) || 1;
+    });
+
     return {
-        pegawai, isLoading, searchQuery, currentPage, isEdit, formPegawai, errors, resetForm,
+        pegawai, isLoading, searchQuery, currentPage, isEdit, formPegawai, errors, resetForm, totalPages,
         filteredPegawai: computed(() => {
             const query = searchQuery.value.toLowerCase();
             return pegawai.value.filter(item => (item.nama || '').toLowerCase().includes(query));

@@ -147,8 +147,17 @@ export function useKategori() {
         await fetchKategori();
     }
 
+    const totalPages = computed(() => {
+        const query = searchQuery.value.toLowerCase(); // Ambil string pencarian
+        const filteredCount = kategoris.value.filter(item =>
+            (item.kategori || '').toLowerCase().includes(query)
+        ).length;
+
+        return Math.ceil(filteredCount / itemsPerPage) || 1;
+    });
+
     return {
-        kategoris, isLoading, searchQuery, currentPage, isEdit, formKategori, errors,
+        kategoris, isLoading, searchQuery, currentPage, isEdit, formKategori, errors, totalPages,
         filteredKategori: computed(() => {
             const query = searchQuery.value.toLowerCase();
             return kategoris.value.filter(item => {

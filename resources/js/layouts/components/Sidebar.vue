@@ -98,7 +98,7 @@ const masterItems = [
 ];
 
 const timbanganItems = [
-    { name: 'Timbangan Masuk', path: '/timbangan-masuk' },
+    { name: 'SC', path: '/stonecrusher' },
     { name: 'Timbangan Keluar', path: '/timbangan-keluar' },
 ];
 

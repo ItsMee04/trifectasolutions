@@ -147,8 +147,18 @@ export function useRole() {
         await fetchRoles();
     }
 
+    // --- Tambahkan Logic Pagination ---
+    const totalPages = computed(() => {
+        const filteredCount = roles.value.filter(item =>
+            (item.role || '').toLowerCase().includes(searchQuery.value.toLowerCase())
+        ).length;
+
+        // Hitung total halaman, minimal 1 halaman
+        return Math.ceil(filteredCount / itemsPerPage) || 1;
+    });
+
     return {
-        roles, isLoading, searchQuery, currentPage, isEdit, formRole, errors,
+        roles, isLoading, searchQuery, currentPage, isEdit, formRole, errors, totalPages,
         filteredRoles: computed(() => {
             const query = searchQuery.value.toLowerCase();
             return roles.value.filter(item => (item.role || '').toLowerCase().includes(query));

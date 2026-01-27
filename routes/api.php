@@ -11,6 +11,7 @@ use App\Http\Controllers\Master\KategoriController;
 use App\Http\Controllers\Master\MaterialController;
 use App\Http\Controllers\Master\KendaraanController;
 use App\Http\Controllers\Authentication\AuthController;
+use App\Http\Controllers\Timbangan\StoneCrusherController;
 
 /*
 |--------------------------------------------------------------------------
@@ -73,6 +74,12 @@ Route::middleware(['auth:sanctum'])->group(function(){
     Route::post('material/storeMaterial', [MaterialController::class, 'storeMaterial']);
     Route::post('material/updateMaterial', [MaterialController::class, 'updateMaterial']);
     Route::post('material/deleteMaterial', [MaterialController::class, 'deleteMaterial']);
+
+    //API STONECRUSHER
+    Route::post('stonecrusher/getStoneCrusher', [StoneCrusherController::class, 'getStoneCrusher']);
+    Route::post('stonecrusher/storeStoneCrusher', [StoneCrusherController::class, 'storeStoneCrusher']);
+    Route::post('stonecrusher/updateStoneCrusher', [StoneCrusherController::class, 'updateStoneCrusher']);
+    Route::post('stonecrusher/deleteStoneCrusher', [StoneCrusherController::class, 'deleteStoneCrusher']);
 
     Route::post('/logout', [AuthController::class, 'logout']);
 });
