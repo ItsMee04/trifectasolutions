@@ -2,20 +2,16 @@
 
 namespace App\Models\Master;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class Kendaraan extends Model
+class Kategori extends Model
 {
     use HasFactory;
-    protected $table = 'kendaraan';
+    protected $table = 'kategori';
     protected $hidden = ['created_at', 'updated_at'];
     protected $fillable = [
-        'kode',
-        'kendaraan',
-        'jenis',
-        'nomor',
+        'kategori',
         'status',
     ];
 

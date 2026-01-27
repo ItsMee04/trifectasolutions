@@ -6,9 +6,10 @@ use App\Http\Controllers\Master\RoleController;
 use App\Http\Controllers\Master\UserController;
 use App\Http\Controllers\Master\DriverController;
 use App\Http\Controllers\Master\PegawaiController;
-use App\Http\Controllers\Authentication\AuthController;
-use App\Http\Controllers\Master\KendaraanController;
 use App\Http\Controllers\Master\SuplierController;
+use App\Http\Controllers\Master\KategoriController;
+use App\Http\Controllers\Master\KendaraanController;
+use App\Http\Controllers\Authentication\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -59,6 +60,12 @@ Route::middleware(['auth:sanctum'])->group(function(){
     Route::post('kendaraan/storeKendaraan', [KendaraanController::class, 'storeKendaraan']);
     Route::post('kendaraan/updateKendaraan', [KendaraanController::class, 'updateKendaraan']);
     Route::post('kendaraan/deleteKendaraan', [KendaraanController::class, 'deleteKendaraan']);
+
+    // API KATEGORI
+    Route::get('kategori/getKategori', [KategoriController::class, 'getKategori']);
+    Route::post('kategori/storeKategori', [KategoriController::class, 'storeKategori']);
+    Route::post('kategori/updateKategori', [KategoriController::class, 'updateKategori']);
+    Route::post('kategori/deleteKategori', [KategoriController::class, 'deleteKategori']);
 
     Route::post('/logout', [AuthController::class, 'logout']);
 });
