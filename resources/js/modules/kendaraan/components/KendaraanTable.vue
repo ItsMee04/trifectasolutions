@@ -41,6 +41,7 @@
                             <th style="width: 20%">Kendaraan</th>
                             <th style="width: 20%">Jenis</th>
                             <th style="width: 20%">Nomor</th>
+                            <th style="width: 20%">Status</th>
                             <th style="width: 20%">Action</th>
                         </tr>
                     </thead>
@@ -63,6 +64,14 @@
                                 <td>{{ item.kendaraan }}</td>
                                 <td>{{ item.jenis }}</td>
                                 <td>{{ item.nomor }}</td>
+                                <td>
+                                    <span v-if="item.status == 1" class="badge bg-success">
+                                        ACTIVE
+                                    </span>
+                                    <span v-else class="badge bg-danger">
+                                        INACTIVE
+                                    </span>
+                                </td>
                                 <td>
                                     <div class="actions d-flex justify-content-center">
                                         <a @click="handleEdit(item)" class="btn btn-sm bg-success-light me-2">
