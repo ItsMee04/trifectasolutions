@@ -7,6 +7,7 @@ use App\Http\Controllers\Master\UserController;
 use App\Http\Controllers\Master\DriverController;
 use App\Http\Controllers\Master\PegawaiController;
 use App\Http\Controllers\Authentication\AuthController;
+use App\Http\Controllers\Master\KendaraanController;
 use App\Http\Controllers\Master\SuplierController;
 
 /*
@@ -52,6 +53,12 @@ Route::middleware(['auth:sanctum'])->group(function(){
     Route::post('suplier/storeSuplier', [SuplierController::class, 'storeSuplier']);
     Route::post('suplier/updateSuplier', [SuplierController::class, 'updateSuplier']);
     Route::post('suplier/deleteSuplier', [SuplierController::class, 'deleteSuplier']);
+
+    // API KENDARAAN
+    Route::get('kendaraan/getKendaraan', [KendaraanController::class, 'getKendaraan']);
+    Route::post('kendaraan/storeKendaraan', [KendaraanController::class, 'storeKendaraan']);
+    Route::post('kendaraan/updateKendaraan', [KendaraanController::class, 'updateKendaraan']);
+    Route::post('kendaraan/deleteKendaraan', [KendaraanController::class, 'deleteKendaraan']);
 
     Route::post('/logout', [AuthController::class, 'logout']);
 });

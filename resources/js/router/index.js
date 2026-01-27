@@ -61,6 +61,12 @@ const routes = [
                 component: () =>
                     import("@/modules/suplier/views/SuplierView.vue"),
             },
+            {
+                path: "kendaraan",
+                name: "kendaraan",
+                component: () =>
+                    import("@/modules/kendaraan/views/KendaraanView.vue"),
+            },
             // Tambahkan rute modular lainnya di sini
         ],
     },
