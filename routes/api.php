@@ -4,8 +4,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Master\RoleController;
 use App\Http\Controllers\Master\UserController;
+use App\Http\Controllers\Master\DriverController;
 use App\Http\Controllers\Master\PegawaiController;
 use App\Http\Controllers\Authentication\AuthController;
+use App\Http\Controllers\Master\SuplierController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,6 +40,18 @@ Route::middleware(['auth:sanctum'])->group(function(){
     //API USERS
     Route::get('users/getUsers', [UserController::class, 'getUsers']);
     Route::post('users/updateUsers', [UserController::class, 'updateUsers']);
+
+    // API DRIVERS
+    Route::get('driver/getDriver', [DriverController::class, 'getDriver']);
+    Route::post('driver/storeDriver', [DriverController::class, 'storeDriver']);
+    Route::post('driver/updateDriver', [DriverController::class, 'updateDriver']);
+    Route::post('driver/deleteDriver', [DriverController::class, 'deleteDriver']);
+
+    // API SUPLIER
+    Route::get('suplier/getSuplier', [SuplierController::class, 'getSuplier']);
+    Route::post('suplier/storeSuplier', [SuplierController::class, 'storeSuplier']);
+    Route::post('suplier/updateSuplier', [SuplierController::class, 'updateSuplier']);
+    Route::post('suplier/deleteSuplier', [SuplierController::class, 'deleteSuplier']);
 
     Route::post('/logout', [AuthController::class, 'logout']);
 });

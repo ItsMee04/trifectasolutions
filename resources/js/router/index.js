@@ -49,6 +49,18 @@ const routes = [
                 component: () =>
                     import("@/modules/users/views/UsersView.vue"),
             },
+            {
+                path: "driver",
+                name: "driver",
+                component: () =>
+                    import("@/modules/driver/views/DriverView.vue"),
+            },
+            {
+                path: "suplier",
+                name: "suplier",
+                component: () =>
+                    import("@/modules/suplier/views/SuplierView.vue"),
+            },
             // Tambahkan rute modular lainnya di sini
         ],
     },
