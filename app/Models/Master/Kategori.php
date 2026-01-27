@@ -2,8 +2,10 @@
 
 namespace App\Models\Master;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Master\Material;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Kategori extends Model
 {
@@ -15,13 +17,13 @@ class Kategori extends Model
         'status',
     ];
 
-    // /**
-    //  * Get all of the material for the Kategori
-    //  *
-    //  * @return \Illuminate\Database\Eloquent\Relations\HasMany
-    //  */
-    // public function material(): HasMany
-    // {
-    //     return $this->hasMany(Material::class, 'kategori_id', 'id');
-    // }
+    /**
+     * Get all of the material for the Kategori
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function material(): HasMany
+    {
+        return $this->hasMany(Material::class, 'kategori_id', 'id');
+    }
 }

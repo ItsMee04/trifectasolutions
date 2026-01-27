@@ -8,6 +8,7 @@ use App\Http\Controllers\Master\DriverController;
 use App\Http\Controllers\Master\PegawaiController;
 use App\Http\Controllers\Master\SuplierController;
 use App\Http\Controllers\Master\KategoriController;
+use App\Http\Controllers\Master\MaterialController;
 use App\Http\Controllers\Master\KendaraanController;
 use App\Http\Controllers\Authentication\AuthController;
 
@@ -66,6 +67,12 @@ Route::middleware(['auth:sanctum'])->group(function(){
     Route::post('kategori/storeKategori', [KategoriController::class, 'storeKategori']);
     Route::post('kategori/updateKategori', [KategoriController::class, 'updateKategori']);
     Route::post('kategori/deleteKategori', [KategoriController::class, 'deleteKategori']);
+
+    //API MATERIAL
+    Route::get('material/getMaterial', [MaterialController::class, 'getMaterial']);
+    Route::post('material/storeMaterial', [MaterialController::class, 'storeMaterial']);
+    Route::post('material/updateMaterial', [MaterialController::class, 'updateMaterial']);
+    Route::post('material/deleteMaterial', [MaterialController::class, 'deleteMaterial']);
 
     Route::post('/logout', [AuthController::class, 'logout']);
 });

@@ -73,6 +73,12 @@ const routes = [
                 component: () =>
                     import("@/modules/kategori/views/KategoriView.vue"),
             },
+            {
+                path: "material",
+                name: "material",
+                component: () =>
+                    import("@/modules/material/views/MaterialView.vue"),
+            },
             // Tambahkan rute modular lainnya di sini
         ],
     },
