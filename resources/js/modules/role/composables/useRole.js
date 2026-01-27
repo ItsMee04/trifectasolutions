@@ -74,9 +74,14 @@ export function useRole() {
             return true;
         } catch (error) {
             if (error.response?.status === 422) {
-                // Error validasi dari Laravel otomatis masuk ke state errors
+                // 1. Simpan error untuk ditampilkan di bawah input field
                 errors.value = error.response.data.errors;
+
+                // 2. ✨ TAMBAHKAN INI: Munculkan notify agar user tahu ada yang salah
+                const firstErrorMessage = error.response.data.message || 'Terjadi kesalahan validasi.';
+                notify.error(firstErrorMessage);
             } else {
+                // Untuk error server (500), koneksi, dsb.
                 notify.error(error.response?.data?.message || 'Gagal menyimpan data.');
             }
             return false;

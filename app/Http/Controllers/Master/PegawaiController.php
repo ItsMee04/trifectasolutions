@@ -58,7 +58,7 @@ class PegawaiController extends Controller
         $pegawai = Pegawai::create([
             'nama'   => strtoupper($request->nama),
             'kontak' => $request->kontak,
-            'alamat' => $request->alamat,
+            'alamat' => strtoupper($request->alamat),
             'image'  => $imageName,
             'status' => 1,
         ]);

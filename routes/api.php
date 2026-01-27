@@ -3,8 +3,9 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Master\RoleController;
-use App\Http\Controllers\Authentication\AuthController;
+use App\Http\Controllers\Master\UserController;
 use App\Http\Controllers\Master\PegawaiController;
+use App\Http\Controllers\Authentication\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +34,10 @@ Route::middleware(['auth:sanctum'])->group(function(){
     Route::post('pegawai/storePegawai', [PegawaiController::class, 'storePegawai']);
     Route::post('pegawai/updatePegawai', [PegawaiController::class, 'updatePegawai']);
     Route::post('pegawai/deletePegawai', [PegawaiController::class, 'deletePegawai']);
+
+    //API USERS
+    Route::get('users/getUsers', [UserController::class, 'getUsers']);
+    Route::post('users/updateUsers', [UserController::class, 'updateUsers']);
 
     Route::post('/logout', [AuthController::class, 'logout']);
 });

@@ -43,6 +43,12 @@ const routes = [
                 component: () =>
                     import("@/modules/pegawai/views/PegawaiView.vue"),
             },
+            {
+                path: "users",
+                name: "users",
+                component: () =>
+                    import("@/modules/users/views/UsersView.vue"),
+            },
             // Tambahkan rute modular lainnya di sini
         ],
     },
