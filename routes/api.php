@@ -11,6 +11,9 @@ use App\Http\Controllers\Master\KategoriController;
 use App\Http\Controllers\Master\MaterialController;
 use App\Http\Controllers\Master\KendaraanController;
 use App\Http\Controllers\Authentication\AuthController;
+use App\Http\Controllers\KegiatanArmada\JarakDanHargaController;
+use App\Http\Controllers\Timbangan\AsphaltMixingPlantController;
+use App\Http\Controllers\Timbangan\ConcreteBatchingPlantController;
 use App\Http\Controllers\Timbangan\StoneCrusherController;
 
 /*
@@ -80,6 +83,24 @@ Route::middleware(['auth:sanctum'])->group(function(){
     Route::post('stonecrusher/storeStoneCrusher', [StoneCrusherController::class, 'storeStoneCrusher']);
     Route::post('stonecrusher/updateStoneCrusher', [StoneCrusherController::class, 'updateStoneCrusher']);
     Route::post('stonecrusher/deleteStoneCrusher', [StoneCrusherController::class, 'deleteStoneCrusher']);
+
+    //API CONCRETE BATCHING PLANT
+    Route::post('concretebatchingplant/getConcreteBatchingPlant', [ConcreteBatchingPlantController::class, 'getConcreteBatchingPlant']);
+    Route::post('concretebatchingplant/storeConcreteBatchingPlant', [ConcreteBatchingPlantController::class, 'storeConcreteBatchingPlant']);
+    Route::post('concretebatchingplant/updateConcreteBatchingPlant', [ConcreteBatchingPlantController::class, 'updateConcreteBatchingPlant']);
+    Route::post('concretebatchingplant/deleteConcreteBatchingPlant', [ConcreteBatchingPlantController::class, 'deleteConcreteBatchingPlant']);
+
+    //API CONCRETE BATCHING PLANT
+    Route::post('asphaltmixingplant/getAsphaltMixingPlant', [AsphaltMixingPlantController::class, 'getAsphaltMixingPlant']);
+    Route::post('asphaltmixingplant/storeAsphaltMixingPlant', [AsphaltMixingPlantController::class, 'storeAsphaltMixingPlant']);
+    Route::post('asphaltmixingplant/updateAsphaltMixingPlant', [AsphaltMixingPlantController::class, 'updateAsphaltMixingPlant']);
+    Route::post('asphaltmixingplant/deleteAsphaltMixingPlant', [AsphaltMixingPlantController::class, 'deleteAsphaltMixingPlant']);
+
+    //API JARAK & HARGA
+    Route::get('jarakdanharga/getJarakDanHarga', [JarakDanHargaController::class, 'getJarakDanHarga']);
+    Route::post('jarakdanharga/storeJarakDanHarga', [JarakDanHargaController::class, 'storeJarakDanHarga']);
+    Route::post('jarakdanharga/updateJarakDanHarga', [JarakDanHargaController::class, 'updateJarakDanHarga']);
+    Route::post('jarakdanharga/deleteJarakDanHarga', [JarakDanHargaController::class, 'deleteJarakDanHarga']);
 
     Route::post('/logout', [AuthController::class, 'logout']);
 });

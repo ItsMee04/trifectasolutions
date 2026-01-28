@@ -85,6 +85,24 @@ const routes = [
                 component: () =>
                     import("@/modules/sc/views/SCView.vue"),
             },
+            {
+                path: "concretebatchingplant",
+                name: "concretebatchingplant",
+                component: () =>
+                    import("@/modules/cbp/views/CBPView.vue"),
+            },
+            {
+                path: "asphaltmixingplant",
+                name: "asphaltmixingplant",
+                component: () =>
+                    import("@/modules/amp/views/AMPView.vue"),
+            },
+            {
+                path: "jarakdanharga",
+                name: "jarakdanharga",
+                component: () =>
+                    import("@/modules/jarakdanharga/views/JarakHargaView.vue"),
+            },
             // Tambahkan rute modular lainnya di sini
         ],
     },
