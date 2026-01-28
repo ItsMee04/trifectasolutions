@@ -145,7 +145,7 @@ class JarakDanHargaController extends Controller
         return response()->json([
             'status' => 200,
             'success' => true,
-            'message' => 'Material deleted successfully.',
+            'message' => 'Data jarak & harga berhasil di hapus.',
         ], 200);
     }
 }

@@ -12,6 +12,7 @@ use App\Http\Controllers\Master\MaterialController;
 use App\Http\Controllers\Master\KendaraanController;
 use App\Http\Controllers\Authentication\AuthController;
 use App\Http\Controllers\KegiatanArmada\JarakDanHargaController;
+use App\Http\Controllers\KegiatanArmada\KegiatanArmadaController;
 use App\Http\Controllers\Timbangan\AsphaltMixingPlantController;
 use App\Http\Controllers\Timbangan\ConcreteBatchingPlantController;
 use App\Http\Controllers\Timbangan\StoneCrusherController;
@@ -101,6 +102,11 @@ Route::middleware(['auth:sanctum'])->group(function(){
     Route::post('jarakdanharga/storeJarakDanHarga', [JarakDanHargaController::class, 'storeJarakDanHarga']);
     Route::post('jarakdanharga/updateJarakDanHarga', [JarakDanHargaController::class, 'updateJarakDanHarga']);
     Route::post('jarakdanharga/deleteJarakDanHarga', [JarakDanHargaController::class, 'deleteJarakDanHarga']);
+
+    //API JARAK & HARGA
+    Route::get('kegiatanarmada/getKegiatanArmada', [KegiatanArmadaController::class, 'getKegiatanArmada']);
+    Route::post('kegiatanarmada/updateKegiatanArmada', [KegiatanArmadaController::class, 'updateKegiatanArmada']);
+    Route::post('kegiatanarmada/deleteKegiatanArmada', [KegiatanArmadaController::class, 'deleteKegiatanArmada']);
 
     Route::post('/logout', [AuthController::class, 'logout']);
 });

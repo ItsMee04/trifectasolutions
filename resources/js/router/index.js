@@ -103,6 +103,12 @@ const routes = [
                 component: () =>
                     import("@/modules/jarakdanharga/views/JarakHargaView.vue"),
             },
+            {
+                path: "kegiatanarmada",
+                name: "kegiatanarmada",
+                component: () =>
+                    import("@/modules/kegiatanarmada/views/KegiatanArmadaView.vue"),
+            },
             // Tambahkan rute modular lainnya di sini
         ],
     },
