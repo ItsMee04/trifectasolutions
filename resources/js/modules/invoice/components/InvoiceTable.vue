@@ -52,20 +52,18 @@
                             <th style="width: 20%">Satuan</th>
                             <th style="width: 20%">Harga</th>
                             <th style="width: 20%">Nilai</th>
-                            <th style="width: 20%">Status</th>
-                            <th style="width: 20%">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-if="isLoading">
-                            <td colspan="12" class="text-center p-5">
+                            <td colspan="10" class="text-center p-5">
                                 <div class="spinner-border text-primary" role="status"></div>
                                 <p class="mt-2 mb-0">Memuat data...</p>
                             </td>
                         </tr>
 
                         <tr v-else-if="!paginatedInvoice || paginatedInvoice.length === 0">
-                            <td colspan="12" class="text-center p-5">Tidak ada data.</td>
+                            <td colspan="10" class="text-center p-5">Tidak ada data.</td>
                         </tr>
 
                         <template v-else>
@@ -80,24 +78,6 @@
                                 <td>{{ item.satuan }}</td>
                                 <td>{{ formatNumber(item.jarak?.hargajasa) }}</td>
                                 <td>{{ formatNumber(item.penjualan) }}</td>
-                                <td>
-                                    <span v-if="item.status == 1" class="badge bg-success">
-                                        ACTIVE
-                                    </span>
-                                    <span v-else class="badge bg-danger">
-                                        INACTIVE
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="actions d-flex justify-content-center">
-                                        <a @click="handleEdit(item)" class="btn btn-sm bg-success-light me-2">
-                                            <i class="feather-edit"></i>
-                                        </a>
-                                        <a @click="handleDelete(item)" class="btn btn-sm bg-danger-light">
-                                            <i class="feather-trash"></i>
-                                        </a>
-                                    </div>
-                                </td>
                             </tr>
                         </template>
                     </tbody>
@@ -110,7 +90,6 @@
                             <td colspan="1" class="text-end"></td>
                             <td>{{ formatNumber(totalFooter.jasaTotal) }}</td>
                             <td>{{ formatNumber(totalFooter.penjualanTotal) }}</td>
-                            <td colspan="2"></td>
                         </tr>
                     </tfoot>
                 </table>
