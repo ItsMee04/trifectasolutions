@@ -11,6 +11,7 @@ use App\Http\Controllers\Master\KategoriController;
 use App\Http\Controllers\Master\MaterialController;
 use App\Http\Controllers\Master\KendaraanController;
 use App\Http\Controllers\Authentication\AuthController;
+use App\Http\Controllers\KegiatanArmada\InvoiceController;
 use App\Http\Controllers\KegiatanArmada\JarakDanHargaController;
 use App\Http\Controllers\KegiatanArmada\KegiatanArmadaController;
 use App\Http\Controllers\Timbangan\AsphaltMixingPlantController;
@@ -107,6 +108,9 @@ Route::middleware(['auth:sanctum'])->group(function(){
     Route::get('kegiatanarmada/getKegiatanArmada', [KegiatanArmadaController::class, 'getKegiatanArmada']);
     Route::post('kegiatanarmada/updateKegiatanArmada', [KegiatanArmadaController::class, 'updateKegiatanArmada']);
     Route::post('kegiatanarmada/deleteKegiatanArmada', [KegiatanArmadaController::class, 'deleteKegiatanArmada']);
+
+    // API INVOICE
+    Route::post('invoice/getInvoice', [InvoiceController::class, 'getInvoice']);
 
     Route::post('/logout', [AuthController::class, 'logout']);
 });

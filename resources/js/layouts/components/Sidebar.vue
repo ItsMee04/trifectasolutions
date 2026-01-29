@@ -106,6 +106,7 @@ const timbanganItems = [
 const kegiatanArmadaItems = [
     { name: 'Jarak & Harga', path: '/jarakdanharga' },
     { name: 'Kegiatan Armada', path: '/kegiatanarmada' },
+    { name: 'Invoice & Upah', path: '/invoice' },
 ];
 
 

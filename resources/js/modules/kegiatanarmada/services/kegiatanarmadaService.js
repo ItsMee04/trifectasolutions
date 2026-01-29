@@ -2,22 +2,22 @@
 import apiClient from '../../../helper/apiClient';
 
 export const kegiatanarmadaService = {
-    async getgetKegiatanArmada() {
+    async getKegiatanArmada() {
         const response = await apiClient.get('/kegiatanarmada/getKegiatanArmada');
         return response.data; // Sesuaikan dengan struktur JSON Laravel Anda
     },
 
-    async storegetKegiatanArmada(payload) {
+    async storeKegiatanArmada(payload) {
         const response = await apiClient.post('/kegiatanarmada/storeKegiatanArmada', payload);
         return response.data; // Sesuaikan dengan struktur JSON Laravel Anda
     },
 
-    async updategetKegiatanArmada(payload) {
+    async updateKegiatanArmada(payload) {
         const response = await apiClient.post('/kegiatanarmada/updateKegiatanArmada', payload);
         return response.data; // Sesuaikan dengan struktur JSON Laravel Anda
     },
 
-    async deletegetKegiatanArmada(payload) {
+    async deleteKegiatanArmada(payload) {
         const response = await apiClient.post('/kegiatanarmada/deleteKegiatanArmada', payload);
         return response.data; // Sesuaikan dengan struktur JSON Laravel Anda
     }

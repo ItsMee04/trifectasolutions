@@ -109,6 +109,12 @@ const routes = [
                 component: () =>
                     import("@/modules/kegiatanarmada/views/KegiatanArmadaView.vue"),
             },
+            {
+                path: "invoice",
+                name: "invoice",
+                component: () =>
+                    import("@/modules/invoice/views/InvoiceView.vue"),
+            },
             // Tambahkan rute modular lainnya di sini
         ],
     },

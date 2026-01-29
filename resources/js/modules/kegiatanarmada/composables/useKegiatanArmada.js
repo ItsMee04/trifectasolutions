@@ -37,7 +37,7 @@ export function useKegiatanArmada() {
         isLoading.value = true;
 
         try {
-            const response = await kegiatanarmadaService.getgetKegiatanArmada();
+            const response = await kegiatanarmadaService.getKegiatanArmada();
             KegiatanArmadas.value = Array.isArray(response) ? response : (response.data || []);
         } catch (error) {
             console.error("Gagal mengambil data Kegiatan Armada:", error);
@@ -112,7 +112,7 @@ export function useKegiatanArmada() {
 
             let response;
             if (isEdit.value) {
-                response = await kegiatanarmadaService.updategetKegiatanArmada(payload);
+                response = await kegiatanarmadaService.updateKegiatanArmada(payload);
             }
 
             notify.success(response.message || 'Data berhasil disimpan');
@@ -169,7 +169,7 @@ export function useKegiatanArmada() {
             isLoading.value = true;
             try {
                 const payload = { id: item.id };
-                await kegiatanarmadaService.deletegetKegiatanArmada(payload);
+                await kegiatanarmadaService.deleteKegiatanArmada(payload);
                 notify.success('Data Kegiatan Armada berhasil dihapus.');
                 await fetchKegiatanArmada();
             } catch (error) {
