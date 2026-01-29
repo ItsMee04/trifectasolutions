@@ -67,20 +67,31 @@ export function useInvoice() {
     };
 
     const handlePrintInvoice = () => {
-        // Cek apakah user sudah melakukan filter sebelumnya
+        // 1. Cek apakah user sudah melakukan filter pencarian sebelumnya
         if (!lastFilter.value) {
             notify.error("Silakan filter data terlebih dahulu sebelum mencetak.");
             return;
         }
 
-        // Sekarang Anda punya akses ke payload yang sama di sini
-        console.log("Mencetak dengan payload:", lastFilter.value);
+        formInvoice.pengambilan = '';
+        formInvoice.tujuan = '';
+        formInvoice.kategori = '';
 
-        // Contoh: Redirect ke route cetak dengan query params
-        // window.open(`/invoice/print?pengambilan=${lastFilter.value.pengambilan}&tujuan=${lastFilter.value.tujuan}`, '_blank');
+        const modal = new bootstrap.Modal(document.getElementById('modalPrintInvoice'));
+        modal.show();
+    }
 
-        // Atau panggil service print jika ada
-        // invoiceService.print(lastFilter.value);
+    const submitPrint = async () => {
+        // 2. Gabungkan (Append) lastFilter dengan data tambahan dari form
+        const payload = {
+            ...lastFilter.value, // Append: pengambilan, tujuan, kategori
+            tanggal: formInvoice.tanggal,
+            nomorinvoice: formInvoice.nomorinvoice,
+            periodeawal: formInvoice.periodeawal,
+            periodeakhir: formInvoice.periodeakhir
+        };
+
+        console.log("Payload Final untuk Cetak:", payload);
     }
 
     const validateForm = () => {
@@ -232,6 +243,6 @@ export function useInvoice() {
         formatNumber,
         filteredInvoice,
         paginatedInvoice,
-        fetchInvoice, handleFilterInvoice, handlePrintInvoice, handleRefresh, submitGetInvoice, resetDateFilter
+        fetchInvoice, handleFilterInvoice, handlePrintInvoice, handleRefresh, submitGetInvoice, submitPrint, resetDateFilter
     };
 }
