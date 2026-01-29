@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('material_id');
             $table->string('pengambilan', 100);
             $table->string('tujuan', 100);
-            $table->integer('jarak')->default(0);
+            $table->decimal('jarak', 5, 2)->default(0.0);
             $table->integer('hargaupah')->default(0);
             $table->integer('hargajasa')->default(0);
             $table->integer('status')->default(1);

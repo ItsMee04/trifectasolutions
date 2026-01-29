@@ -227,7 +227,7 @@ export function useJarakDanHarga() {
 
     const totalFooter = computed(() => {
         return filteredJarakDanHarga.value.reduce((acc, item) => {
-            acc.jarakTotal += Number(item.jarak || 0);
+            acc.jarakTotal += parseFloat(item.jarak || 0);
             acc.upahTotal += Number(item.hargaupah || 0);
             acc.jasaTotal += Number(item.hargajasa || 0);
             return acc;

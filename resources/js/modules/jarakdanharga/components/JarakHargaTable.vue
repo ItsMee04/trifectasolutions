@@ -119,7 +119,7 @@
                     <tfoot v-if="!isLoading && paginatedJarakDanHarga.length > 0">
                         <tr class="text-center fw-bold bg-light">
                             <td colspan="5" class="text-end">TOTAL</td>
-                            <td>{{ formatNumber(totalFooter.jarakTotal) }}</td>
+                            <td>{{ formatNumber(totalFooter.jarakTotal,2) }}</td>
                             <td>{{ formatNumber(totalFooter.upahTotal) }}</td>
                             <td>{{ formatNumber(totalFooter.jasaTotal) }}</td>
                             <td colspan="2"></td>

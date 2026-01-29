@@ -38,7 +38,7 @@ class JarakDanHargaController extends Controller
             'material'      => 'required|exists:material,id',
             'pengambilan'   => 'required|string|max:100',
             'tujuan'        => 'required|string|max:100',
-            'jarak'         => 'required|integer|min:0',
+            'jarak'         => 'required',
             'hargaupah'     => 'required|integer|min:0',
             'hargajasa'     => 'required|integer|min:0',
         ]);
