@@ -7,8 +7,6 @@ import Swal from 'sweetalert2';
 
 // Shared State
 const KegiatanArmadas = ref([]);
-const kendaraanList = ref([]);
-const driverList = ref([]);
 const startDate = ref(''); // State Baru
 const endDate = ref('');   // State Baru
 const isLoading = ref(false);
@@ -47,36 +45,8 @@ export function useKegiatanArmada() {
         }
     };
 
-    const fetchKendaraan = async () => {
-        try {
-            const response = await kendaraanService.getKendaraan();
-            kendaraanList.value = response.data.map(item => ({
-                value: item.id,
-                label: item.kode
-            }))
-        } catch (error) {
-            console.log("Gagal memuat kendaraan:", error)
-        }
-    }
-
-    const fetchDriver = async () => {
-        try {
-            const response = await driverService.getDrivers();
-            driverList.value = response.data.map(item => ({
-                value: item.id,
-                label: item.nama
-            }))
-        } catch (error) {
-            console.log("Gagal memuat driver:", error)
-        }
-    }
-
     const validateForm = () => {
         errors.value = {};
-
-        if (!formKegiatanArmada.kendaraan_id) errors.value.kendaraan_id = 'Pilih Kendaraan terlebih dahulu.';
-
-        if (!formKegiatanArmada.driver_id) errors.value.driver_id = 'Pilih Driver terlebih dahulu.';
 
         if (formKegiatanArmada.rit === null || formKegiatanArmada.rit === '') {
             errors.value.rit = 'RIT tidak boleh kosong.';
@@ -84,10 +54,6 @@ export function useKegiatanArmada() {
 
         if (!formKegiatanArmada.satuan || formKegiatanArmada.satuan.trim() === '') {
             errors.value.satuan = 'Satuan tidak boleh kosong.';
-        }
-
-        if (formKegiatanArmada.volume === null || formKegiatanArmada.volume === '') {
-            errors.value.volume = 'Volume tidak boleh kosong.';
         }
 
         return Object.keys(errors.value).length === 0;
@@ -99,11 +65,8 @@ export function useKegiatanArmada() {
         try {
             const payload = {
                 id: formKegiatanArmada.id,
-                kendaraan: formKegiatanArmada.kendaraan_id,
-                driver: formKegiatanArmada.driver_id,
                 rit: formKegiatanArmada.rit,
                 satuan: formKegiatanArmada.satuan,
-                volume: formKegiatanArmada.volume,
                 upahhariankenet: formKegiatanArmada.upahhariankenet,
                 umluarkotatelahterbayar: formKegiatanArmada.umluarkotatelahterbayar,
                 umpengajuan: formKegiatanArmada.umpengajuan,
@@ -139,11 +102,8 @@ export function useKegiatanArmada() {
         isEdit.value = true;
         errors.value = {};
         formKegiatanArmada.id = item.id;
-        formKegiatanArmada.kendaraan_id = item.kendaraan_id;
-        formKegiatanArmada.driver_id = item.driver_id;
         formKegiatanArmada.rit = item.rit;
         formKegiatanArmada.satuan = item.satuan;
-        formKegiatanArmada.volume = item.volume;
         formKegiatanArmada.upahhariankenet = item.upahhariankenet;
         formKegiatanArmada.umluarkotatelahterbayar = item.umluarkotatelahterbayar;
         formKegiatanArmada.umpengajuan = item.umpengajuan;
@@ -151,33 +111,6 @@ export function useKegiatanArmada() {
 
         const modal = new bootstrap.Modal(document.getElementById('modalKegiatanArmada'));
         modal.show();
-    };
-
-    const handleDelete = async (item) => {
-        const result = await Swal.fire({
-            title: 'Apakah Anda yakin?',
-            text: `Data Kegiatan Armada "${item.jarak.material.material}" yang dihapus tidak dapat dikembalikan!`,
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Ya, hapus!',
-            cancelButtonText: 'Batal',
-            reverseButtons: true
-        });
-
-        if (result.isConfirmed) {
-            isLoading.value = true;
-            try {
-                const payload = { id: item.id };
-                await kegiatanarmadaService.deleteKegiatanArmada(payload);
-                notify.success('Data Kegiatan Armada berhasil dihapus.');
-                await fetchKegiatanArmada();
-            } catch (error) {
-                notify.error('Gagal menghapus data Kegiatan Armada.');
-            } finally {
-                isLoading.value = false;
-            }
-        }
     };
 
     const handleRefresh = async () => {
@@ -197,9 +130,10 @@ export function useKegiatanArmada() {
         return (
             String(item.jarak?.jarak || '').toLowerCase().includes(query) ||
             String(item.jarak?.hargaupah || '').toLowerCase().includes(query) ||
-            String(item.material?.material || '').toLowerCase().includes(query) ||
-            String(item.kendaraan?.nomor || '').toLowerCase().includes(query) ||
-            String(item.driver?.nama || '').toLowerCase().includes(query) ||
+            String(item.jarak?.source?.material.material || '').toLowerCase().includes(query) ||
+            String(item.tanggal || '').toLowerCase().includes(query) ||
+            String(item.jarak?.source?.kendaraan?.kode || '').toLowerCase().includes(query) ||
+            String(item.jarak?.source?.driver?.nama || '').toLowerCase().includes(query) ||
             String(item.rit || '').toLowerCase().includes(query) ||
             String(item.satuan || '').toLowerCase().includes(query) ||
             String(item.volume || '').toLowerCase().includes(query) ||
@@ -240,7 +174,7 @@ export function useKegiatanArmada() {
             acc.jarakTotal += Number(item.jarak?.jarak || 0);
             acc.hargaTotal += Number(item.jarak?.hargaupah || 0);
             acc.ritTotal += Number(item.rit || 0);
-            acc.volumeTotal += Number(item.volume || 0);
+            acc.volumeTotal += Number(item.jarak?.source.volume || 0);
             acc.upahkenetTotal += Number(item.upahhariankenet|| 0);
             acc.umluarkotatelahterbayarTotal += Number(item.umluarkotatelahterbayar || 0);
             acc.umpengajuanTotal += Number(item.umpengajuan || 0);
@@ -248,6 +182,8 @@ export function useKegiatanArmada() {
             acc.upahTotal += Number(item.upah || 0);
             acc.jumlahTotal += Number(item.jumlah || 0);
             acc.penjualanTotal += Number(item.penjualan || 0);
+            acc.hargasolarTotal += Number(item.hargasolar || 0);
+            acc.nominalbiayasolarTotal += Number(item.nominalbiayasolar || 0);
             return acc;
         }, {
             jarakTotal: 0,
@@ -260,7 +196,9 @@ export function useKegiatanArmada() {
             insentifataulemburTotal: 0,
             upahTotal: 0,
             jumlahTotal: 0,
-            penjualanTotal: 0
+            penjualanTotal: 0,
+            hargasolarTotal:0,
+            nominalbiayasolarTotal: 0,
         });
     });
 
@@ -280,13 +218,13 @@ export function useKegiatanArmada() {
     };
 
     return {
-        KegiatanArmadas, kendaraanList, driverList, isLoading, searchQuery, currentPage, startDate, endDate, isEdit, formKegiatanArmada,
+        KegiatanArmadas, isLoading, searchQuery, currentPage, startDate, endDate, isEdit, formKegiatanArmada,
         errors,
         totalPages,
         totalFooter,
         formatNumber,
         filteredKegiatanArmada,
         paginatedKegiatanArmada,
-        fetchKegiatanArmada, fetchKendaraan, fetchDriver, handleEdit, handleDelete, handleRefresh, submitKegiatanArmada, resetDateFilter
+        fetchKegiatanArmada, handleEdit, handleRefresh, submitKegiatanArmada, resetDateFilter
     };
 }

@@ -14,6 +14,7 @@ use App\Http\Controllers\Authentication\AuthController;
 use App\Http\Controllers\KegiatanArmada\InvoiceController;
 use App\Http\Controllers\KegiatanArmada\JarakDanHargaController;
 use App\Http\Controllers\KegiatanArmada\KegiatanArmadaController;
+use App\Http\Controllers\Master\BahanBakarController;
 use App\Http\Controllers\Timbangan\AsphaltMixingPlantController;
 use App\Http\Controllers\Timbangan\ConcreteBatchingPlantController;
 use App\Http\Controllers\Timbangan\StoneCrusherController;
@@ -33,7 +34,7 @@ Route::middleware(['guest'])->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
 });
 
-Route::middleware(['auth:sanctum'])->group(function(){
+Route::middleware(['auth:sanctum'])->group(function () {
     //API ROLE
     Route::get('role/getRole', [RoleController::class, 'getRole']);
     Route::post('role/storeRole', [RoleController::class, 'storeRole']);
@@ -61,6 +62,12 @@ Route::middleware(['auth:sanctum'])->group(function(){
     Route::post('suplier/storeSuplier', [SuplierController::class, 'storeSuplier']);
     Route::post('suplier/updateSuplier', [SuplierController::class, 'updateSuplier']);
     Route::post('suplier/deleteSuplier', [SuplierController::class, 'deleteSuplier']);
+
+    //API BAHAN BAKAR
+    Route::get('bahanbakar/getBahanBakar', [BahanBakarController::class, 'getBahanBakar']);
+    Route::post('bahanbakar/storeBahanBakar', [BahanBakarController::class, 'storeBahanBakar']);
+    Route::post('bahanbakar/updateBahanBakar', [BahanBakarController::class, 'updateBahanBakar']);
+    Route::post('bahanbakar/deleteBahanBakar', [BahanBakarController::class, 'deleteBahanBakar']);
 
     // API KENDARAAN
     Route::get('kendaraan/getKendaraan', [KendaraanController::class, 'getKendaraan']);

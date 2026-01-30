@@ -16,11 +16,8 @@ class KegiatanArmada extends Model
     protected $fillable = [
         'tanggal',
         'jarak_id',
-        'kendaraan_id',
-        'driver_id',
         'rit',
         'satuan',
-        'volume',
         'upahhariankenet',
         'umluarkotatelahterbayar',
         'umpengajuan',

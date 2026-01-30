@@ -46,11 +46,6 @@
                                 @click="handleRefresh" :class="{ 'disabled': isLoading }">
                                 <i class="feather-rotate-cw" :class="{ 'fa-spin': isLoading }"></i>
                             </button>
-
-                            <button class="btn btn-primary btn-sm p-2 d-flex align-items-center shadow-sm"
-                                @click="handleCreate(currentTab)">
-                                <i class="feather-plus"></i>
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -88,7 +83,7 @@
                             <tr v-for="(item, index) in paginatedJarakDanHarga" :key="item.id" class="text-center">
                                 <td>{{ ((currentPage - 1) * 10) + (index + 1) }}</td>
                                 <td>{{ item.kode }}</td>
-                                <td>{{ item.material.material }}</td>
+                                <td>{{ item?.source?.material.material }}</td>
                                 <td>{{ item.pengambilan }}</td>
                                 <td>{{ item.tujuan }}</td>
                                 <td>{{ item.jarak }}</td>
@@ -106,9 +101,6 @@
                                     <div class="actions d-flex justify-content-center">
                                         <a @click="handleEdit(item)" class="btn btn-sm bg-success-light me-2">
                                             <i class="feather-edit"></i>
-                                        </a>
-                                        <a @click="handleDelete(item)" class="btn btn-sm bg-danger-light">
-                                            <i class="feather-trash"></i>
                                         </a>
                                     </div>
                                 </td>

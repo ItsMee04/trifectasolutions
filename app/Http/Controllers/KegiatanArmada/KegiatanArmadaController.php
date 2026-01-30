@@ -4,14 +4,27 @@ namespace App\Http\Controllers\KegiatanArmada;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Timbangan\StoneCrusher;
 use App\Models\KegiatanArmada\JarakHarga;
+use App\Models\Timbangan\AsphaltMixingPlant;
 use App\Models\KegiatanArmada\KegiatanArmada;
+use App\Models\Timbangan\ConcreteBatchingPlant;
 
 class KegiatanArmadaController extends Controller
 {
-    public function getKegiatanArmada(Request $request)
+    public function getKegiatanArmada()
     {
-        $data = KegiatanArmada::with(['jarak', 'jarak.material', 'kendaraan', 'driver'])->where('status', 1)->get();
+        $data = KegiatanArmada::where('status', 1) // Menambahkan filter di tabel utama
+            ->with([
+                'jarak.source' => function ($morphTo) {
+                    $morphTo->morphWith([
+                        StoneCrusher::class => ['material', 'kendaraan', 'driver', 'suplier'],
+                        ConcreteBatchingPlant::class => ['material', 'kendaraan', 'driver', 'suplier'],
+                        AsphaltMixingPlant::class => ['material', 'kendaraan', 'driver', 'suplier'],
+                    ]);
+                }
+            ])
+            ->get();
 
         if ($data->isEmpty()) {
             return response()->json([
@@ -33,54 +46,68 @@ class KegiatanArmadaController extends Controller
     public function updateKegiatanArmada(Request $request)
     {
         $request->validate([
-            'kendaraan'                 => 'required|exists:kendaraan,id',
-            'driver'                    => 'required|exists:driver,id',
-            'rit'                       => 'required',
+            'id'                        => 'required|exists:kegiatanarmada,id',
+            'rit'                       => 'required|numeric',
             'satuan'                    => 'required',
-            'volume'                    => 'required',
-            'upahhariankenet'           => 'required',
-            'umluarkotatelahterbayar'   => 'required',
-            'umpengajuan'               => 'required',
-            'insentifataulembur'        => 'required',
+            'upahhariankenet'           => 'required|numeric',
+            'umluarkotatelahterbayar'   => 'required|numeric',
+            'umpengajuan'               => 'required|numeric',
+            'insentifataulembur'        => 'required|numeric',
         ]);
 
-        $kegiatan = KegiatanArmada::find($request->id);
-        $jarak = $kegiatan->jarak_id;
+        // 1. Gunakan relasi 'jarak' dan 'jarak.source' sesuai nama di model Anda
+        $kegiatan = KegiatanArmada::with(['jarak.source'])->findOrFail($request->id);
 
-        $jarakKegiatan = JarakHarga::where('id', $kegiatan->jarak_id)->first();
+        // 2. Keamanan: Cek apakah relasi jarak tersedia
+        if (!$kegiatan->jarak) {
+            return response()->json([
+                'status' => 404,
+                'success' => false,
+                'message' => 'Relasi Jarak tidak ditemukan. Pastikan jarak_id valid.'
+            ], 404);
+        }
+
+        $jarakKegiatan = $kegiatan->jarak;
         $upahDriver = $jarakKegiatan->hargaupah;
         $hargaJasaAngkut = $jarakKegiatan->hargajasa;
 
-        // UPAH
+        // 3. Ambil Volume dari source (SC/CBP/AMP)
+        // Gunakan (float) dan pastikan source tidak null
+        $volume = 0;
+        if ($jarakKegiatan->source) {
+            $volume = (float) $jarakKegiatan->source->volume;
+        }
+
+        // 4. Hitung UPAH & JUMLAH
         $upah = $upahDriver * $request->rit;
         $jumlah = $upah + $request->insentifataulembur + $request->umpengajuan + $request->upahhariankenet;
 
-        if ($request->volume == 0) {
-            $penjualan = $hargaJasaAngkut * 1;
+        // 5. Hitung PENJUALAN
+        if ($request->satuan == "RIT") {
+            $penjualan = $hargaJasaAngkut * $request->rit;
         } else {
-            $penjualan = $hargaJasaAngkut * $request->volume;
+            // Jika satuan selain RIT (misal M3), gunakan Volume dari source
+            $penjualan = $hargaJasaAngkut * $request->rit * $volume;
         }
 
+        // 6. Update data ke database
         $kegiatan->update([
-            'kendaraan_id'              => $request->kendaraan,
-            'driver_id'                 => $request->driver,
             'rit'                       => $request->rit,
-            'satuan'                    => $request->satuan,
-            'volume'                    => $request->volume,
+            'satuan'                    => strtoupper($request->satuan),
             'upahhariankenet'           => $request->upahhariankenet,
             'umluarkotatelahterbayar'   => $request->umluarkotatelahterbayar,
             'umpengajuan'               => $request->umpengajuan,
             'insentifataulembur'        => $request->insentifataulembur,
             'upah'                      => $upah,
             'jumlah'                    => $jumlah,
-            'penjualan'                 => $penjualan,
+            'penjualan'                 => $penjualan, // Mengupdate volume di kegiatan jika ada kolomnya
         ]);
 
         return response()->json([
             'status'    => 200,
             'success'   => true,
             'message'   => 'Data kegiatan armada berhasil diupdate',
-            'data'      => $penjualan
+            'data'      => $kegiatan
         ]);
     }
 

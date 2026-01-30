@@ -11,104 +11,54 @@
                 </div>
                 <form @submit.prevent="handleSubmit">
                     <div class="modal-body p-4">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-4">
-                                    <div class="form-group local-forms mb-3">
-                                        <label> Material <span class="login-danger">*</span></label>
-                                        <Multiselect v-model="formJarakDanHarga.material_id" :options="materialList"
-                                            :searchable="true" placeholder="Pilih Material"
-                                            noOptionsText="Memuat data..."
-                                            :class="{ 'is-invalid': errors.material_id }" />
-                                        <div class="invalid-feedback" v-if="errors.material_id">
-                                            {{ Array.isArray(errors.material_id) ? errors.material_id[0] :
-                                                errors.material_id }}
-                                        </div>
+                        <div class="col-md-12">
+                            <div class="mb-4">
+                                <div class="form-group local-forms mb-3">
+                                    <label>Jarak <span class="login-danger">*</span></label>
+                                    <input v-model="formJarakDanHarga.jarak" type="text" class="form-control"
+                                        :class="{ 'is-invalid': errors.jarak }">
+                                    <div class="invalid-feedback" v-if="errors.jarak">
+                                        {{ Array.isArray(errors.jarak) ? errors.jarak[0] : errors.jarak }}
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="mb-4">
-                                    <div class="form-group local-forms mb-3">
-                                        <label>Pengambilan <span class="login-danger">*</span></label>
-                                        <input
-                                            v-model="formJarakDanHarga.pengambilan"
-                                            type="text"
-                                            class="form-control"
-                                            :class="{ 'is-invalid': errors.pengambilan }"
-                                            @input="showSuggestionsPengambilan = true"
-                                            @focus="showSuggestionsPengambilan = true"
-                                            autocomplete="off"
-                                        >
+                        </div>
 
-                                        <ul v-if="showSuggestionsPengambilan && filteredSupplierSuggestions.length > 0"
-                                            class="list-group position-absolute w-100 shadow-lg"
-                                            style="z-index: 1050; max-height: 200px; overflow-y: auto; top: 100%;">
-                                            <li
-                                                v-for="(nama, index) in filteredSupplierSuggestions"
-                                                :key="index"
-                                                class="list-group-item list-group-item-action"
-                                                style="cursor: pointer; font-size: 0.85rem;"
-                                                @click="selectPengambilan(nama)"
-                                            >
-                                                {{ nama }}
-                                            </li>
-                                        </ul>
-                                        <div class="invalid-feedback" v-if="errors.pengambilan">
-                                            {{ Array.isArray(errors.pengambilan) ? errors.pengambilan[0] : errors.pengambilan }}
-                                        </div>
+                        <div class="col-md-12">
+                            <div class="mb-4">
+                                <div class="form-group local-forms mb-3">
+                                    <label>Harga Upah Driver <span class="login-danger">*</span></label>
+                                    <input v-model="formJarakDanHarga.hargaupah" type="text" class="form-control"
+                                        :class="{ 'is-invalid': errors.hargaupah }">
+                                    <div class="invalid-feedback" v-if="errors.hargaupah">
+                                        {{ Array.isArray(errors.hargaupah) ? errors.hargaupah[0] : errors.hargaupah
+                                        }}
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-4">
-                                    <div class="form-group local-forms mb-3">
-                                        <label>Tujuan <span class="login-danger">*</span></label>
-                                        <input v-model="formJarakDanHarga.tujuan" type="text" class="form-control"
-                                            :class="{ 'is-invalid': errors.tujuan }">
-                                        <div class="invalid-feedback" v-if="errors.tujuan">
-                                            {{ Array.isArray(errors.tujuan) ? errors.tujuan[0] : errors.tujuan }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-4">
-                                    <div class="form-group local-forms mb-3">
-                                        <label>Jarak <span class="login-danger">*</span></label>
-                                        <input v-model="formJarakDanHarga.jarak" type="text" class="form-control"
-                                            :class="{ 'is-invalid': errors.jarak }">
-                                        <div class="invalid-feedback" v-if="errors.jarak">
-                                            {{ Array.isArray(errors.jarak) ? errors.jarak[0] : errors.jarak }}
-                                        </div>
+                        <div class="col-md-12">
+                            <div class="mb-4">
+                                <div class="form-group local-forms mb-3">
+                                    <label>Harga Jasa Angkut <span class="login-danger">*</span></label>
+                                    <input v-model="formJarakDanHarga.hargajasa" type="text" class="form-control"
+                                        :class="{ 'is-invalid': errors.hargajasa }">
+                                    <div class="invalid-feedback" v-if="errors.hargajasa">
+                                        {{ Array.isArray(errors.hargajasa) ? errors.hargajasa[0] : errors.hargajasa
+                                        }}
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-4">
-                                    <div class="form-group local-forms mb-3">
-                                        <label>Harga Upah Driver <span class="login-danger">*</span></label>
-                                        <input v-model="formJarakDanHarga.hargaupah" type="text" class="form-control"
-                                            :class="{ 'is-invalid': errors.hargaupah }">
-                                        <div class="invalid-feedback" v-if="errors.hargaupah">
-                                            {{ Array.isArray(errors.hargaupah) ? errors.hargaupah[0] : errors.hargaupah }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-4">
-                                    <div class="form-group local-forms mb-3">
-                                        <label>Harga Jasa Angkut <span class="login-danger">*</span></label>
-                                        <input v-model="formJarakDanHarga.hargajasa" type="text" class="form-control"
-                                            :class="{ 'is-invalid': errors.hargajasa }">
-                                        <div class="invalid-feedback" v-if="errors.hargajasa">
-                                            {{ Array.isArray(errors.hargajasa) ? errors.hargajasa[0] : errors.hargajasa }}
-                                        </div>
+                        <div class="col-md-12">
+                            <div class="mb-4">
+                                <div class="form-group local-forms mb-3">
+                                    <label>Harga Solar <span class="login-danger">*</span></label>
+                                    <input v-model="formJarakDanHarga.hargasolar" type="text" class="form-control"
+                                        :class="{ 'is-invalid': errors.hargasolar }">
+                                    <div class="invalid-feedback" v-if="errors.hargasolar">
+                                        {{ Array.isArray(errors.hargasolar) ? errors.hargasolar[0] : errors.hargasolar
+                                        }}
                                     </div>
                                 </div>
                             </div>
@@ -136,24 +86,12 @@ import { useJarakDanHarga } from '../composables/useJarakHarga';
 const {
     isEdit,
     formJarakDanHarga,
-    materialList,
     errors,
-    fetchMaterial,
     submitJarakDanHarga,
     isLoading,
-    // Tambahkan property baru ini:
-    fetchSupplier,
-    filteredSupplierSuggestions,
-    showSuggestionsPengambilan,
-    selectPengambilan
 } = useJarakDanHarga();
 
 const handleSubmit = async () => {
     await submitJarakDanHarga();
 }
-
-onMounted(() => {
-    fetchMaterial();
-    fetchSupplier(); // Panggil data supplier saat modal load
-});
 </script>

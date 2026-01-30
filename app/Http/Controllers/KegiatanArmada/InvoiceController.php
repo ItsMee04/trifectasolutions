@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\KegiatanArmada;
 
-use App\Http\Controllers\Controller;
-use App\Models\KegiatanArmada\KegiatanArmada;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Models\Timbangan\StoneCrusher;
+use App\Models\Timbangan\AsphaltMixingPlant;
+use App\Models\KegiatanArmada\KegiatanArmada;
+use App\Models\Timbangan\ConcreteBatchingPlant;
 
 class InvoiceController extends Controller
 {
@@ -16,19 +19,27 @@ class InvoiceController extends Controller
             'kategori'    => 'required'
         ]);
 
-        $data = KegiatanArmada::with(['jarak.material.kategori', 'kendaraan', 'driver'])
+        $data = KegiatanArmada::with(['jarak.source.material.kategori', 'jarak.source.kendaraan', 'jarak.source.driver'])
             ->where('status', 1)
-            // 1. Filter Pengambilan & Tujuan di tabel Jarak
             ->whereHas('jarak', function ($query) use ($request) {
+                // 1. Filter Pengambilan & Tujuan di tabel Jarak
                 $query->where('pengambilan', $request->pengambilan)
                     ->where('tujuan', $request->tujuan)
-                    // 2. Masuk lebih dalam ke relasi Material
-                    ->whereHas('material', function ($qMaterial) use ($request) {
-                        // 3. Masuk lebih dalam lagi ke relasi Kategori
-                        $qMaterial->whereHas('kategori', function ($qKategori) use ($request) {
-                            // Filter berdasarkan nama kategori atau ID
-                            // Sesuaikan 'kategori' di bawah ini dengan nama kolom di tabel kategori Anda
-                            $qKategori->where('kategori', $request->kategori);
+
+                    // 2. Masuk ke relasi Polymorphic 'source'
+                    ->whereHasMorph('source', [
+                        StoneCrusher::class,
+                        ConcreteBatchingPlant::class,
+                        AsphaltMixingPlant::class
+                    ], function ($qSource) use ($request) {
+
+                        // 3. Masuk ke relasi Material yang ada di dalam Source
+                        $qSource->whereHas('material', function ($qMaterial) use ($request) {
+
+                            // 4. Masuk ke relasi Kategori
+                            $qMaterial->whereHas('kategori', function ($qKategori) use ($request) {
+                                $qKategori->where('kategori', $request->kategori);
+                            });
                         });
                     });
             })

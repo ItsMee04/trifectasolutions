@@ -1,4 +1,4 @@
-import { ref, computed, reactive } from 'vue';
+import { ref, computed, reactive, watch } from 'vue';
 import { concretebatchingplantService } from '../services/cbpService';
 import { materialService } from '../../material/services/materialService';
 import { kendaraanService } from '../../kendaraan/services/kendaraanService'
@@ -194,6 +194,18 @@ export function useCBP() {
         const modal = new bootstrap.Modal(document.getElementById('modalCBP'));
         modal.show();
     };
+
+    watch(
+        () => [formCBP.berattotal, formCBP.beratkendaraan],
+        ([total, kendaraan]) => {
+            const t = parseFloat(total) || 0;
+            const k = parseFloat(kendaraan) || 0;
+            const hasil = t - k;
+
+            // Set hasil ke beratmuatan (jika hasil negatif set ke 0 atau biarkan saja)
+            formCBP.beratmuatan = hasil > 0 ? hasil : 0;
+        }
+    );
 
     const handleEdit = (item) => {
         isEdit.value = true;

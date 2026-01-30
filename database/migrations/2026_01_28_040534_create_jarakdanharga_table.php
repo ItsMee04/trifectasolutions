@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('jarakdanharga', function (Blueprint $table) {
             $table->id();
+            $table->nullableMorphs('source');
             $table->string('kode', 100);
             $table->date('tanggal');
-            $table->unsignedBigInteger('material_id');
             $table->string('pengambilan', 100);
             $table->string('tujuan', 100);
             $table->decimal('jarak', 5, 2)->default(0.0);
@@ -23,8 +23,6 @@ return new class extends Migration
             $table->integer('hargajasa')->default(0);
             $table->integer('status')->default(1);
             $table->timestamps();
-
-            $table->foreign('material_id')->references('id')->on('material')->onDelete('cascade');
         });
     }
 

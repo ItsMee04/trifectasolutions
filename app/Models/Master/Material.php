@@ -2,7 +2,11 @@
 
 namespace App\Models\Master;
 
+use App\Models\Master\Kategori;
+use App\Models\Timbangan\StoneCrusher;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Timbangan\AsphaltMixingPlant;
+use App\Models\Timbangan\ConcreteBatchingPlant;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -57,5 +61,23 @@ class Material extends Model
     public function kategori(): BelongsTo
     {
         return $this->belongsTo(Kategori::class, 'kategori_id', 'id');
+    }
+
+    // Relasi ke Stone Crusher
+    public function stoneCrushers()
+    {
+        return $this->hasMany(StoneCrusher::class, 'material_id');
+    }
+
+    // Relasi ke Concrete Batching Plant
+    public function concretePlants()
+    {
+        return $this->hasMany(ConcreteBatchingPlant::class, 'material_id');
+    }
+
+    // Relasi ke Asphalt Mixing Plant
+    public function asphaltPlants()
+    {
+        return $this->hasMany(AsphaltMixingPlant::class, 'material_id');
     }
 }

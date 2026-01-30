@@ -74,20 +74,22 @@
                             <th style="width: 20%">Upah</th>
                             <th style="width: 20%">Jumlah</th>
                             <th style="width: 20%">Penjualan</th>
+                            <th style="width: 20%">Harga Solar</th>
+                            <th style="width: 20%">Nominal Biaya Solar</th>
                             <th style="width: 20%">Status</th>
                             <th style="width: 20%">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-if="isLoading">
-                            <td colspan="21" class="text-center p-5">
+                            <td colspan="23" class="text-center p-5">
                                 <div class="spinner-border text-primary" users="status"></div>
                                 <p class="mt-2 mb-0">Memuat data...</p>
                             </td>
                         </tr>
 
                         <tr v-else-if="!paginatedKegiatanArmada || paginatedKegiatanArmada.length === 0">
-                            <td colspan="21" class="text-center p-5">Tidak ada data.</td>
+                            <td colspan="23" class="text-center p-5">Tidak ada data.</td>
                         </tr>
 
                         <template v-else>
@@ -95,13 +97,13 @@
                                 <td>{{ ((currentPage - 1) * 10) + (index + 1) }}</td>
                                 <td>{{ item.jarak?.jarak }}</td>
                                 <td>{{ formatNumber(item.jarak?.hargaupah) }}</td>
-                                <td>{{ item.jarak.material.material }}</td>
+                                <td>{{ item.jarak?.source?.material.material }}</td>
                                 <td>{{ item.tanggal }}</td>
-                                <td>{{ item.kendaraan?.nomor }}</td>
-                                <td>{{ item.driver?.nama }}</td>
+                                <td>{{ item.jarak?.source?.kendaraan?.kode }}</td>
+                                <td>{{ item.jarak?.source?.driver?.nama }}</td>
                                 <td>{{ item.rit }}</td>
                                 <td>{{ item.satuan }}</td>
-                                <td>{{ item.volume }}</td>
+                                <td>{{ item.jarak?.source?.volume }}</td>
                                 <td>{{ item.jarak?.pengambilan }}</td>
                                 <td>{{ item.jarak?.tujuan }}</td>
                                 <td>{{ formatNumber(item.upahhariankenet) }}</td>
@@ -111,6 +113,8 @@
                                 <td>{{ formatNumber(item.upah) }}</td>
                                 <td>{{ formatNumber(item.jumlah) }}</td>
                                 <td>{{ formatNumber(item.penjualan) }}</td>
+                                <td>{{ formatNumber(item.hargasolar) }}</td>
+                                <td>{{ formatNumber(item.nominalbiayasolar) }}</td>
                                 <td>
                                     <span v-if="item.status == 1" class="badge bg-success">
                                         ACTIVE
@@ -124,9 +128,6 @@
                                         <a @click="handleEdit(item)" class="btn btn-sm bg-success-light me-2">
                                             <i class="feather-edit"></i>
                                         </a>
-                                        <a @click="handleDelete(item)" class="btn btn-sm bg-danger-light">
-                                            <i class="feather-trash"></i>
-                                        </a>
                                     </div>
                                 </td>
                             </tr>
@@ -136,12 +137,12 @@
                     <tfoot v-if="!isLoading && paginatedKegiatanArmada.length > 0">
                         <tr class="text-center fw-bold bg-light">
                             <td colspan="1" class="text-end">TOTAL</td>
-                            <td>{{ formatNumber(totalFooter.jarakTotal) }}</td>
+                            <td>{{ formatNumber(totalFooter.jarakTotal,2) }}</td>
                             <td>{{ formatNumber(totalFooter.hargaTotal) }}</td>
                             <td colspan="4" class="text-end"></td>
                             <td>{{ formatNumber(totalFooter.ritTotal) }}</td>
                             <td colspan="1" class="text-end"></td>
-                            <td>{{ formatNumber(totalFooter.volumeTotal) }}</td>
+                            <td>{{ formatNumber(totalFooter.volumeTotal,2) }}</td>
                             <td colspan="2" class="text-end"></td>
                             <td>{{ formatNumber(totalFooter.upahkenetTotal) }}</td>
                             <td>{{ formatNumber(totalFooter.umluarkotatelahterbayarTotal) }}</td>
@@ -150,6 +151,8 @@
                             <td>{{ formatNumber(totalFooter.upahTotal) }}</td>
                             <td>{{ formatNumber(totalFooter.jumlahTotal) }}</td>
                             <td>{{ formatNumber(totalFooter.penjualanTotal) }}</td>
+                            <td>{{ formatNumber(totalFooter.hargasolarTotal) }}</td>
+                            <td>{{ formatNumber(totalFooter.nominalbiayasolarTotal) }}</td>
                             <td colspan="2"></td>
                         </tr>
                     </tfoot>
@@ -195,7 +198,6 @@ import { useKegiatanArmada } from '../composables/useKegiatanArmada';
 // Destructure semua yang dibutuhkan dari composable
 const {
     handleEdit,
-    handleDelete,
     handleRefresh,
     formatNumber,
 

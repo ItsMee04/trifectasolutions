@@ -10,7 +10,7 @@ class KendaraanController extends Controller
 {
     public function getKendaraan()
     {
-        $data = Kendaraan::where('status', 1)->get();
+        $data = Kendaraan::where('status', 1)->with(['bahanbakar'])->get();
 
         if ($data->isEmpty()) {
             return response()->json([
@@ -33,17 +33,17 @@ class KendaraanController extends Controller
     {
         // 1. Validasi
         $request->validate([
-            'kode'  => 'required|string|max:100',
-            'kendaraan'  => 'required|string|max:100',
-            'jenis' => 'required|string',
-            'nomor' => 'required|string',
+            'kode'          => 'required|string|max:100',
+            'kendaraan'     => 'required|string|max:100',
+            'jenis'         => 'required|exists:bahanbakar,id',
+            'nomor'         => 'required|string',
         ]);
 
         // 2. Simpan data
         $kendaraan = new Kendaraan();
         $kendaraan->kode        = strtoupper($request->input('kode'));
         $kendaraan->kendaraan   = strtoupper($request->input('kendaraan'));
-        $kendaraan->jenis       = strtoupper($request->input('jenis'));
+        $kendaraan->jenis_id    = strtoupper($request->input('jenis'));
         $kendaraan->nomor       = strtoupper($request->input('nomor'));
         $kendaraan->save();
 
@@ -61,7 +61,7 @@ class KendaraanController extends Controller
         $request->validate([
             'kode'  => 'required|string|max:100',
             'kendaraan'  => 'required|string|max:100',
-            'jenis' => 'required|string',
+            'jenis' => 'required|exists:bahanbakar,id',
             'nomor' => 'required|string',
         ]);
 
@@ -78,7 +78,7 @@ class KendaraanController extends Controller
 
         $kendaraan->kode        = strtoupper($request->input('kode'));
         $kendaraan->kendaraan   = strtoupper($request->input('kendaraan'));
-        $kendaraan->jenis       = strtoupper($request->input('jenis'));
+        $kendaraan->jenis_id    = $request->input('jenis');
         $kendaraan->nomor       = strtoupper($request->input('nomor'));
         $kendaraan->save();
 

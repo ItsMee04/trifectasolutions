@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Timbangan;
 
+use Illuminate\Http\Request;
+use App\Models\Master\Suplier;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\Timbangan\AsphaltMixingPlant;
-use Illuminate\Http\Request;
 
 class AsphaltMixingPlantController extends Controller
 {
@@ -39,36 +41,66 @@ class AsphaltMixingPlantController extends Controller
     public function storeAsphaltMixingPlant(Request $request)
     {
         $request->validate([
-            'tanggal'           => 'required|date',
-            'material'          => 'required|exists:material,id',
-            'kendaraan'         => 'required|exists:kendaraan,id',
-            'driver'            => 'required|exists:driver,id',
-            'suplier'           => 'required|exists:suplier,id',
-            'volume'            => 'required',
-            'berattotal'        => 'required',
-            'beratkendaraan'    => 'required',
-            'beratmuatan'       => 'required'
+            'tanggal'        => 'required|date',
+            'material'       => 'required|exists:material,id',
+            'kendaraan'      => 'required|exists:kendaraan,id',
+            'driver'         => 'required|exists:driver,id',
+            'suplier'        => 'required|exists:suplier,id',
+            'jenis'          => 'required|in:IN,OUT',
+            'volume'         => 'required|numeric',
+            'berattotal'     => 'required|numeric',
+            'beratkendaraan' => 'required|numeric',
+            'beratmuatan'    => 'required|numeric'
         ]);
 
-        $data = AsphaltMixingPlant::create([
-            'tanggal'       => $request->tanggal,
-            'material_id'   => $request->material,
-            'kendaraan_id'  => $request->kendaraan,
-            'driver_id'     => $request->driver,
-            'suplier_id'    => $request->suplier,
-            'jenis'         => $request->jenis,
-            'volume'        => $request->volume,
-            'berattotal'    => $request->berattotal,
-            'beratkendaraan' => $request->beratkendaraan,
-            'beratmuatan'   => $request->beratmuatan,
-        ]);
+        try {
+            $data = DB::transaction(function () use ($request) {
+                // 1. Ambil Nama Supplier
+                $suplier = Suplier::findOrFail($request->suplier);
 
-        return response()->json([
-            'status'    => 200,
-            'success'   => true,
-            'message'   => "Data AMP berhasil disimpan",
-            'data'      => $data,
-        ]);
+                // 2. Simpan ke AsphaltMixingPlant
+                $amp = AsphaltMixingPlant::create([
+                    'tanggal'        => $request->tanggal,
+                    'material_id'    => $request->material,
+                    'kendaraan_id'   => $request->kendaraan,
+                    'driver_id'      => $request->driver,
+                    'suplier_id'     => $request->suplier,
+                    'jenis'          => $request->jenis,
+                    'volume'         => $request->volume,
+                    'berattotal'     => $request->berattotal,
+                    'beratkendaraan' => $request->beratkendaraan,
+                    'beratmuatan'    => $request->beratmuatan,
+                ]);
+
+                // 3. Logika Penentuan Pengambilan & Tujuan untuk AMP
+                $pengambilan = ($request->jenis == 'IN') ? $suplier->nama : "SBPS AMP";
+                $tujuan      = ($request->jenis == 'IN') ? "SBPS AMP" : $suplier->nama;
+
+                // 4. Simpan ke JarakDanHarga (Polymorphic)
+                $amp->jarakHarga()->create([
+                    'kode'        => 'AMP-' . strtoupper(bin2hex(random_bytes(3))),
+                    'tanggal'     => $request->tanggal,
+                    'material_id' => $request->material,
+                    'pengambilan' => $pengambilan,
+                    'tujuan'      => $tujuan,
+                ]);
+
+                return $amp;
+            });
+
+            return response()->json([
+                'status'  => 200,
+                'success' => true,
+                'message' => "Data AMP berhasil disimpan",
+                'data'    => $data,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 500,
+                'success' => false,
+                'message' => "Gagal menyimpan data: " . $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function updateAsphaltMixingPlant(Request $request)

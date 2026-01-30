@@ -70,11 +70,11 @@
                             <tr v-for="(item, index) in paginatedInvoice" :key="item.id" class="text-center">
                                 <td>{{ ((currentPage - 1) * 10) + (index + 1) }}</td>
                                 <td>{{ item.tanggal }}</td>
-                                <td>{{ item.driver?.nama }}</td>
-                                <td>{{ item.kendaraan?.nomor }}</td>
-                                <td>{{ item.jarak.material?.material }}</td>
+                                <td>{{ item.jarak?.source?.driver?.nama }}</td>
+                                <td>{{ item.jarak?.source?.kendaraan?.nomor }}</td>
+                                <td>{{ item.jarak?.source?.material?.material }}</td>
                                 <td>{{ item.rit }}</td>
-                                <td>{{ item.volume }}</td>
+                                <td>{{ item.jarak?.source?.volume }}</td>
                                 <td>{{ item.satuan }}</td>
                                 <td>{{ formatNumber(item.jarak?.hargajasa) }}</td>
                                 <td>{{ formatNumber(item.penjualan) }}</td>
@@ -86,7 +86,7 @@
                         <tr class="text-center fw-bold bg-light">
                             <td colspan="5" class="text-end">TOTAL</td>
                             <td>{{ formatNumber(totalFooter.ritTotal) }}</td>
-                            <td>{{ formatNumber(totalFooter.volumeTotal) }}</td>
+                            <td>{{ formatNumber(totalFooter.volumeTotal, 2) }}</td>
                             <td colspan="1" class="text-end"></td>
                             <td>{{ formatNumber(totalFooter.jasaTotal) }}</td>
                             <td>{{ formatNumber(totalFooter.penjualanTotal) }}</td>

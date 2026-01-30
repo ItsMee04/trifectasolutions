@@ -6,14 +6,27 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Models\Timbangan\StoneCrusher;
 use App\Models\KegiatanArmada\JarakHarga;
+use App\Models\Timbangan\AsphaltMixingPlant;
 use App\Models\KegiatanArmada\KegiatanArmada;
+use App\Models\Timbangan\ConcreteBatchingPlant;
 
 class JarakDanHargaController extends Controller
 {
     public function getJarakDanHarga()
     {
-        $data = JarakHarga::where('status', 1)->with('material')->get();
+        $data = JarakHarga::with([
+            'source' => function ($morphTo) {
+                $morphTo->morphWith([
+                    \App\Models\Timbangan\StoneCrusher::class => ['material', 'kendaraan', 'driver', 'suplier'],
+                    \App\Models\Timbangan\ConcreteBatchingPlant::class => ['material', 'kendaraan', 'driver', 'suplier'],
+                    \App\Models\Timbangan\AsphaltMixingPlant::class => ['material', 'kendaraan', 'driver', 'suplier'],
+                ]);
+            }
+        ])
+            ->where('status', 1)
+            ->get();
 
         if ($data->isEmpty()) {
             return response()->json([
@@ -32,94 +45,93 @@ class JarakDanHargaController extends Controller
         ], 200);
     }
 
-    public function storeJarakDanHarga(Request $request)
-    {
-        $request->validate([
-            'material'      => 'required|exists:material,id',
-            'pengambilan'   => 'required|string|max:100',
-            'tujuan'        => 'required|string|max:100',
-            'jarak'         => 'required',
-            'hargaupah'     => 'required|integer|min:0',
-            'hargajasa'     => 'required|integer|min:0',
-        ]);
+    // public function updateJarakDanHarga(Request $request)
+    // {
+    //     $jarakdanharga = JarakHarga::find($request->id);
 
-        DB::beginTransaction();
+    //     if (!$jarakdanharga) {
+    //         return response()->json([
+    //             'status' => 404,
+    //             'success' => false,
+    //             'message' => 'Data jarak & harga tidak ditemukan.',
+    //         ]);
+    //     }
 
-        try {
-            $jarakDanHarga = JarakHarga::create([
-                'tanggal'       => Carbon::now(),
-                'material_id'   => $request->material,
-                'pengambilan'   => strtoupper($request->pengambilan),
-                'tujuan'        => strtoupper($request->tujuan),
-                'jarak'         => $request->jarak,
-                'hargaupah'     => $request->hargaupah,
-                'hargajasa'     => $request->hargajasa,
-            ]);
+    //     // Kita gunakan optional() atau null safe operator agar tidak error jika relasi kosong
+    //     $indexPerKm = $jarakdanharga->source->kendaraan->bahanbakar->indexperkm ?? 0;
 
-            // Pastikan $jarakDanHarga berhasil dibuat
-            if (!$jarakDanHarga) {
-                throw new \Exception('Gagal membuat data jarak dan harga');
-            }
 
-            $kegiatanArmada = KegiatanArmada::create([
-                'tanggal'   => Carbon::now(),
-                'jarak_id'  => $jarakDanHarga->id,
-            ]);
 
-            DB::commit();
+    //     $request->validate([
+    //         'jarak'         => 'required',
+    //         'hargaupah'     => 'required|integer',
+    //         'hargajasa'     => 'required|integer',
+    //     ]);
 
-            return response()->json([
-                'status'    => 201,
-                'success'   => true,
-                'message'   => 'Data Jarak dan Harga beserta Kegiatan Armada berhasil disimpan.',
-            ], 201);
-        } catch (\Exception $e) {
-            DB::rollBack();
+    //     $jarakdanharga->update([
+    //         'jarak'         => $request->jarak,
+    //         'hargaupah'     => $request->hargaupah,
+    //         'hargajasa'     => $request->hargajasa,
+    //     ]);
 
-            return response()->json([
-                'status'    => 500,
-                'success'   => false,
-                'message'   => 'Terjadi kesalahan: ' . $e->getMessage(),
-            ], 500);
-        }
-    }
+    //     return response()->json([
+    //         'status' => 200,
+    //         'success' => true,
+    //         'message' => 'Data jarak & harga berhasil diubah.',
+    //         'data' => $jarakdanharga
+    //     ], 200);
+    // }
 
     public function updateJarakDanHarga(Request $request)
     {
-        $jarakdanharga = JarakHarga::find($request->id);
+        // 1. Eager Load relasi sampai ke tabel BahanBakar
+        $jarakdanharga = JarakHarga::with(['source.kendaraan.bahanbakar'])->find($request->id);
 
         if (!$jarakdanharga) {
-            return response()->json([
-                'status' => 404,
-                'success' => false,
-                'message' => 'Data jarak & harga tidak ditemukan.',
-            ]);
+            return response()->json(['status' => 404, 'success' => false, 'message' => 'Data tidak ditemukan']);
         }
 
         $request->validate([
-            'material'      => 'required|exists:material,id',
-            'pengambilan'   => 'required|string|max:255',
-            'tujuan'        => 'required|string|max:255',
-            'jarak'         => 'required|integer',
-            'hargaupah'     => 'required|integer',
-            'hargajasa'     => 'required|integer',
+            'jarak'     => 'required|numeric',
+            'hargaupah' => 'required|integer',
+            'hargajasa' => 'required|integer',
+            'hargasolar'=> 'required|integer', // Harga BBM per liter (misal 13000)
         ]);
 
-        $jarakdanharga->update([
-            'material'      => $request->material,
-            'pengambilan'   => strtoupper($request->pengambilan),
-            'tujuan'        => strtoupper($request->tujuan),
-            'jarak'         => $request->jarak,
-            'hargaupah'     => $request->hargaupah,
-            'hargajasa'     => $request->hargajasa,
+        // 2. Ambil data indexperkm dari relasi (Gunakan 1 sebagai default untuk menghindari pembagian dengan nol)
+        $indexPerKm = $jarakdanharga->source->kendaraan->bahanbakar->indexperkm ?? 0;
+
+        // 3. Hitung Biaya Bahan Bakar
+        // Rumus: (($jarak * 2) / indexperkm) * harga_bbm
+        $biayabahanbakar = 0;
+        if ($indexPerKm > 0) {
+            $biayabahanbakar = (($request->jarak * 2) / $indexPerKm) * $request->hargasolar;
+        }
+
+        // 4. Update data
+        $inserjarak = $jarakdanharga->update([
+            'jarak'             => $request->jarak,
+            'hargaupah'         => $request->hargaupah,
+            'hargajasa'         => $request->hargajasa,
         ]);
+
+        if ($inserjarak) {
+            KegiatanArmada::where('jarak_id', $request->id)
+                ->update([
+                    'hargasolar'            => $request->hargasolar,
+                    'nominalbiayasolar'     => $biayabahanbakar
+                ]);
+        }
 
         return response()->json([
-            'status' => 200,
+            'status'  => 200,
             'success' => true,
-            'message' => 'Data jarak & harga berhasil diubah.',
-            'data' => $jarakdanharga
-        ], 200);
+            'message' => 'Data berhasil dihitung dan diupdate.',
+            'data'    => [
+                'biayabahanbakar' => $biayabahanbakar,
+                'index_digunakan' => $indexPerKm
+            ]
+        ]);
     }
 
     public function deleteJarakDanHarga(Request $request)

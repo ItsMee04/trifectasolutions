@@ -4,6 +4,7 @@ namespace App\Models\KegiatanArmada;
 
 use App\Models\Master\Material;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\KegiatanArmada\KegiatanArmada;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -15,7 +16,6 @@ class JarakHarga extends Model
     protected $fillable = [
         'tanggal',
         'kode',
-        'material_id',
         'pengambilan',
         'tujuan',
         'jarak',
@@ -55,6 +55,11 @@ class JarakHarga extends Model
         return 'JRK-' . $formattedNumber;
     }
 
+    public function kegiatanArmada()
+    {
+        return $this->hasOne(KegiatanArmada::class, 'jarak_id');
+    }
+
     /**
      * Get the user that owns the JarakDanHarga
      *
@@ -63,5 +68,10 @@ class JarakHarga extends Model
     public function material(): BelongsTo
     {
         return $this->belongsTo(Material::class, 'material_id', 'id');
+    }
+
+    public function source()
+    {
+        return $this->morphTo();
     }
 }

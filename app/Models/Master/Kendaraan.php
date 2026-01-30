@@ -5,6 +5,7 @@ namespace App\Models\Master;
 use App\Models\Master\Material;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Kendaraan extends Model
@@ -15,7 +16,7 @@ class Kendaraan extends Model
     protected $fillable = [
         'kode',
         'kendaraan',
-        'jenis',
+        'jenis_id',
         'nomor',
         'status',
     ];
@@ -28,5 +29,15 @@ class Kendaraan extends Model
     public function material(): HasMany
     {
         return $this->hasMany(Material::class, 'kategori_id', 'id');
+    }
+
+    /**
+     * Get the bahanbakar that owns the Kendaraan
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function bahanbakar(): BelongsTo
+    {
+        return $this->belongsTo(BahanBakar::class, 'jenis_id', 'id');
     }
 }

@@ -92,6 +92,7 @@ const masterItems = [
     { name: 'Users', path: '/users' },
     { name: 'Driver', path: '/driver' },
     { name: 'Suplier', path: '/suplier' },
+    { name: 'Bahan Bakar', path: '/bahanbakar'},
     { name: 'Kendaraan', path: '/kendaraan' },
     { name: 'Kategori', path: '/kategori' },
     { name: 'Material', path: '/material' },

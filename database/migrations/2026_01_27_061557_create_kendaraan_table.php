@@ -15,10 +15,12 @@ return new class extends Migration
             $table->id();
             $table->string('kode', 100);
             $table->string('kendaraan', 100);
-            $table->string('jenis', 100);
+            $table->unsignedBigInteger('jenis_id');
             $table->string('nomor', 100);
             $table->integer('status')->unsigned()->default(1);
             $table->timestamps();
+
+            $table->foreign('jenis_id')->references('id')->on('bahanbakar')->onDelete('cascade');
         });
     }
 

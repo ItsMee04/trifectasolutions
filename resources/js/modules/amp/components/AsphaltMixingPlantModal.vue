@@ -134,10 +134,10 @@
                                     <div class="form-group local-forms mb-3">
                                         <label>Berat Muatan <span class="login-danger">*</span></label>
                                         <input v-model="formAMP.beratmuatan" type="text" class="form-control"
-                                            :class="{ 'is-invalid': errors.beratmuatan }">
+                                            :class="{ 'is-invalid': errors.beratmuatan }" readonly>
                                         <div class="invalid-feedback" v-if="errors.beratmuatan">
                                             {{ Array.isArray(errors.beratmuatan) ? errors.beratmuatan[0] :
-                                                errors.beratmuatan }}
+                                            errors.beratmuatan }}
                                         </div>
                                     </div>
                                 </div>

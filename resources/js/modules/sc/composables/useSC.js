@@ -1,4 +1,4 @@
-import { ref, computed, reactive } from 'vue';
+import { ref, computed, reactive, watch } from 'vue';
 import { stonecrusherService } from '../services/scService';
 import { materialService } from '../../material/services/materialService';
 import { kendaraanService } from '../../kendaraan/services/kendaraanService'
@@ -194,6 +194,18 @@ export function useStoneCrusher() {
         const modal = new bootstrap.Modal(document.getElementById('modalStoneCrusher'));
         modal.show();
     };
+
+    watch(
+        () => [formStoneCrusher.berattotal, formStoneCrusher.beratkendaraan],
+        ([total, kendaraan]) => {
+            const t = parseFloat(total) || 0;
+            const k = parseFloat(kendaraan) || 0;
+            const hasil = t - k;
+
+            // Set hasil ke beratmuatan (jika hasil negatif set ke 0 atau biarkan saja)
+            formStoneCrusher.beratmuatan = hasil > 0 ? hasil : 0;
+        }
+    );
 
     const handleEdit = (item) => {
         isEdit.value = true;

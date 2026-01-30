@@ -35,8 +35,8 @@
                             <div class="col-md-12">
                                 <div class="form-group local-forms mb-3">
                                     <label>Jenis <span class="login-danger">*</span></label>
-                                    <input v-model="formKendaraan.jenis" type="text" class="form-control"
-                                        :class="{ 'is-invalid': errors.jenis }">
+                                    <Multiselect v-model="formKendaraan.jenis" :options="bahanbakarList"
+                                        :searchable="true" placeholder="Pilih Jenis" noOptionsText="Memuat data..." />
                                     <div class="invalid-feedback" v-if="errors.jenis">
                                         {{ Array.isArray(errors.jenis) ? errors.jenis[0] : errors.jenis }}
                                     </div>
@@ -67,13 +67,20 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue';
+import Multiselect from '@vueform/multiselect';
+import '@vueform/multiselect/themes/default.css';
 import { useKendaraan } from '../composables/useKendaraan';
 
 // Ambil state dan action dari composable
-const { isEdit, formKendaraan, isLoading, errors, submitKendaraan } = useKendaraan();
+const { isEdit, formKendaraan, fetchBahanBakar, bahanbakarList, isLoading, errors, submitKendaraan } = useKendaraan();
 
 const handleSubmit = async () => {
     // submitRole akan mengembalikan true jika berhasil
     await submitKendaraan();
 };
+
+onMounted(() => {
+    fetchBahanBakar();
+});
 </script>

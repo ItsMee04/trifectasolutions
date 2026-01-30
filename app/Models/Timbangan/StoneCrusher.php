@@ -3,10 +3,11 @@
 namespace App\Models\Timbangan;
 
 use App\Models\Master\Driver;
-use App\Models\Master\Kendaraan;
-use App\Models\Master\Material;
 use App\Models\Master\Suplier;
+use App\Models\Master\Material;
+use App\Models\Master\Kendaraan;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\KegiatanArmada\JarakHarga;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -99,5 +100,10 @@ class StoneCrusher extends Model
     public function suplier(): BelongsTo
     {
         return $this->belongsTo(Suplier::class, 'suplier_id', 'id');
+    }
+
+    public function jarakHarga()
+    {
+        return $this->morphOne(JarakHarga::class, 'source');
     }
 }

@@ -1,10 +1,12 @@
 import { ref, computed, reactive } from 'vue';
 import { kendaraanService } from '../services/kendaraanService';
+import { bahanbakarService } from '../../bahanbakar/services/bahanbakarService';
 import { notify } from '../../../helper/notification';
 import Swal from 'sweetalert2';
 
 // Shared State
 const kendaraans = ref([]);
+const bahanbakarList = ref([])
 const isLoading = ref(false);
 const searchQuery = ref('');
 const currentPage = ref(1);
@@ -16,7 +18,7 @@ const formKendaraan = reactive({
     id: null,
     kode: '',
     kendaraan: '',
-    jenis: '',
+    jenis: null,
     nomor: '',
 });
 
@@ -34,6 +36,19 @@ export function useKendaraan() {
         }
     };
 
+    const fetchBahanBakar = async () => {
+        try {
+            const response = await bahanbakarService.getBahanBakar();
+            // Map data agar formatnya { value: id, label: 'nama' } sesuai standar Multiselect
+            bahanbakarList.value = response.data.map(bahanbakarList => ({
+                value: bahanbakarList.id,
+                label: bahanbakarList.jenis // Sesuaikan field 'role' dengan nama kolom di tabel roles Anda
+            }));
+        } catch (error) {
+            console.error("Gagal memuat bahan bakar:", error);
+        }
+    };
+
     // --- LOGIKA VALIDASI ---
     const validateForm = () => {
         errors.value = {}; // Reset error
@@ -43,8 +58,9 @@ export function useKendaraan() {
         if (!formKendaraan.kendaraan || formKendaraan.kendaraan.trim() === '') {
             errors.value.kendaraan = 'Nama Kendaraan tidak boleh kosong.';
         }
-        if (!formKendaraan.jenis || formKendaraan.jenis.trim() === '') {
-            errors.value.jenis = 'Jenis Kendaraan tidak boleh kosong.';
+        // 4. TAMBAHKAN validasi kategori
+        if (!formKendaraan.jenis) {
+            errors.value.jenis = 'Pilih Bahan Bakar terlebih dahulu.';
         }
         if (!formKendaraan.nomor || formKendaraan.nomor.trim() === '') {
             errors.value.nomor = 'Nomor Kendaraan tidak boleh kosong.';
@@ -123,7 +139,7 @@ export function useKendaraan() {
         formKendaraan.id = item.id;
         formKendaraan.kode = item.kode;
         formKendaraan.kendaraan = item.kendaraan;
-        formKendaraan.jenis = item.jenis;
+        formKendaraan.jenis = item.jenis_id;
         formKendaraan.nomor = item.nomor;
         const modal = new bootstrap.Modal(document.getElementById('modalKendaraan'));
         modal.show();
@@ -173,7 +189,7 @@ export function useKendaraan() {
         const filteredCount = kendaraans.value.filter(item =>
             (item.kode || '').toLowerCase().includes(query) ||
             (item.kendaraan || '').toLowerCase().includes(query) ||
-            (item.jenis || '').toLowerCase().includes(query) ||
+            (item.jenis?.jenis || '').toLowerCase().includes(query) ||
             (item.nomor || '').toLowerCase().includes(query)
         ).length;
 
@@ -181,14 +197,14 @@ export function useKendaraan() {
     });
 
     return {
-        kendaraans, isLoading, searchQuery, currentPage, isEdit, formKendaraan, errors, totalPages,
+        kendaraans, bahanbakarList, isLoading, searchQuery, currentPage, isEdit, formKendaraan, errors, totalPages,
         filteredKendaraan: computed(() => {
             const query = searchQuery.value.toLowerCase();
             return kendaraans.value.filter(item => {
                 return (
                     (item.kode || '').toLowerCase().includes(query) ||
                     (item.kendaraan || '').toLowerCase().includes(query) ||
-                    (item.jenis || '').toLowerCase().includes(query) ||
+                    (item.bahanbakar?.jenis || '').toLowerCase().includes(query) ||
                     (item.nomor || '').toLowerCase().includes(query) // Pastikan path relasi role benar
                 );
             });
@@ -199,13 +215,13 @@ export function useKendaraan() {
                 return (
                     (item.kode || '').toLowerCase().includes(query) ||
                     (item.kendaraan || '').toLowerCase().includes(query) ||
-                    (item.jenis || '').toLowerCase().includes(query) ||
+                    (item.jenis?.jenis || '').toLowerCase().includes(query) ||
                     (item.nomor || '').toLowerCase().includes(query)
                 );
             });
             const start = (currentPage.value - 1) * itemsPerPage;
             return filtered.slice(start, start + itemsPerPage);
         }),
-        fetchKendaraan, handleCreate, handleEdit, handleDelete, handleRefresh, submitKendaraan
+        fetchKendaraan, fetchBahanBakar, handleCreate, handleEdit, handleDelete, handleRefresh, submitKendaraan
     };
 }

@@ -62,6 +62,12 @@ const routes = [
                     import("@/modules/suplier/views/SuplierView.vue"),
             },
             {
+                path: "bahanbakar",
+                name: "bahanbakar",
+                component: () =>
+                    import("@/modules/bahanbakar/views/BahanBakarView.vue"),
+            },
+            {
                 path: "kendaraan",
                 name: "kendaraan",
                 component: () =>

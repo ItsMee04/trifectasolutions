@@ -1,14 +1,10 @@
 import { ref, computed, reactive } from 'vue';
 import { jarakdanhargaService } from '../services/jarakdanhargaService';
-import { materialService } from '../../material/services/materialService';
-import { suplierService } from '../../suplier/services/suplierService'
 import { notify } from '../../../helper/notification';
 import Swal from 'sweetalert2';
 
 // Shared State
 const JarakHarga = ref([]);
-const materialList = ref([]);
-const supplierList = ref([]);
 const showSuggestionsPengambilan = ref(false);
 const startDate = ref(''); // State Baru
 const endDate = ref('');   // State Baru
@@ -21,12 +17,12 @@ const errors = ref({});
 
 const formJarakDanHarga = reactive({
     id: null,
-    material_id: null,
     pengambilan: '',
     tujuan: '',
     jarak: '',
     hargaupah: '',
     hargajasa: '',
+    hargasolar: ''
 });
 
 export function useJarakDanHarga() {
@@ -45,30 +41,8 @@ export function useJarakDanHarga() {
         }
     };
 
-    const fetchMaterial = async () => {
-        try {
-            const response = await materialService.getMaterial();
-            materialList.value = response.data.map(item => ({
-                value: item.id,
-                label: item.material
-            }))
-        } catch (error) {
-            console.log("Gagal memuat material:", error)
-        }
-    }
-
     const validateForm = () => {
         errors.value = {};
-
-        if (!formJarakDanHarga.material_id) errors.value.material_id = 'Pilih Material terlebih dahulu.';
-
-        if (!formJarakDanHarga.pengambilan || formJarakDanHarga.pengambilan.trim() === '') {
-            errors.value.pengambilan = 'Pengambilan tidak boleh kosong.';
-        }
-
-        if (!formJarakDanHarga.tujuan || formJarakDanHarga.tujuan.trim() === '') {
-            errors.value.tujuan = 'Tujuan tidak boleh kosong.';
-        }
 
         if (formJarakDanHarga.jarak === null || formJarakDanHarga.jarak === '') {
             errors.value.jarak = 'Jarak tidak boleh kosong.';
@@ -88,6 +62,10 @@ export function useJarakDanHarga() {
             errors.value.hargajasa = 'Harga Jasa Angkut boleh kosong.';
         }
 
+        if (formJarakDanHarga.hargasolar === null || formJarakDanHarga.hargasolar === '') {
+            errors.value.hargasolar = 'Harga Jasa Angkut boleh kosong.';
+        }
+
         return Object.keys(errors.value).length === 0;
     };
 
@@ -97,12 +75,12 @@ export function useJarakDanHarga() {
         try {
             const payload = {
                 id: formJarakDanHarga.id,
-                material: formJarakDanHarga.material_id,
                 pengambilan: formJarakDanHarga.pengambilan,
                 tujuan: formJarakDanHarga.tujuan,
                 jarak: formJarakDanHarga.jarak,
                 hargaupah: formJarakDanHarga.hargaupah,
                 hargajasa: formJarakDanHarga.hargajasa,
+                hargasolar: formJarakDanHarga.hargasolar
             };
 
             let response;
@@ -132,61 +110,19 @@ export function useJarakDanHarga() {
         }
     };
 
-    const handleCreate = () => {
-        isEdit.value = false;
-        errors.value = {};
-        formJarakDanHarga.id = null;
-        formJarakDanHarga.material_id = null;
-        formJarakDanHarga.pengambilan = '';
-        formJarakDanHarga.tujuan = '';
-        formJarakDanHarga.jarak = '';
-        formJarakDanHarga.hargaupah = '';
-        formJarakDanHarga.hargajasa = '';
-
-        const modal = new bootstrap.Modal(document.getElementById('modalJarak'));
-        modal.show();
-    };
-
     const handleEdit = (item) => {
         isEdit.value = true;
         errors.value = {};
         formJarakDanHarga.id = item.id;
-        formJarakDanHarga.material_id = item.material_id;
         formJarakDanHarga.pengambilan = item.pengambilan;
         formJarakDanHarga.tujuan = item.tujuan;
         formJarakDanHarga.jarak = item.jarak;
         formJarakDanHarga.hargaupah = item.hargaupah;
         formJarakDanHarga.hargajasa = item.hargajasa;
+        formJarakDanHarga.hargasolar = item.hargasolar;
 
         const modal = new bootstrap.Modal(document.getElementById('modalJarak'));
         modal.show();
-    };
-
-    const handleDelete = async (item) => {
-        const result = await Swal.fire({
-            title: 'Apakah Anda yakin?',
-            text: `Data Jarak & Harga "${item.kode}" yang dihapus tidak dapat dikembalikan!`,
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Ya, hapus!',
-            cancelButtonText: 'Batal',
-            reverseButtons: true
-        });
-
-        if (result.isConfirmed) {
-            isLoading.value = true;
-            try {
-                const payload = { id: item.id };
-                await jarakdanhargaService.deleteJarakDanHarga(payload);
-                notify.success('Data Harga & Jarak berhasil dihapus.');
-                await fetchJarakDanHarga();
-            } catch (error) {
-                notify.error('Gagal menghapus data Harga & Jarak.');
-            } finally {
-                isLoading.value = false;
-            }
-        }
     };
 
     const handleRefresh = async () => {
@@ -205,12 +141,13 @@ export function useJarakDanHarga() {
     const searchMatch = (item, query) => {
         return (
             String(item.kode || '').toLowerCase().includes(query) ||
-            String(item.material?.material || '').toLowerCase().includes(query) ||
+            String(item.source?.material?.material || '').toLowerCase().includes(query) ||
             String(item.pengambilan || '').toLowerCase().includes(query) ||
             String(item.tujuan || '').toLowerCase().includes(query) ||
             String(item.jarak || '').toLowerCase().includes(query) ||
             String(item.hargaupah || '').toLowerCase().includes(query) ||
-            String(item.hargajasa || '').toLowerCase().includes(query)
+            String(item.hargajasa || '').toLowerCase().includes(query) ||
+            String(item.hargasolar || '').toLowerCase().includes(query)
         );
     }
 
@@ -239,8 +176,9 @@ export function useJarakDanHarga() {
             acc.jarakTotal += parseFloat(item.jarak || 0);
             acc.upahTotal += Number(item.hargaupah || 0);
             acc.jasaTotal += Number(item.hargajasa || 0);
+            acc.hargasolarTotal += Number(item.hargasolar || 0);
             return acc;
-        }, { jarakTotal: 0, upahTotal: 0, jasaTotal: 0 });
+        }, { jarakTotal: 0, upahTotal: 0, jasaTotal: 0, hargasolarTotal: 0 });
     });
 
     const totalPages = computed(() => {
@@ -256,17 +194,6 @@ export function useJarakDanHarga() {
         startDate.value = '';
         endDate.value = '';
         currentPage.value = 1;
-    };
-
-    // Ambil data supplier dari service
-    const fetchSupplier = async () => {
-        try {
-            // Ganti supplierService sesuai dengan nama service kamu
-            const response = await suplierService.getSuplier();
-            supplierList.value = response.data || [];
-        } catch (error) {
-            console.error("Gagal memuat supplier:", error);
-        }
     };
 
     // Computed untuk memfilter supplier berdasarkan input "Pengambilan"
@@ -285,18 +212,16 @@ export function useJarakDanHarga() {
     };
 
     return {
-        JarakHarga, materialList, isLoading, searchQuery, currentPage, startDate, endDate, isEdit, formJarakDanHarga,
+        JarakHarga, isLoading, searchQuery, currentPage, startDate, endDate, isEdit, formJarakDanHarga,
         errors,
         totalPages,
         totalFooter,
         formatNumber,
         filteredJarakDanHarga,
         paginatedJarakDanHarga,
-        supplierList,
         showSuggestionsPengambilan,
         filteredSupplierSuggestions,
-        fetchSupplier,
         selectPengambilan,
-        fetchJarakDanHarga, fetchMaterial, handleCreate, handleEdit, handleDelete, handleRefresh, submitJarakDanHarga, resetDateFilter
+        fetchJarakDanHarga, handleEdit, handleRefresh, submitJarakDanHarga, resetDateFilter
     };
 }
