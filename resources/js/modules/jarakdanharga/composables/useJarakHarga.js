@@ -1,12 +1,15 @@
 import { ref, computed, reactive } from 'vue';
 import { jarakdanhargaService } from '../services/jarakdanhargaService';
 import { materialService } from '../../material/services/materialService';
+import { suplierService } from '../../suplier/services/suplierService'
 import { notify } from '../../../helper/notification';
 import Swal from 'sweetalert2';
 
 // Shared State
 const JarakHarga = ref([]);
 const materialList = ref([]);
+const supplierList = ref([]);
+const showSuggestionsPengambilan = ref(false);
 const startDate = ref(''); // State Baru
 const endDate = ref('');   // State Baru
 const isLoading = ref(false);
@@ -69,6 +72,12 @@ export function useJarakDanHarga() {
 
         if (formJarakDanHarga.jarak === null || formJarakDanHarga.jarak === '') {
             errors.value.jarak = 'Jarak tidak boleh kosong.';
+        } else if (String(formJarakDanHarga.jarak).includes(',')) {
+            // Mengecek jika ada karakter koma
+            errors.value.jarak = 'Gunakan titik (.) sebagai pemisah desimal, bukan koma.';
+        } else if (isNaN(formJarakDanHarga.jarak)) {
+            // Opsional: Memastikan input adalah angka valid
+            errors.value.jarak = 'Jarak harus berupa angka valid.';
         }
 
         if (formJarakDanHarga.hargaupah === null || formJarakDanHarga.hargaupah === '') {
@@ -249,6 +258,32 @@ export function useJarakDanHarga() {
         currentPage.value = 1;
     };
 
+    // Ambil data supplier dari service
+    const fetchSupplier = async () => {
+        try {
+            // Ganti supplierService sesuai dengan nama service kamu
+            const response = await suplierService.getSuplier();
+            supplierList.value = response.data || [];
+        } catch (error) {
+            console.error("Gagal memuat supplier:", error);
+        }
+    };
+
+    // Computed untuk memfilter supplier berdasarkan input "Pengambilan"
+    const filteredSupplierSuggestions = computed(() => {
+        const query = formJarakDanHarga.pengambilan.toLowerCase();
+        if (!query) return [];
+
+        return supplierList.value
+            .filter(sup => sup.nama.toLowerCase().includes(query))
+            .map(sup => sup.nama); // Ambil namanya saja
+    });
+
+    const selectPengambilan = (nama) => {
+        formJarakDanHarga.pengambilan = nama;
+        showSuggestionsPengambilan.value = false;
+    };
+
     return {
         JarakHarga, materialList, isLoading, searchQuery, currentPage, startDate, endDate, isEdit, formJarakDanHarga,
         errors,
@@ -257,6 +292,11 @@ export function useJarakDanHarga() {
         formatNumber,
         filteredJarakDanHarga,
         paginatedJarakDanHarga,
+        supplierList,
+        showSuggestionsPengambilan,
+        filteredSupplierSuggestions,
+        fetchSupplier,
+        selectPengambilan,
         fetchJarakDanHarga, fetchMaterial, handleCreate, handleEdit, handleDelete, handleRefresh, submitJarakDanHarga, resetDateFilter
     };
 }

@@ -31,8 +31,29 @@
                                 <div class="mb-4">
                                     <div class="form-group local-forms mb-3">
                                         <label>Pengambilan <span class="login-danger">*</span></label>
-                                        <input v-model="formJarakDanHarga.pengambilan" type="text" class="form-control"
-                                            :class="{ 'is-invalid': errors.pengambilan }">
+                                        <input
+                                            v-model="formJarakDanHarga.pengambilan"
+                                            type="text"
+                                            class="form-control"
+                                            :class="{ 'is-invalid': errors.pengambilan }"
+                                            @input="showSuggestionsPengambilan = true"
+                                            @focus="showSuggestionsPengambilan = true"
+                                            autocomplete="off"
+                                        >
+
+                                        <ul v-if="showSuggestionsPengambilan && filteredSupplierSuggestions.length > 0"
+                                            class="list-group position-absolute w-100 shadow-lg"
+                                            style="z-index: 1050; max-height: 200px; overflow-y: auto; top: 100%;">
+                                            <li
+                                                v-for="(nama, index) in filteredSupplierSuggestions"
+                                                :key="index"
+                                                class="list-group-item list-group-item-action"
+                                                style="cursor: pointer; font-size: 0.85rem;"
+                                                @click="selectPengambilan(nama)"
+                                            >
+                                                {{ nama }}
+                                            </li>
+                                        </ul>
                                         <div class="invalid-feedback" v-if="errors.pengambilan">
                                             {{ Array.isArray(errors.pengambilan) ? errors.pengambilan[0] : errors.pengambilan }}
                                         </div>
@@ -119,7 +140,12 @@ const {
     errors,
     fetchMaterial,
     submitJarakDanHarga,
-    isLoading
+    isLoading,
+    // Tambahkan property baru ini:
+    fetchSupplier,
+    filteredSupplierSuggestions,
+    showSuggestionsPengambilan,
+    selectPengambilan
 } = useJarakDanHarga();
 
 const handleSubmit = async () => {
@@ -128,5 +154,6 @@ const handleSubmit = async () => {
 
 onMounted(() => {
     fetchMaterial();
+    fetchSupplier(); // Panggil data supplier saat modal load
 });
 </script>
