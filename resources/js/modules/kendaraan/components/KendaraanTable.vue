@@ -47,14 +47,14 @@
                     </thead>
                     <tbody>
                         <tr v-if="isLoading">
-                            <td colspan="6" class="text-center p-5">
+                            <td colspan="7" class="text-center p-5">
                                 <div class="spinner-border text-primary" role="status"></div>
                                 <p class="mt-2 mb-0">Memuat data...</p>
                             </td>
                         </tr>
 
                         <tr v-else-if="!paginatedKendaraan || paginatedKendaraan.length === 0">
-                            <td colspan="6" class="text-center p-5">Tidak ada data.</td>
+                            <td colspan="7" class="text-center p-5">Tidak ada data.</td>
                         </tr>
 
                         <template v-else>

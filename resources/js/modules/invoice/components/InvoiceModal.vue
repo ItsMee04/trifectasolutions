@@ -13,23 +13,66 @@
                     <div class="modal-body p-4">
                         <div class="col-md-12">
                             <div class="mb-4">
-                                <div class="form-group local-forms mb-3">
+                                <div class="form-group local-forms mb-3 position-relative">
                                     <label>Pengambilan <span class="login-danger">*</span></label>
-                                    <input v-model="formInvoice.pengambilan" type="text" class="form-control"
-                                        :class="{ 'is-invalid': errors.pengambilan }">
+                                    <input
+                                        v-model="formInvoice.pengambilan"
+                                        type="text"
+                                        class="form-control"
+                                        :class="{ 'is-invalid': errors.pengambilan }"
+                                        @input="showSuggestions = true"
+                                        @focus="showSuggestions = true"
+                                        autocomplete="off"
+                                    >
+
+                                    <ul v-if="showSuggestions && suggestionPengambilan.length > 0"
+                                        class="list-group position-absolute w-100 shadow-sm"
+                                        style="z-index: 1000; max-height: 200px; overflow-y: auto;">
+                                        <li
+                                            v-for="(nama, index) in suggestionPengambilan"
+                                            :key="index"
+                                            class="list-group-item list-group-item-action"
+                                            style="cursor: pointer;"
+                                            @click="selectPengambilan(nama)"
+                                        >
+                                            {{ nama }}
+                                        </li>
+                                    </ul>
+
                                     <div class="invalid-feedback" v-if="errors.pengambilan">
-                                        {{ Array.isArray(errors.pengambilan) ? errors.pengambilan[0] :
-                                        errors.pengambilan }}
+                                        {{ Array.isArray(errors.pengambilan) ? errors.pengambilan[0] : errors.pengambilan }}
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-12">
                             <div class="mb-4">
-                                <div class="form-group local-forms mb-3">
+                                <div class="form-group local-forms mb-3 position-relative">
                                     <label>Tujuan <span class="login-danger">*</span></label>
-                                    <input v-model="formInvoice.tujuan" type="text" class="form-control"
-                                        :class="{ 'is-invalid': errors.tujuan }">
+                                    <input
+                                        v-model="formInvoice.tujuan"
+                                        type="text"
+                                        class="form-control"
+                                        :class="{ 'is-invalid': errors.tujuan }"
+                                        @input="showSuggestionsTujuan = true"
+                                        @focus="showSuggestionsTujuan = true"
+                                        autocomplete="off"
+                                    >
+
+                                    <ul v-if="showSuggestionsTujuan && suggestionTujuan.length > 0"
+                                        class="list-group position-absolute w-100 shadow-sm"
+                                        style="z-index: 1000; max-height: 200px; overflow-y: auto; top: 100%;">
+                                        <li
+                                            v-for="(nama, index) in suggestionTujuan"
+                                            :key="index"
+                                            class="list-group-item list-group-item-action"
+                                            style="cursor: pointer;"
+                                            @click="selectTujuan(nama)"
+                                        >
+                                            {{ nama }}
+                                        </li>
+                                    </ul>
+
                                     <div class="invalid-feedback" v-if="errors.tujuan">
                                         {{ Array.isArray(errors.tujuan) ? errors.tujuan[0] : errors.tujuan }}
                                     </div>
@@ -117,12 +160,23 @@ import { onMounted } from 'vue';
 import { useInvoice } from '../composables/useInvoice';
 
 const {
+    suggestionTujuan,
+    suggestionPengambilan,
+    showSuggestionsTujuan,
+    showSuggestions,
+    fetchReferensiJarak,
+    selectPengambilan,
+    selectTujuan,
     formInvoice,
     errors,
     submitGetInvoice,
     submitPrint,
     isLoading
 } = useInvoice();
+
+onMounted(() => {
+    fetchReferensiJarak(); // Ambil data referensi saat modal/page dibuka
+});
 
 const handleSubmit = async () => {
     await submitGetInvoice();

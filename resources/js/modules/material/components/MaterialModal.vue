@@ -24,9 +24,9 @@
                             </div>
                             <div class="col-md-12">
                                 <div class="form-group local-forms mb-3">
-                                    <label>Role <span class="login-danger">*</span></label>
+                                    <label>Kategori <span class="login-danger">*</span></label>
                                     <Multiselect v-model="formMaterial.kategori_id" :options="kategori"
-                                        :searchable="true" placeholder="Pilih Role" noOptionsText="Memuat data..." />
+                                        :searchable="true" placeholder="Pilih Kategori" noOptionsText="Memuat data..." />
                                 </div>
                             </div>
                         </div>

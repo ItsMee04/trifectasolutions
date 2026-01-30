@@ -52,7 +52,7 @@ export function useKegiatanArmada() {
             const response = await kendaraanService.getKendaraan();
             kendaraanList.value = response.data.map(item => ({
                 value: item.id,
-                label: item.nomor
+                label: item.kode
             }))
         } catch (error) {
             console.log("Gagal memuat kendaraan:", error)

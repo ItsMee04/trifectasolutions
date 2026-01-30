@@ -1,5 +1,6 @@
 import { ref, computed, reactive } from 'vue';
 import { kegiatanarmadaService } from '../../kegiatanarmada/services/kegiatanarmadaService'
+import { jarakdanhargaService } from '../../jarakdanharga/services/jarakdanhargaService'
 import { invoiceService } from '../services/invoiceService';
 import { notify } from '../../../helper/notification';
 import Swal from 'sweetalert2';
@@ -15,6 +16,10 @@ const itemsPerPage = 10;
 const isEdit = ref(false);
 const errors = ref({});
 const lastFilter = ref(null); // Penampung payload filter terakhir
+// Tambahkan state baru di shared state (di luar export function)
+const referensiJarakHarga = ref([]);
+const showSuggestions = ref(false); // Untuk kontrol list di UI
+const showSuggestionsTujuan = ref(false);
 
 const formInvoice = reactive({
     id: null,
@@ -235,9 +240,67 @@ export function useInvoice() {
         currentPage.value = 1;
     };
 
+    // Fungsi untuk mengambil referensi (Panggil ini saat onMounted di component)
+    const fetchReferensiJarak = async () => {
+        try {
+            const response = await jarakdanhargaService.getJarakDanHarga(); // Asumsi nama servicenya
+            if (response && response.success) {
+                referensiJarakHarga.value = response.data;
+            }
+        } catch (error) {
+            console.error("Gagal ambil referensi:", error);
+        }
+    };
+
+    // Filter Autocomplete dengan Group By (Unique)
+    const suggestionPengambilan = computed(() => {
+        const query = formInvoice.pengambilan.toLowerCase();
+        if (!query) return [];
+
+        // 1. Filter berdasarkan ketikan
+        const filtered = referensiJarakHarga.value.filter(item =>
+            item.pengambilan.toLowerCase().includes(query)
+        );
+
+        // 2. Group By / Unique (Ambil hanya nama pengambilan yang unik)
+        const uniqueNames = [...new Set(filtered.map(item => item.pengambilan))];
+
+        return uniqueNames;
+    });
+
+    const suggestionTujuan = computed(() => {
+        const query = formInvoice.tujuan.toLowerCase();
+        if (!query) return [];
+
+        const filtered = referensiJarakHarga.value.filter(item =>
+            item.tujuan.toLowerCase().includes(query)
+        );
+
+        // Group By / Unique agar tidak duplikat
+        return [...new Set(filtered.map(item => item.tujuan))];
+    });
+
+    const selectTujuan = (nama) => {
+        formInvoice.tujuan = nama;
+        showSuggestionsTujuan.value = false;
+    };
+
+    // Fungsi saat item saran dipilih
+    const selectPengambilan = (nama) => {
+        formInvoice.pengambilan = nama;
+        showSuggestions.value = false;
+    };
+
     return {
         invoices, isLoading, searchQuery, currentPage, startDate, endDate, isEdit, formInvoice,
         errors, lastFilter,
+        suggestionPengambilan,
+        showSuggestions,
+        fetchReferensiJarak,
+        selectPengambilan,
+        suggestionTujuan,
+        showSuggestionsTujuan,
+        selectTujuan,
         totalPages,
         totalFooter,
         formatNumber,
