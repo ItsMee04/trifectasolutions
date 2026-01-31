@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\Master\Suplier;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Models\KegiatanArmada\JarakHarga;
 use App\Models\Timbangan\AsphaltMixingPlant;
+use App\Models\KegiatanArmada\KegiatanArmada;
 
 class AsphaltMixingPlantController extends Controller
 {
@@ -55,10 +57,10 @@ class AsphaltMixingPlantController extends Controller
 
         try {
             $data = DB::transaction(function () use ($request) {
-                // 1. Ambil Nama Supplier
+                // 1. Ambil Nama Supplier untuk kebutuhan teks pengambilan/tujuan
                 $suplier = Suplier::findOrFail($request->suplier);
 
-                // 2. Simpan ke AsphaltMixingPlant
+                // 2. Simpan ke AsphaltMixingPlant (Tabel Utama)
                 $amp = AsphaltMixingPlant::create([
                     'tanggal'        => $request->tanggal,
                     'material_id'    => $request->material,
@@ -72,17 +74,26 @@ class AsphaltMixingPlantController extends Controller
                     'beratmuatan'    => $request->beratmuatan,
                 ]);
 
-                // 3. Logika Penentuan Pengambilan & Tujuan untuk AMP
+                // 3. Logika Penentuan Lokasi (Basecamp AMP biasanya disebut SBPS AMP)
                 $pengambilan = ($request->jenis == 'IN') ? $suplier->nama : "SBPS AMP";
                 $tujuan      = ($request->jenis == 'IN') ? "SBPS AMP" : $suplier->nama;
 
-                // 4. Simpan ke JarakDanHarga (Polymorphic)
-                $amp->jarakHarga()->create([
-                    'kode'        => 'AMP-' . strtoupper(bin2hex(random_bytes(3))),
+                // 4. Simpan ke JarakDanHarga (Polymorphic Chaining)
+                // Sesuai diskusi sebelumnya, material_id tidak perlu diinput di sini
+                $jarakHarga = $amp->jarakHarga()->create([
                     'tanggal'     => $request->tanggal,
-                    'material_id' => $request->material,
                     'pengambilan' => $pengambilan,
                     'tujuan'      => $tujuan,
+                    'jarak'       => 0, // Nilai awal sebelum diedit
+                    'hargaupah'   => 0,
+                    'hargajasa'   => 0,
+                    'status'      => 1,
+                ]);
+
+                // 5. Simpan ke KegiatanArmada (Chaining level 2)
+                // Eloquent akan otomatis mengisi jarak_id menggunakan ID dari $jarakHarga
+                $jarakHarga->kegiatanArmada()->create([
+                    'tanggal' => $request->tanggal,
                 ]);
 
                 return $amp;
@@ -91,14 +102,14 @@ class AsphaltMixingPlantController extends Controller
             return response()->json([
                 'status'  => 200,
                 'success' => true,
-                'message' => "Data AMP berhasil disimpan",
+                'message' => "Data AMP, Jarak, dan Kegiatan Armada berhasil disimpan secara berantai",
                 'data'    => $data,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'status'  => 500,
                 'success' => false,
-                'message' => "Gagal menyimpan data: " . $e->getMessage(),
+                'message' => "Gagal menyimpan data berantai: " . $e->getMessage(),
             ], 500);
         }
     }
@@ -106,69 +117,122 @@ class AsphaltMixingPlantController extends Controller
     public function updateAsphaltMixingPlant(Request $request)
     {
         $request->validate([
+            'id'                => 'required|exists:asphaltmixingplant,id',
             'tanggal'           => 'required|date',
             'material'          => 'required|exists:material,id',
             'kendaraan'         => 'required|exists:kendaraan,id',
             'driver'            => 'required|exists:driver,id',
             'suplier'           => 'required|exists:suplier,id',
-            'volume'            => 'required',
-            'berattotal'        => 'required',
-            'beratkendaraan'    => 'required',
-            'beratmuatan'       => 'required'
+            'jenis'             => 'required|in:IN,OUT',
+            'volume'            => 'required|numeric',
+            'berattotal'        => 'required|numeric',
+            'beratkendaraan'    => 'required|numeric',
+            'beratmuatan'       => 'required|numeric'
         ]);
 
-        $data = AsphaltMixingPlant::find($request->id);
+        // Eager load relasi untuk mempercepat proses update
+        $amp = AsphaltMixingPlant::with('jarakHarga.kegiatanArmada')->find($request->id);
 
-        if (!$data) {
+        if (!$amp) {
             return response()->json([
                 'status' => 404,
                 'success' => false,
                 'message' => 'Data AMP tidak ditemukan.',
-                'data' => null
             ], 404);
         }
 
-        $data->update([
-            'tanggal'           => $request->tanggal,
-            'material_id'       => $request->material,
-            'kendaraan_id'      => $request->kendaraan,
-            'driver_id'         => $request->driver,
-            'suplier_id'        => $request->suplier,
-            'jenis'             => $request->jenis,
-            'volume'            => $request->volume,
-            'berattotal'        => $request->berattotal,
-            'beratkendaraan'    => $request->beratkendaraan,
-            'beratmuatan'       => $request->beratmuatan,
-        ]);
+        try {
+            DB::transaction(function () use ($request, $amp) {
+                // 1. Ambil Nama Supplier terbaru
+                $suplier = Suplier::findOrFail($request->suplier);
 
-        return response()->json([
-            'status' => 200,
-            'success' => true,
-            'message' => 'Data AMP berhasil di updated.',
-            'data' => $data
-        ], 200);
+                // 2. Update Master AMP
+                $amp->update([
+                    'tanggal'        => $request->tanggal,
+                    'material_id'    => $request->material,
+                    'kendaraan_id'   => $request->kendaraan,
+                    'driver_id'      => $request->driver,
+                    'suplier_id'     => $request->suplier,
+                    'jenis'          => $request->jenis,
+                    'volume'         => $request->volume,
+                    'berattotal'     => $request->berattotal,
+                    'beratkendaraan' => $request->beratkendaraan,
+                    'beratmuatan'    => $request->beratmuatan,
+                ]);
+
+                // 3. Logika Penentuan Lokasi Khusus AMP
+                $pengambilan = ($request->jenis == 'IN') ? $suplier->nama : "SBPS AMP";
+                $tujuan      = ($request->jenis == 'IN') ? "SBPS AMP" : $suplier->nama;
+
+                // 4. Update JarakHarga terkait (Polymorphic)
+                if ($amp->jarakHarga) {
+                    $amp->jarakHarga->update([
+                        'tanggal'     => $request->tanggal,
+                        'pengambilan' => $pengambilan,
+                        'tujuan'      => $tujuan,
+                    ]);
+
+                    // 5. Update Tanggal di KegiatanArmada terkait agar sinkron di laporan
+                    if ($amp->jarakHarga->kegiatanArmada) {
+                        $amp->jarakHarga->kegiatanArmada->update([
+                            'tanggal' => $request->tanggal
+                        ]);
+                    }
+                }
+            });
+
+            return response()->json([
+                'status' => 200,
+                'success' => true,
+                'message' => 'Data AMP dan relasi logistik berhasil diperbarui.',
+                'data' => $amp
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'success' => false,
+                'message' => 'Gagal memperbarui data: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function deleteAsphaltMixingPlant(Request $request)
     {
+        // 1. Cari data AMP utama
         $data = AsphaltMixingPlant::find($request->id);
+
         if (!$data) {
             return response()->json([
                 'status'    => 404,
                 'success'   => false,
                 'message'   => 'Data AMP tidak ditemukan',
-                'data'      => null
             ]);
         }
 
-        $data->status = 0; // Soft delete
-        $data->save();
+        // 2. Gunakan Transaction agar jika salah satu gagal, semua dibatalkan
+        DB::transaction(function () use ($data) {
+            // A. Update status AMP itu sendiri
+            $data->update(['status' => 0]);
+
+            // B. Update status JarakHarga yang terhubung (Polymorphic)
+            // Kita ambil ID jarak untuk update KegiatanArmada nantinya
+            $jarakIds = JarakHarga::where('source_type', get_class($data))
+                ->where('source_id', $data->id)
+                ->pluck('id');
+
+            if ($jarakIds->isNotEmpty()) {
+                // Update status semua JarakHarga terkait
+                JarakHarga::whereIn('id', $jarakIds)->update(['status' => 0]);
+
+                // C. Update status KegiatanArmada yang terhubung dengan Jarak tersebut
+                KegiatanArmada::whereIn('jarak_id', $jarakIds)->update(['status' => 0]);
+            }
+        });
 
         return response()->json([
             'status'    => 200,
             'success'   => true,
-            'message'   => 'Data AMP berhasil dihapus',
-            'data'      => null
+            'message'   => 'Data AMP dan relasi terkait berhasil dinonaktifkan',
         ], 200);
     }
 }

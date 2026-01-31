@@ -4,12 +4,13 @@ namespace App\Http\Controllers\Timbangan;
 
 use Illuminate\Http\Request;
 use App\Models\Master\Suplier;
+use App\Models\Master\Kendaraan;
+use App\Models\Master\BahanBakar;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\Timbangan\StoneCrusher;
 use App\Models\KegiatanArmada\JarakHarga;
-use App\Models\Master\BahanBakar;
-use App\Models\Master\Kendaraan;
+use App\Models\KegiatanArmada\KegiatanArmada;
 
 class StoneCrusherController extends Controller
 {
@@ -114,69 +115,122 @@ class StoneCrusherController extends Controller
     public function updateStoneCrusher(Request $request)
     {
         $request->validate([
+            'id'                => 'required|exists:stonecrusher,id',
             'tanggal'           => 'required|date',
             'material'          => 'required|exists:material,id',
             'kendaraan'         => 'required|exists:kendaraan,id',
             'driver'            => 'required|exists:driver,id',
             'suplier'           => 'required|exists:suplier,id',
-            'volume'            => 'required',
-            'berattotal'        => 'required',
-            'beratkendaraan'    => 'required',
-            'beratmuatan'       => 'required'
+            'jenis'             => 'required|in:IN,OUT',
+            'volume'            => 'required|numeric',
+            'berattotal'        => 'required|numeric',
+            'beratkendaraan'    => 'required|numeric',
+            'beratmuatan'       => 'required|numeric'
         ]);
 
-        $stonecrusher = StoneCrusher::find($request->id);
+        // Load relasi agar proses update lebih efisien
+        $stonecrusher = StoneCrusher::with('jarakHarga.kegiatanArmada')->find($request->id);
 
         if (!$stonecrusher) {
             return response()->json([
                 'status' => 404,
                 'success' => false,
                 'message' => 'Data Stone Crusher tidak ditemukan.',
-                'data' => null
             ], 404);
         }
 
-        $stonecrusher->update([
-            'tanggal'           => $request->tanggal,
-            'material_id'       => $request->material,
-            'kendaraan_id'      => $request->kendaraan,
-            'driver_id'         => $request->driver,
-            'suplier_id'        => $request->suplier,
-            'jenis'             => $request->jenis,
-            'volume'            => $request->volume,
-            'berattotal'        => $request->berattotal,
-            'beratkendaraan'    => $request->beratkendaraan,
-            'beratmuatan'       => $request->beratmuatan,
-        ]);
+        try {
+            DB::transaction(function () use ($request, $stonecrusher) {
+                // 1. Ambil Nama Supplier terbaru
+                $suplier = Suplier::findOrFail($request->suplier);
 
-        return response()->json([
-            'status' => 200,
-            'success' => true,
-            'message' => 'Data Stone Crusher berhasil di updated.',
-            'data' => $stonecrusher
-        ], 200);
+                // 2. Update Master Stone Crusher
+                $stonecrusher->update([
+                    'tanggal'        => $request->tanggal,
+                    'material_id'    => $request->material,
+                    'kendaraan_id'   => $request->kendaraan,
+                    'driver_id'      => $request->driver,
+                    'suplier_id'     => $request->suplier,
+                    'jenis'          => $request->jenis,
+                    'volume'         => $request->volume,
+                    'berattotal'     => $request->berattotal,
+                    'beratkendaraan' => $request->beratkendaraan,
+                    'beratmuatan'    => $request->beratmuatan,
+                ]);
+
+                // 3. Logika Lokasi untuk Stone Crusher (SBPS SC)
+                $pengambilan = ($request->jenis == 'IN') ? $suplier->nama : "SBPS SC";
+                $tujuan      = ($request->jenis == 'IN') ? "SBPS SC" : $suplier->nama;
+
+                // 4. Update JarakHarga terkait
+                if ($stonecrusher->jarakHarga) {
+                    $stonecrusher->jarakHarga->update([
+                        'tanggal'     => $request->tanggal,
+                        'pengambilan' => $pengambilan,
+                        'tujuan'      => $tujuan,
+                    ]);
+
+                    // 5. Update Tanggal di KegiatanArmada terkait
+                    if ($stonecrusher->jarakHarga->kegiatanArmada) {
+                        $stonecrusher->jarakHarga->kegiatanArmada->update([
+                            'tanggal' => $request->tanggal
+                        ]);
+                    }
+                }
+            });
+
+            return response()->json([
+                'status' => 200,
+                'success' => true,
+                'message' => 'Data Stone Crusher dan relasi logistik berhasil diperbarui.',
+                'data' => $stonecrusher
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'success' => false,
+                'message' => 'Gagal memperbarui data: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function deleteStoneCrusher(Request $request)
     {
-        $stonecrusher = StoneCrusher::find($request->id);
-        if (!$stonecrusher) {
+        // 1. Cari data AMP utama
+        $data = StoneCrusher::find($request->id);
+
+        if (!$data) {
             return response()->json([
                 'status'    => 404,
                 'success'   => false,
-                'message'   => 'Data Stone Crusher tidak ditemukan',
-                'data'      => null
+                'message'   => 'Data SC tidak ditemukan',
             ]);
         }
 
-        $stonecrusher->status = 0; // Soft delete
-        $stonecrusher->save();
+        // 2. Gunakan Transaction agar jika salah satu gagal, semua dibatalkan
+        DB::transaction(function () use ($data) {
+            // A. Update status AMP itu sendiri
+            $data->update(['status' => 0]);
+
+            // B. Update status JarakHarga yang terhubung (Polymorphic)
+            // Kita ambil ID jarak untuk update KegiatanArmada nantinya
+            $jarakIds = JarakHarga::where('source_type', get_class($data))
+                ->where('source_id', $data->id)
+                ->pluck('id');
+
+            if ($jarakIds->isNotEmpty()) {
+                // Update status semua JarakHarga terkait
+                JarakHarga::whereIn('id', $jarakIds)->update(['status' => 0]);
+
+                // C. Update status KegiatanArmada yang terhubung dengan Jarak tersebut
+                KegiatanArmada::whereIn('jarak_id', $jarakIds)->update(['status' => 0]);
+            }
+        });
 
         return response()->json([
             'status'    => 200,
             'success'   => true,
-            'message'   => 'Data Stone Crusher berhasil dihapus',
-            'data'      => null
+            'message'   => 'Data AMP dan relasi terkait berhasil dinonaktifkan',
         ], 200);
     }
 }

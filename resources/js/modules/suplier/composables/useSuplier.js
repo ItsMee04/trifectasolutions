@@ -170,8 +170,28 @@ export function useSuplier() {
         return Math.ceil(filteredCount / itemsPerPage) || 1;
     });
 
+    const displayedPages = computed(() => {
+        const total = totalPages.value;
+        const current = currentPage.value;
+        const maxVisible = 5; // Jumlah nomor yang ingin ditampilkan
+
+        let start = Math.max(current - Math.floor(maxVisible / 2), 1);
+        let end = start + maxVisible - 1;
+
+        if (end > total) {
+            end = total;
+            start = Math.max(end - maxVisible + 1, 1);
+        }
+
+        const pages = [];
+        for (let i = start; i <= end; i++) {
+            pages.push(i);
+        }
+        return pages;
+    });
+
     return {
-        supliers, isLoading, searchQuery, currentPage, isEdit, formSuplier, errors, totalPages,
+        supliers, isLoading, searchQuery, currentPage, isEdit, formSuplier, errors, totalPages, displayedPages,
         filteredSuplier: computed(() => {
             const query = searchQuery.value.toLowerCase();
             return supliers.value.filter(item => (item.nama || '').toLowerCase().includes(query));

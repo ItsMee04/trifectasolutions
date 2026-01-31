@@ -142,7 +142,7 @@ export function useBahanBakar() {
                 notify.success('Bahan Bakar berhasil dihapus.');
 
                 // Memanggil fetchDriver agar tabel terupdate otomatis tanpa reload
-                await fetchDriver();
+                await fetchBahanBakar();
             } catch (error) {
                 console.error('Gagal menghapus data Bahan Bakar:', error);
                 notify.error('Gagal menghapus data Bahan Bakar.');
@@ -166,8 +166,28 @@ export function useBahanBakar() {
         return Math.ceil(filteredCount / itemsPerPage) || 1;
     });
 
+    const displayedPages = computed(() => {
+        const total = totalPages.value;
+        const current = currentPage.value;
+        const maxVisible = 5; // Jumlah nomor yang ingin ditampilkan
+
+        let start = Math.max(current - Math.floor(maxVisible / 2), 1);
+        let end = start + maxVisible - 1;
+
+        if (end > total) {
+            end = total;
+            start = Math.max(end - maxVisible + 1, 1);
+        }
+
+        const pages = [];
+        for (let i = start; i <= end; i++) {
+            pages.push(i);
+        }
+        return pages;
+    });
+
     return {
-        bahanbakars, isLoading, searchQuery, currentPage, isEdit, formBahanBakar, errors, totalPages,
+        bahanbakars, isLoading, searchQuery, currentPage, isEdit, formBahanBakar, errors, totalPages, displayedPages,
         filteredBahanBakar: computed(() => {
             const query = searchQuery.value.toLowerCase();
             return bahanbakars.value.filter(item =>

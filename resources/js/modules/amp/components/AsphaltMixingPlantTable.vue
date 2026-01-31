@@ -135,7 +135,8 @@
                 </table>
             </div>
 
-            <div v-if="filteredAsphaltMixingPlant.length > 0" class="d-flex justify-content-between align-items-center p-3">
+            <div v-if="filteredAsphaltMixingPlant.length > 0"
+                class="d-flex justify-content-between align-items-center p-3">
 
                 <div class="text-muted small">
                     Showing {{ ((currentPage - 1) * 10) + 1 }}
@@ -145,12 +146,18 @@
 
                 <ul class="pagination mb-0">
                     <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                        <a class="page-link" href="javascript:void(0);" @click="currentPage = 1">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+
+                    <li class="page-item" :class="{ disabled: currentPage === 1 }">
                         <a class="page-link" href="javascript:void(0);" @click="currentPage > 1 && currentPage--">
                             Previous
                         </a>
                     </li>
 
-                    <li v-for="page in totalPages" :key="page" class="page-item"
+                    <li v-for="page in displayedPages" :key="page" class="page-item"
                         :class="{ active: currentPage === page }">
                         <a class="page-link" href="javascript:void(0);" @click="currentPage = page">
                             {{ page }}
@@ -161,6 +168,12 @@
                         <a class="page-link" href="javascript:void(0);"
                             @click="currentPage < totalPages && currentPage++">
                             Next
+                        </a>
+                    </li>
+
+                    <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                        <a class="page-link" href="javascript:void(0);" @click="currentPage = totalPages">
+                            <i class="fas fa-angle-double-right"></i>
                         </a>
                     </li>
                 </ul>
@@ -182,6 +195,7 @@ const {
     startDate,
     endDate,
     resetDateFilter,
+    displayedPages,
     totalFooter,
     currentTab,
     filteredAsphaltMixingPlant,

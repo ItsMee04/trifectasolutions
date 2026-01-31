@@ -175,7 +175,7 @@ export function useKegiatanArmada() {
             acc.hargaTotal += Number(item.jarak?.hargaupah || 0);
             acc.ritTotal += Number(item.rit || 0);
             acc.volumeTotal += Number(item.jarak?.source.volume || 0);
-            acc.upahkenetTotal += Number(item.upahhariankenet|| 0);
+            acc.upahkenetTotal += Number(item.upahhariankenet || 0);
             acc.umluarkotatelahterbayarTotal += Number(item.umluarkotatelahterbayar || 0);
             acc.umpengajuanTotal += Number(item.umpengajuan || 0);
             acc.insentifataulemburTotal += Number(item.insentifataulembur || 0);
@@ -197,7 +197,7 @@ export function useKegiatanArmada() {
             upahTotal: 0,
             jumlahTotal: 0,
             penjualanTotal: 0,
-            hargasolarTotal:0,
+            hargasolarTotal: 0,
             nominalbiayasolarTotal: 0,
         });
     });
@@ -217,9 +217,29 @@ export function useKegiatanArmada() {
         currentPage.value = 1;
     };
 
+    const displayedPages = computed(() => {
+        const total = totalPages.value;
+        const current = currentPage.value;
+        const maxVisible = 5; // Jumlah nomor yang ingin ditampilkan
+
+        let start = Math.max(current - Math.floor(maxVisible / 2), 1);
+        let end = start + maxVisible - 1;
+
+        if (end > total) {
+            end = total;
+            start = Math.max(end - maxVisible + 1, 1);
+        }
+
+        const pages = [];
+        for (let i = start; i <= end; i++) {
+            pages.push(i);
+        }
+        return pages;
+    });
+
     return {
         KegiatanArmadas, isLoading, searchQuery, currentPage, startDate, endDate, isEdit, formKegiatanArmada,
-        errors,
+        errors, displayedPages,
         totalPages,
         totalFooter,
         formatNumber,

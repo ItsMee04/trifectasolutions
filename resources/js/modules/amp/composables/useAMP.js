@@ -325,8 +325,28 @@ export function useAMP() {
         currentPage.value = 1;
     };
 
+    const displayedPages = computed(() => {
+        const total = totalPages.value;
+        const current = currentPage.value;
+        const maxVisible = 5; // Jumlah nomor yang ingin ditampilkan
+
+        let start = Math.max(current - Math.floor(maxVisible / 2), 1);
+        let end = start + maxVisible - 1;
+
+        if (end > total) {
+            end = total;
+            start = Math.max(end - maxVisible + 1, 1);
+        }
+
+        const pages = [];
+        for (let i = start; i <= end; i++) {
+            pages.push(i);
+        }
+        return pages;
+    });
+
     return {
-        AsphaltMixingPlants, materialList, kendaraanList, driverList, suplierList, isLoading, searchQuery, currentPage, currentTab, startDate, endDate,
+        AsphaltMixingPlants, materialList, kendaraanList, driverList, suplierList, isLoading, searchQuery, currentPage, currentTab, startDate, endDate, displayedPages,
         switchTab, isEdit, formAMP, errors,
         totalPages,
         totalFooter,

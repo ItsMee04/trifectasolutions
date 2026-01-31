@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Master\Suplier;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Models\KegiatanArmada\JarakHarga;
+use App\Models\KegiatanArmada\KegiatanArmada;
 use App\Models\Timbangan\ConcreteBatchingPlant;
 
 class ConcreteBatchingPlantController extends Controller
@@ -38,41 +40,6 @@ class ConcreteBatchingPlantController extends Controller
         ]);
     }
 
-    // public function storeConcreteBatchingPlant(Request $request)
-    // {
-    //     $request->validate([
-    //         'tanggal'           => 'required|date',
-    //         'material'          => 'required|exists:material,id',
-    //         'kendaraan'         => 'required|exists:kendaraan,id',
-    //         'driver'            => 'required|exists:driver,id',
-    //         'suplier'           => 'required|exists:suplier,id',
-    //         'volume'            => 'required',
-    //         'berattotal'        => 'required',
-    //         'beratkendaraan'    => 'required',
-    //         'beratmuatan'       => 'required'
-    //     ]);
-
-    //     $ConcreteBatchingPlant = ConcreteBatchingPlant::create([
-    //         'tanggal'       => $request->tanggal,
-    //         'material_id'   => $request->material,
-    //         'kendaraan_id'  => $request->kendaraan,
-    //         'driver_id'     => $request->driver,
-    //         'suplier_id'    => $request->suplier,
-    //         'jenis'         => $request->jenis,
-    //         'volume'        => $request->volume,
-    //         'berattotal'    => $request->berattotal,
-    //         'beratkendaraan'=> $request->beratkendaraan,
-    //         'beratmuatan'   => $request->beratmuatan,
-    //     ]);
-
-    //     return response()->json([
-    //         'status'    => 200,
-    //         'success'   => true,
-    //         'message'   => "Data Concrete Batching Plant berhasil disimpan",
-    //         'data'      => $ConcreteBatchingPlant,
-    //     ]);
-    // }
-
     public function storeConcreteBatchingPlant(Request $request)
     {
         $request->validate([
@@ -90,10 +57,10 @@ class ConcreteBatchingPlantController extends Controller
 
         try {
             $data = DB::transaction(function () use ($request) {
-                // 1. Ambil Nama Supplier untuk string kolom pengambilan/tujuan
+                // 1. Ambil Nama Supplier
                 $suplier = Suplier::findOrFail($request->suplier);
 
-                // 2. Simpan ke ConcreteBatchingPlant
+                // 2. Simpan ke ConcreteBatchingPlant (Master Source)
                 $cbp = ConcreteBatchingPlant::create([
                     'tanggal'        => $request->tanggal,
                     'material_id'    => $request->material,
@@ -107,18 +74,22 @@ class ConcreteBatchingPlantController extends Controller
                     'beratmuatan'    => $request->beratmuatan,
                 ]);
 
-                // 3. Logika Penentuan Pengambilan & Tujuan untuk CBP
-                // Menggunakan identitas lokasi "SBPS CBP"
+                // 3. Logika Lokasi untuk CBP
                 $pengambilan = ($request->jenis == 'IN') ? $suplier->nama : "SBPS CBP";
                 $tujuan      = ($request->jenis == 'IN') ? "SBPS CBP" : $suplier->nama;
 
-                // 4. Simpan ke JarakDanHarga melalui relasi Morph
-                // source_id akan otomatis berisi ID CBP, source_type berisi model CBP
-                $cbp->jarakHarga()->create([
+                // 4. Simpan ke JarakDanHarga (Chaining Level 1)
+                // Morph relation: source_id & source_type terisi otomatis
+                $jarakHarga = $cbp->jarakHarga()->create([
                     'tanggal'     => $request->tanggal,
-                    'material_id' => $request->material,
                     'pengambilan' => $pengambilan,
                     'tujuan'      => $tujuan,
+                ]);
+
+                // 5. Simpan ke KegiatanArmada (Chaining Level 2)
+                // Menggunakan instance $jarakHarga agar jarak_id terhubung sempurna
+                $jarakHarga->kegiatanArmada()->create([
+                    'tanggal' => $request->tanggal,
                 ]);
 
                 return $cbp;
@@ -127,14 +98,14 @@ class ConcreteBatchingPlantController extends Controller
             return response()->json([
                 'status'  => 200,
                 'success' => true,
-                'message' => "Data Concrete Batching Plant berhasil disimpan",
+                'message' => "Data CBP, Jarak, dan Kegiatan Armada berhasil disinkronkan",
                 'data'    => $data,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'status'  => 500,
                 'success' => false,
-                'message' => "Gagal menyimpan data: " . $e->getMessage(),
+                'message' => "Gagal menyimpan data berantai: " . $e->getMessage(),
             ], 500);
         }
     }
@@ -142,69 +113,122 @@ class ConcreteBatchingPlantController extends Controller
     public function updateConcreteBatchingPlant(Request $request)
     {
         $request->validate([
+            'id'                => 'required|exists:concretebatchingplant,id',
             'tanggal'           => 'required|date',
             'material'          => 'required|exists:material,id',
             'kendaraan'         => 'required|exists:kendaraan,id',
             'driver'            => 'required|exists:driver,id',
             'suplier'           => 'required|exists:suplier,id',
-            'volume'            => 'required',
-            'berattotal'        => 'required',
-            'beratkendaraan'    => 'required',
-            'beratmuatan'       => 'required'
+            'jenis'             => 'required|in:IN,OUT',
+            'volume'            => 'required|numeric',
+            'berattotal'        => 'required|numeric',
+            'beratkendaraan'    => 'required|numeric',
+            'beratmuatan'       => 'required|numeric'
         ]);
 
-        $ConcreteBatchingPlant = ConcreteBatchingPlant::find($request->id);
+        // Ambil data beserta relasi Jarak dan Kegiatan
+        $cbp = ConcreteBatchingPlant::with('jarakHarga.kegiatanArmada')->find($request->id);
 
-        if (!$ConcreteBatchingPlant) {
+        if (!$cbp) {
             return response()->json([
                 'status' => 404,
                 'success' => false,
-                'message' => 'Data Concrete Batching Plant tidak ditemukan.',
-                'data' => null
+                'message' => 'Data tidak ditemukan.',
             ], 404);
         }
 
-        $ConcreteBatchingPlant->update([
-            'tanggal'           => $request->tanggal,
-            'material_id'       => $request->material,
-            'kendaraan_id'      => $request->kendaraan,
-            'driver_id'         => $request->driver,
-            'suplier_id'        => $request->suplier,
-            'jenis'             => $request->jenis,
-            'volume'            => $request->volume,
-            'berattotal'        => $request->berattotal,
-            'beratkendaraan'    => $request->beratkendaraan,
-            'beratmuatan'       => $request->beratmuatan,
-        ]);
+        try {
+            DB::transaction(function () use ($request, $cbp) {
+                // 1. Ambil Nama Supplier terbaru
+                $suplier = Suplier::findOrFail($request->suplier);
 
-        return response()->json([
-            'status' => 200,
-            'success' => true,
-            'message' => 'Data Concrete Batching Plant berhasil di updated.',
-            'data' => $ConcreteBatchingPlant
-        ], 200);
+                // 2. Update Master CBP
+                $cbp->update([
+                    'tanggal'        => $request->tanggal,
+                    'material_id'    => $request->material,
+                    'kendaraan_id'   => $request->kendaraan,
+                    'driver_id'      => $request->driver,
+                    'suplier_id'     => $request->suplier,
+                    'jenis'          => $request->jenis,
+                    'volume'         => $request->volume,
+                    'berattotal'     => $request->berattotal,
+                    'beratkendaraan' => $request->beratkendaraan,
+                    'beratmuatan'    => $request->beratmuatan,
+                ]);
+
+                // 3. Tentukan ulang Pengambilan & Tujuan jika Jenis/Supplier berubah
+                $pengambilan = ($request->jenis == 'IN') ? $suplier->nama : "SBPS CBP";
+                $tujuan      = ($request->jenis == 'IN') ? "SBPS CBP" : $suplier->nama;
+
+                // 4. Update JarakHarga terkait (Polymorphic)
+                if ($cbp->jarakHarga) {
+                    $cbp->jarakHarga->update([
+                        'tanggal'     => $request->tanggal,
+                        'pengambilan' => $pengambilan,
+                        'tujuan'      => $tujuan,
+                    ]);
+
+                    // 5. Update Tanggal di KegiatanArmada terkait
+                    if ($cbp->jarakHarga->kegiatanArmada) {
+                        $cbp->jarakHarga->kegiatanArmada->update([
+                            'tanggal' => $request->tanggal
+                        ]);
+                    }
+                }
+            });
+
+            return response()->json([
+                'status' => 200,
+                'success' => true,
+                'message' => 'Data CBP dan relasi logistik berhasil diperbarui.',
+                'data' => $cbp
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'success' => false,
+                'message' => 'Gagal memperbarui data: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function deleteConcreteBatchingPlant(Request $request)
     {
-        $ConcreteBatchingPlant = ConcreteBatchingPlant::find($request->id);
-        if (!$ConcreteBatchingPlant) {
+        // 1. Cari data AMP utama
+        $data = ConcreteBatchingPlant::find($request->id);
+
+        if (!$data) {
             return response()->json([
                 'status'    => 404,
                 'success'   => false,
-                'message'   => 'Data Concrete Batching Plant tidak ditemukan',
-                'data'      => null
+                'message'   => 'Data CBP tidak ditemukan',
             ]);
         }
 
-        $ConcreteBatchingPlant->status = 0; // Soft delete
-        $ConcreteBatchingPlant->save();
+        // 2. Gunakan Transaction agar jika salah satu gagal, semua dibatalkan
+        DB::transaction(function () use ($data) {
+            // A. Update status AMP itu sendiri
+            $data->update(['status' => 0]);
+
+            // B. Update status JarakHarga yang terhubung (Polymorphic)
+            // Kita ambil ID jarak untuk update KegiatanArmada nantinya
+            $jarakIds = JarakHarga::where('source_type', get_class($data))
+                ->where('source_id', $data->id)
+                ->pluck('id');
+
+            if ($jarakIds->isNotEmpty()) {
+                // Update status semua JarakHarga terkait
+                JarakHarga::whereIn('id', $jarakIds)->update(['status' => 0]);
+
+                // C. Update status KegiatanArmada yang terhubung dengan Jarak tersebut
+                KegiatanArmada::whereIn('jarak_id', $jarakIds)->update(['status' => 0]);
+            }
+        });
 
         return response()->json([
             'status'    => 200,
             'success'   => true,
-            'message'   => 'Data Concrete Batching Plant berhasil dihapus',
-            'data'      => null
+            'message'   => 'Data AMP dan relasi terkait berhasil dinonaktifkan',
         ], 200);
     }
 }

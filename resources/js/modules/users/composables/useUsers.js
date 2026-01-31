@@ -133,8 +133,28 @@ export function useUsers() {
         return Math.ceil(filteredCount / itemsPerPage) || 1;
     });
 
+    const displayedPages = computed(() => {
+        const total = totalPages.value;
+        const current = currentPage.value;
+        const maxVisible = 5; // Jumlah nomor yang ingin ditampilkan
+
+        let start = Math.max(current - Math.floor(maxVisible / 2), 1);
+        let end = start + maxVisible - 1;
+
+        if (end > total) {
+            end = total;
+            start = Math.max(end - maxVisible + 1, 1);
+        }
+
+        const pages = [];
+        for (let i = start; i <= end; i++) {
+            pages.push(i);
+        }
+        return pages;
+    });
+
     return {
-        users, roles, isLoading, searchQuery, currentPage, isEdit, formUsers, errors, totalPages,
+        users, roles, isLoading, searchQuery, currentPage, isEdit, formUsers, errors, totalPages, displayedPages,
         filteredUsers: computed(() => {
             const query = searchQuery.value.toLowerCase();
             return users.value.filter(item => {

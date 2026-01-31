@@ -57,7 +57,8 @@
                         </tr>
 
                         <template v-else>
-                            <tr v-for="(item, index) in paginatedPegawai" :key="item.id" class="text-center align-middle">
+                            <tr v-for="(item, index) in paginatedPegawai" :key="item.id"
+                                class="text-center align-middle">
                                 <td>{{ ((currentPage - 1) * 10) + (index + 1) }}</td>
                                 <td class="text-start">
                                     <h2 class="table-avatar d-inline-flex align-items-center mb-0">
@@ -105,12 +106,18 @@
 
                 <ul class="pagination mb-0">
                     <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                        <a class="page-link" href="javascript:void(0);" @click="currentPage = 1">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+
+                    <li class="page-item" :class="{ disabled: currentPage === 1 }">
                         <a class="page-link" href="javascript:void(0);" @click="currentPage > 1 && currentPage--">
                             Previous
                         </a>
                     </li>
 
-                    <li v-for="page in totalPages" :key="page" class="page-item"
+                    <li v-for="page in displayedPages" :key="page" class="page-item"
                         :class="{ active: currentPage === page }">
                         <a class="page-link" href="javascript:void(0);" @click="currentPage = page">
                             {{ page }}
@@ -121,6 +128,12 @@
                         <a class="page-link" href="javascript:void(0);"
                             @click="currentPage < totalPages && currentPage++">
                             Next
+                        </a>
+                    </li>
+
+                    <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                        <a class="page-link" href="javascript:void(0);" @click="currentPage = totalPages">
+                            <i class="fas fa-angle-double-right"></i>
                         </a>
                     </li>
                 </ul>
@@ -138,6 +151,7 @@ const {
     handleDelete,
     handleRefresh,
     getImageUrl, // <--- Tambahkan ini
+    displayedPages,
     filteredPegawai,
     paginatedPegawai,
     searchQuery,

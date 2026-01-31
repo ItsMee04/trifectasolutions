@@ -74,8 +74,8 @@
                             <th style="width: 20%">Upah</th>
                             <th style="width: 20%">Jumlah</th>
                             <th style="width: 20%">Penjualan</th>
-                            <th style="width: 20%">Harga Solar</th>
-                            <th style="width: 20%">Nominal Biaya Solar</th>
+                            <th style="width: 20%">Solar (L)</th>
+                            <th style="width: 20%">Biaya Solar</th>
                             <th style="width: 20%">Status</th>
                             <th style="width: 20%">Action</th>
                         </tr>
@@ -137,12 +137,12 @@
                     <tfoot v-if="!isLoading && paginatedKegiatanArmada.length > 0">
                         <tr class="text-center fw-bold bg-light">
                             <td colspan="1" class="text-end">TOTAL</td>
-                            <td>{{ formatNumber(totalFooter.jarakTotal,2) }}</td>
+                            <td>{{ formatNumber(totalFooter.jarakTotal, 2) }}</td>
                             <td>{{ formatNumber(totalFooter.hargaTotal) }}</td>
                             <td colspan="4" class="text-end"></td>
                             <td>{{ formatNumber(totalFooter.ritTotal) }}</td>
                             <td colspan="1" class="text-end"></td>
-                            <td>{{ formatNumber(totalFooter.volumeTotal,2) }}</td>
+                            <td>{{ formatNumber(totalFooter.volumeTotal, 2) }}</td>
                             <td colspan="2" class="text-end"></td>
                             <td>{{ formatNumber(totalFooter.upahkenetTotal) }}</td>
                             <td>{{ formatNumber(totalFooter.umluarkotatelahterbayarTotal) }}</td>
@@ -169,12 +169,18 @@
 
                 <ul class="pagination mb-0">
                     <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                        <a class="page-link" href="javascript:void(0);" @click="currentPage = 1">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+
+                    <li class="page-item" :class="{ disabled: currentPage === 1 }">
                         <a class="page-link" href="javascript:void(0);" @click="currentPage > 1 && currentPage--">
                             Previous
                         </a>
                     </li>
 
-                    <li v-for="page in totalPages" :key="page" class="page-item"
+                    <li v-for="page in displayedPages" :key="page" class="page-item"
                         :class="{ active: currentPage === page }">
                         <a class="page-link" href="javascript:void(0);" @click="currentPage = page">
                             {{ page }}
@@ -185,6 +191,12 @@
                         <a class="page-link" href="javascript:void(0);"
                             @click="currentPage < totalPages && currentPage++">
                             Next
+                        </a>
+                    </li>
+
+                    <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                        <a class="page-link" href="javascript:void(0);" @click="currentPage = totalPages">
+                            <i class="fas fa-angle-double-right"></i>
                         </a>
                     </li>
                 </ul>
@@ -201,6 +213,7 @@ const {
     handleRefresh,
     formatNumber,
 
+    displayedPages,
     startDate,
     endDate,
     resetDateFilter,
