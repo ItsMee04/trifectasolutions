@@ -15,32 +15,23 @@
                             <div class="mb-4">
                                 <div class="form-group local-forms mb-3 position-relative">
                                     <label>Pengambilan <span class="login-danger">*</span></label>
-                                    <input
-                                        v-model="formInvoice.pengambilan"
-                                        type="text"
-                                        class="form-control"
-                                        :class="{ 'is-invalid': errors.pengambilan }"
-                                        @input="showSuggestions = true"
-                                        @focus="showSuggestions = true"
-                                        autocomplete="off"
-                                    >
+                                    <input v-model="formInvoice.pengambilan" type="text" class="form-control"
+                                        :class="{ 'is-invalid': errors.pengambilan }" @input="showSuggestions = true"
+                                        @focus="showSuggestions = true" autocomplete="off">
 
                                     <ul v-if="showSuggestions && suggestionPengambilan.length > 0"
                                         class="list-group position-absolute w-100 shadow-sm"
                                         style="z-index: 1000; max-height: 200px; overflow-y: auto;">
-                                        <li
-                                            v-for="(nama, index) in suggestionPengambilan"
-                                            :key="index"
-                                            class="list-group-item list-group-item-action"
-                                            style="cursor: pointer;"
-                                            @click="selectPengambilan(nama)"
-                                        >
+                                        <li v-for="(nama, index) in suggestionPengambilan" :key="index"
+                                            class="list-group-item list-group-item-action" style="cursor: pointer;"
+                                            @click="selectPengambilan(nama)">
                                             {{ nama }}
                                         </li>
                                     </ul>
 
                                     <div class="invalid-feedback" v-if="errors.pengambilan">
-                                        {{ Array.isArray(errors.pengambilan) ? errors.pengambilan[0] : errors.pengambilan }}
+                                        {{ Array.isArray(errors.pengambilan) ? errors.pengambilan[0] :
+                                            errors.pengambilan }}
                                     </div>
                                 </div>
                             </div>
@@ -49,26 +40,16 @@
                             <div class="mb-4">
                                 <div class="form-group local-forms mb-3 position-relative">
                                     <label>Tujuan <span class="login-danger">*</span></label>
-                                    <input
-                                        v-model="formInvoice.tujuan"
-                                        type="text"
-                                        class="form-control"
-                                        :class="{ 'is-invalid': errors.tujuan }"
-                                        @input="showSuggestionsTujuan = true"
-                                        @focus="showSuggestionsTujuan = true"
-                                        autocomplete="off"
-                                    >
+                                    <input v-model="formInvoice.tujuan" type="text" class="form-control"
+                                        :class="{ 'is-invalid': errors.tujuan }" @input="showSuggestionsTujuan = true"
+                                        @focus="showSuggestionsTujuan = true" autocomplete="off">
 
                                     <ul v-if="showSuggestionsTujuan && suggestionTujuan.length > 0"
                                         class="list-group position-absolute w-100 shadow-sm"
                                         style="z-index: 1000; max-height: 200px; overflow-y: auto; top: 100%;">
-                                        <li
-                                            v-for="(nama, index) in suggestionTujuan"
-                                            :key="index"
-                                            class="list-group-item list-group-item-action"
-                                            style="cursor: pointer;"
-                                            @click="selectTujuan(nama)"
-                                        >
+                                        <li v-for="(nama, index) in suggestionTujuan" :key="index"
+                                            class="list-group-item list-group-item-action" style="cursor: pointer;"
+                                            @click="selectTujuan(nama)">
                                             {{ nama }}
                                         </li>
                                     </ul>
@@ -87,6 +68,25 @@
                                         :class="{ 'is-invalid': errors.kategori }">
                                     <div class="invalid-feedback" v-if="errors.kategori">
                                         {{ Array.isArray(errors.kategori) ? errors.kategori[0] : errors.kategori }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="mb-4">
+                                <div class="form-group local-forms mb-3">
+                                    <label class="form-label">Periode Tanggal <span
+                                            class="login-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input type="date" v-model="formInvoice.periodeawal" class="form-control"
+                                            :class="{ 'is-invalid': errors.periodeawal }" placeholder="Mulai">
+                                        <span class="input-group-text badge-gradient-secondary text-white">s/d</span>
+                                        <input type="date" v-model="formInvoice.periodeakhir" class="form-control"
+                                            :class="{ 'is-invalid': errors.periodeakhir }" placeholder="Selesai">
+                                    </div>
+                                    <div class="text-danger small mt-1"
+                                        v-if="errors.periodeawal || errors.periodeakhir">
+                                        {{ errors.periodeawal || errors.periodeakhir }}
                                     </div>
                                 </div>
                             </div>
@@ -124,7 +124,7 @@
                                         :class="{ 'is-invalid': errors.tanggal }">
                                     <div class="invalid-feedback" v-if="errors.tanggal">
                                         {{ Array.isArray(errors.tanggal) ? errors.tanggal[0] :
-                                        errors.tanggal }}
+                                            errors.tanggal }}
                                     </div>
                                 </div>
                             </div>
@@ -136,7 +136,8 @@
                                     <input v-model="formInvoice.nomorinvoice" type="text" class="form-control"
                                         :class="{ 'is-invalid': errors.nomorinvoice }">
                                     <div class="invalid-feedback" v-if="errors.nomorinvoice">
-                                        {{ Array.isArray(errors.nomorinvoice) ? errors.nomorinvoice[0] : errors.nomorinvoice }}
+                                        {{ Array.isArray(errors.nomorinvoice) ? errors.nomorinvoice[0] :
+                                            errors.nomorinvoice }}
                                     </div>
                                 </div>
                             </div>

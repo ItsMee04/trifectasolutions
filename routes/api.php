@@ -118,6 +118,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // API INVOICE
     Route::post('invoice/getInvoice', [InvoiceController::class, 'getInvoice']);
+    Route::post('invoice/storeInvoice', [InvoiceController::class, 'storeInvoice']);
 
     Route::post('/logout', [AuthController::class, 'logout']);
 });

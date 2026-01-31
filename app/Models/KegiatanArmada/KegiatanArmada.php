@@ -57,4 +57,15 @@ class KegiatanArmada extends Model
     {
         return $this->belongsTo(Driver::class, 'driver_id', 'id');
     }
+
+    public function invoices()
+    {
+        // Parameter: NamaModelInduk, NamaTabelPivot, ForeignKeyDiPivot, RelatedKeyDiPivot
+        return $this->belongsToMany(
+            Invoice::class,
+            'invoicedetail',
+            'kegiatanarmada_id',
+            'invoice_id'
+        );
+    }
 }

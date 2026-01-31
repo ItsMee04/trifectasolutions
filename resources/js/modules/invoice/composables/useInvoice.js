@@ -87,17 +87,59 @@ export function useInvoice() {
     }
 
     const submitPrint = async () => {
-        // 2. Gabungkan (Append) lastFilter dengan data tambahan dari form
+        // 1. Validasi Input Modal Print
+        errors.value = {};
+        if (!formInvoice.tanggal) errors.value.tanggal = "Tanggal invoice wajib diisi.";
+        if (!formInvoice.nomorinvoice) errors.value.nomorinvoice = "Nomor invoice wajib diisi.";
+
+        if (Object.keys(errors.value).length > 0) return;
+
+        // 2. Ambil semua ID dari filteredInvoice (data yang tampil di tabel saat ini)
+        const selectedIds = filteredInvoice.value.map(item => item.id);
+
+        if (selectedIds.length === 0) {
+            notify.error("Tidak ada data kegiatan untuk di-invoice.");
+            return;
+        }
+
+        // 3. Payload Lengkap
         const payload = {
-            ...lastFilter.value, // Append: pengambilan, tujuan, kategori
-            tanggal: formInvoice.tanggal,
+            pengambilan: lastFilter.value.pengambilan,
+            tujuan: lastFilter.value.tujuan,
+            kategori: lastFilter.value.kategori,
+            periodeawal: lastFilter.value.periodeawal,
+            periodeakhir: lastFilter.value.periodeakhir,
             nomorinvoice: formInvoice.nomorinvoice,
-            periodeawal: formInvoice.periodeawal,
-            periodeakhir: formInvoice.periodeakhir
+            kegiatan_ids: selectedIds
         };
 
-        console.log("Payload Final untuk Cetak:", payload);
-    }
+        isLoading.value = true;
+        try {
+            const response = await invoiceService.storeInvoice(payload);
+
+            if (response.data.success) {
+                notify.success("Invoice berhasil disimpan.");
+
+                // Tutup modal print
+                const modalElement = document.getElementById('modalPrintInvoice');
+                const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                if (modalInstance) modalInstance.hide();
+
+                // 4. BUKA TAB BARU UNTUK PRINT PREVIEW
+                // Asumsi route backend untuk print adalah /invoice/print/{id}
+                const printUrl = `/api/invoice/print/${response.data.data.id}`;
+                window.open(printUrl, '_blank');
+
+                // 5. Reset Tabel (Sesuai instruksi: Memuat data... lalu kosong)
+                await handleRefresh();
+            }
+        } catch (error) {
+            console.error(error);
+            notify.error(error.response?.data?.message || "Gagal memproses invoice.");
+        } finally {
+            isLoading.value = false;
+        }
+    };
 
     const validateForm = () => {
         errors.value = {};
@@ -125,6 +167,8 @@ export function useInvoice() {
             pengambilan: formInvoice.pengambilan,
             tujuan: formInvoice.tujuan,
             kategori: formInvoice.kategori,
+            periodeawal: formInvoice.periodeawal,
+            periodeakhir: formInvoice.periodeakhir
         };
 
         lastFilter.value = { ...payload };
