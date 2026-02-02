@@ -75,35 +75,6 @@
                             <div class="col-md-6">
                                 <div class="mb-4">
                                     <div class="form-group local-forms mb-3">
-                                        <label>Suplier <span class="login-danger">*</span></label>
-                                        <Multiselect v-model="formCBP.suplier_id" :options="suplierList"
-                                            :searchable="true" placeholder="Pilih Suplier"
-                                            noOptionsText="Memuat data..."
-                                            :class="{ 'is-invalid': errors.suplier_id }" />
-                                        <div class="invalid-feedback d-block" v-if="errors.suplier_id">
-                                            {{ Array.isArray(errors.suplier_id) ? errors.suplier_id[0] :
-                                                errors.suplier_id }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-4">
-                                    <div class="form-group local-forms mb-3">
-                                        <label>Volume <span class="login-danger">*</span></label>
-                                        <input v-model="formCBP.volume" type="text" class="form-control"
-                                            :class="{ 'is-invalid': errors.volume }">
-                                        <div class="invalid-feedback" v-if="errors.volume">
-                                            {{ Array.isArray(errors.volume) ? errors.volume[0] : errors.volume }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-4">
-                                    <div class="form-group local-forms mb-3">
                                         <label>Berat Total <span class="login-danger">*</span></label>
                                         <input v-model="formCBP.berattotal" type="text" class="form-control"
                                             :class="{ 'is-invalid': errors.berattotal }">
@@ -118,11 +89,59 @@
                                 <div class="mb-4">
                                     <div class="form-group local-forms mb-3">
                                         <label>Berat Kendaraan <span class="login-danger">*</span></label>
-                                        <input v-model="formCBP.beratkendaraan" type="text"
-                                            class="form-control" :class="{ 'is-invalid': errors.beratkendaraan }">
+                                        <input v-model="formCBP.beratkendaraan" type="text" class="form-control"
+                                            :class="{ 'is-invalid': errors.beratkendaraan }">
                                         <div class="invalid-feedback" v-if="errors.beratkendaraan">
                                             {{ Array.isArray(errors.beratkendaraan) ? errors.beratkendaraan[0] :
                                                 errors.beratkendaraan }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <div class="form-group local-forms mb-3">
+                                        <label>Berat Jenis <span class="login-danger">*</span></label>
+                                        <Multiselect v-model="formCBP.beratjenis_id" :options="beratjenisList"
+                                            :searchable="true" placeholder="Pilih Berat Jenis"
+                                            noOptionsText="Memuat data..."
+                                            :class="{ 'is-invalid': errors.beratjenis_id }" />
+                                        <div class="invalid-feedback d-block" v-if="errors.beratjenis_id">
+                                            {{ Array.isArray(errors.beratjenis_id) ? errors.beratjenis_id[0] :
+                                                errors.beratjenis_id }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <div class="form-group local-forms mb-3">
+                                        <label>Suplier / Customer<span class="login-danger">*</span></label>
+                                        <Multiselect v-model="formCBP.suplier_id" :options="suplierList"
+                                            :searchable="true" placeholder="Pilih Suplier"
+                                            noOptionsText="Memuat data..."
+                                            :class="{ 'is-invalid': errors.suplier_id }" />
+                                        <div class="invalid-feedback d-block" v-if="errors.suplier_id">
+                                            {{ Array.isArray(errors.suplier_id) ? errors.suplier_id[0] :
+                                                errors.suplier_id }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-4">
+                                    <div class="form-group local-forms mb-3">
+                                        <label>Volume ({{ selectedMaterialSatuan }}) <span
+                                                class="login-danger">*</span></label>
+                                        <input v-model="formCBP.volume" type="number" step="0.01" class="form-control"
+                                            :class="{ 'is-invalid': errors.volume }"
+                                            :readonly="selectedMaterialSatuan === 'm3' || selectedMaterialSatuan === 'kg'">
+                                        <div class="invalid-feedback" v-if="errors.volume">
+                                            {{ Array.isArray(errors.volume) ? errors.volume[0] : errors.volume }}
                                         </div>
                                     </div>
                                 </div>
@@ -137,7 +156,7 @@
                                             :class="{ 'is-invalid': errors.beratmuatan }" readonly>
                                         <div class="invalid-feedback" v-if="errors.beratmuatan">
                                             {{ Array.isArray(errors.beratmuatan) ? errors.beratmuatan[0] :
-                                            errors.beratmuatan }}
+                                                errors.beratmuatan }}
                                         </div>
                                     </div>
                                 </div>
@@ -160,8 +179,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary" :disabled="isLoading">
-                            {{ isLoading ? 'Memuat data...' : (isEdit ? 'Update Concrete Batching Plant' : 'Simpan Concrete Batching Plant')
-                            }}
+                            {{ isLoading ? 'Memuat data...' : (isEdit ? 'Update Concrete Batching Plant' : 'Simpan Concrete Batching Plant')}}
                         </button>
                     </div>
                 </form>
@@ -176,7 +194,24 @@ import Multiselect from '@vueform/multiselect';
 import '@vueform/multiselect/themes/default.css';
 import { useCBP } from '../composables/useCBP';
 
-const { isEdit, formCBP, materialList, kendaraanList, driverList, suplierList, errors, fetchMaterial, fetchKendaraan, fetchDriver, fetchSuplier, submitCBP, isLoading } = useCBP();
+const {
+    isEdit,
+    formCBP,
+    materialList,
+    kendaraanList,
+    driverList,
+    suplierList,
+    beratjenisList,
+    errors,
+    selectedMaterialSatuan,
+    fetchMaterial,
+    fetchKendaraan,
+    fetchDriver,
+    fetchSuplier,
+    fetchBeratJenis,
+    submitCBP,
+    isLoading
+} = useCBP();
 
 const handleSubmit = async () => {
     await submitCBP();
@@ -187,5 +222,6 @@ onMounted(() => {
     fetchKendaraan();
     fetchDriver();
     fetchSuplier();
+    fetchBeratJenis();
 });
 </script>

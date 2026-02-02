@@ -4,6 +4,7 @@ import { materialService } from '../../material/services/materialService';
 import { kendaraanService } from '../../kendaraan/services/kendaraanService'
 import { driverService } from '../../driver/services/driverService'
 import { suplierService } from '../../suplier/services/suplierService'
+import { beratjenisService } from '../../beratjenis/services/beratjenisService'
 import { notify } from '../../../helper/notification';
 import Swal from 'sweetalert2';
 
@@ -13,6 +14,7 @@ const materialList = ref([]);
 const kendaraanList = ref([]);
 const driverList = ref([]);
 const suplierList = ref([]);
+const beratjenisList = ref([]);
 const currentTab = ref('IN');
 const startDate = ref(''); // State Baru
 const endDate = ref('');   // State Baru
@@ -22,6 +24,19 @@ const currentPage = ref(1);
 const itemsPerPage = 10;
 const isEdit = ref(false);
 const errors = ref({});
+const materialDataRaw = ref([]);
+const columnFilters = reactive({
+    material: '',
+    tanggal: '',
+    kode: '',
+    kendaraan: '',
+    driver: '',
+    suplier: '',
+    volume: '',
+    berattotal: '',
+    beratkendaraan: '',
+    beratmuatan: ''
+});
 
 const formCBP = reactive({
     id: null,
@@ -31,6 +46,7 @@ const formCBP = reactive({
     kendaraan_id: null,
     driver_id: null,
     suplier_id: null,
+    beratjenis_id: null,
     jenis: '',
     volume: '',
     berattotal: '',
@@ -55,7 +71,7 @@ export function useCBP() {
             const response = await concretebatchingplantService.getConcreteBatchingPlant(payload);
             ConcreteBatchingPlants.value = Array.isArray(response) ? response : (response.data || []);
         } catch (error) {
-            console.error("Gagal mengambil data Concrete Batching Plant:", error);
+            console.error("Gagal mengambil data Concrete Batch Plant:", error);
             ConcreteBatchingPlants.value = [];
         } finally {
             isLoading.value = false;
@@ -65,14 +81,45 @@ export function useCBP() {
     const fetchMaterial = async () => {
         try {
             const response = await materialService.getMaterial();
+            materialDataRaw.value = response.data; // Simpan data asli untuk cek satuan nanti
             materialList.value = response.data.map(item => ({
                 value: item.id,
                 label: item.material
-            }))
+            }));
         } catch (error) {
-            console.log("Gagal memuat material:", error)
+            console.log("Gagal memuat material:", error);
         }
-    }
+    };
+
+    // Helper untuk mendapatkan satuan material yang sedang dipilih
+    const selectedMaterialSatuan = computed(() => {
+        const material = materialDataRaw.value.find(m => m.id === formCBP.material_id);
+        return material ? material.satuan.toLowerCase() : '';
+    });
+
+    // Logika Perhitungan Volume Otomatis
+    watch(
+        () => [formCBP.beratmuatan, formCBP.beratjenis_id, formCBP.material_id],
+        () => {
+            const beratMuatan = parseFloat(formCBP.beratmuatan) || 0;
+            const satuan = selectedMaterialSatuan.value;
+
+            // Cari nilai nominal berat jenis dari list berdasarkan ID yang dipilih
+            const bjTerpilih = beratjenisList.value.find(b => b.value === formCBP.beratjenis_id);
+            const nilaiBJ = bjTerpilih ? parseFloat(bjTerpilih.label) : 0;
+
+            if (satuan === 'm3') {
+                formCBP.volume = nilaiBJ > 0 ? (beratMuatan / nilaiBJ).toFixed(2) : 0;
+            } else if (satuan === 'kg') {
+                formCBP.volume = beratMuatan;
+            } else if (satuan === 'liter' || satuan === 'pcs') {
+                // Biarkan user input manual, jangan override jika sudah ada isinya
+                // kecuali jika baru pindah ke satuan ini
+            } else {
+                formCBP.volume = 0;
+            }
+        }
+    );
 
     const fetchKendaraan = async () => {
         try {
@@ -110,6 +157,18 @@ export function useCBP() {
         }
     };
 
+    const fetchBeratJenis = async () => {
+        try {
+            const response = await beratjenisService.getBeratJenis();
+            beratjenisList.value = response.data.map(item => ({
+                value: item.id,
+                label: item.beratjenis
+            }));
+        } catch (error) {
+            console.error("Gagal memuat berat jenis:", error);
+        }
+    };
+
     const validateForm = () => {
         errors.value = {};
 
@@ -142,6 +201,7 @@ export function useCBP() {
                 kendaraan: formCBP.kendaraan_id,
                 driver: formCBP.driver_id,
                 suplier: formCBP.suplier_id,
+                beratjenis: formCBP.beratjenis_id,
                 jenis: formCBP.jenis,
                 volume: formCBP.volume,
                 berattotal: formCBP.berattotal,
@@ -185,7 +245,8 @@ export function useCBP() {
         formCBP.kendaraan_id = null;
         formCBP.driver_id = null;
         formCBP.suplier_id = null;
-        formCBP.jenis = currentTab.value;
+        formCBP.beratjenis_id = null,
+            formCBP.jenis = currentTab.value;
         formCBP.volume = '';
         formCBP.berattotal = '';
         formCBP.beratkendaraan = '';
@@ -216,6 +277,7 @@ export function useCBP() {
         formCBP.kendaraan_id = item.kendaraan_id;
         formCBP.driver_id = item.driver_id;
         formCBP.suplier_id = item.suplier_id;
+        formCBP.beratjenis_id = item.beratjenis_id;
         formCBP.jenis = item.jenis;
         formCBP.volume = item.volume;
         formCBP.berattotal = item.berattotal;
@@ -285,8 +347,10 @@ export function useCBP() {
         const query = searchQuery.value.toLowerCase();
 
         return ConcreteBatchingPlants.value.filter(item => {
+            // 1. FILTER SEARCH GLOBAL (Cari di semua field)
             const matchesSearch = searchMatch(item, query);
 
+            // 2. FILTER TANGGAL (Range)
             let matchesDate = true;
             if (startDate.value && endDate.value) {
                 matchesDate = item.tanggal >= startDate.value && item.tanggal <= endDate.value;
@@ -296,7 +360,40 @@ export function useCBP() {
                 matchesDate = item.tanggal <= endDate.value;
             }
 
-            return matchesSearch && matchesDate;
+            // 3. FILTER PER KOLOM (Spesifik)
+            // .every() memastikan SEMUA inputan kolom yang diisi harus terpenuhi
+            const matchesColumns = Object.keys(columnFilters).every(key => {
+                const filterVal = columnFilters[key].toLowerCase();
+                if (!filterVal) return true; // Jika filter kosong, loloskan data
+
+                switch (key) {
+                    case 'material':
+                        return String(item.material?.material || '').toLowerCase().includes(filterVal);
+                    case 'tanggal':
+                        return String(item.tanggal || '').toLowerCase().includes(filterVal);
+                    case 'kode':
+                        return String(item.kode || '').toLowerCase().includes(filterVal);
+                    case 'kendaraan':
+                        return String(item.kendaraan?.nomor || '').toLowerCase().includes(filterVal);
+                    case 'driver':
+                        return String(item.driver?.nama || '').toLowerCase().includes(filterVal);
+                    case 'suplier':
+                        return String(item.suplier?.nama || '').toLowerCase().includes(filterVal);
+                    case 'volume':
+                        return String(item.volume || '').toLowerCase().includes(filterVal);
+                    case 'berattotal':
+                        return String(item.berattotal || '').toLowerCase().includes(filterVal);
+                    case 'beratkendaraan':
+                        return String(item.beratkendaraan || '').toLowerCase().includes(filterVal);
+                    case 'beratmuatan':
+                        return String(item.beratmuatan || '').toLowerCase().includes(filterVal);
+                    // ... case kolom lainnya
+                    default: return true;
+                }
+            });
+
+            // KEMBALIKAN DATA HANYA JIKA SEMUA KONDISI TRUE
+            return matchesSearch && matchesDate && matchesColumns;
         });
     });
 
@@ -325,6 +422,11 @@ export function useCBP() {
         currentPage.value = 1;
     };
 
+    // Tambahkan reset filter kolom
+    const resetColumnFilters = () => {
+        Object.keys(columnFilters).forEach(key => columnFilters[key] = '');
+    };
+
     const displayedPages = computed(() => {
         const total = totalPages.value;
         const current = currentPage.value;
@@ -346,13 +448,15 @@ export function useCBP() {
     });
 
     return {
-        ConcreteBatchingPlants, materialList, kendaraanList, driverList, suplierList, isLoading, searchQuery, currentPage, currentTab, startDate, endDate,
+        ConcreteBatchingPlants, materialList, kendaraanList, driverList, suplierList, beratjenisList, selectedMaterialSatuan, isLoading, searchQuery, currentPage, currentTab, startDate, endDate,
         switchTab, isEdit, formCBP, errors, displayedPages,
         totalPages,
         totalFooter,
+        columnFilters,
+        resetColumnFilters,
         formatNumber,
         filteredConcreteBatchingPlant,
         paginatedConcreteBatchingPlant,
-        fetchCBP, fetchMaterial, fetchKendaraan, fetchDriver, fetchSuplier, handleCreate, handleEdit, handleDelete, handleRefresh, submitCBP, resetDateFilter
+        fetchCBP, fetchMaterial, fetchKendaraan, fetchDriver, fetchSuplier, fetchBeratJenis, handleCreate, handleEdit, handleDelete, handleRefresh, submitCBP, resetDateFilter
     };
 }

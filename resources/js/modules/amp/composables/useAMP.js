@@ -367,10 +367,26 @@ export function useAMP() {
                 if (!filterVal) return true; // Jika filter kosong, loloskan data
 
                 switch (key) {
-                    case 'driver':
-                        return String(item.driver?.nama || '').toLowerCase().includes(filterVal);
                     case 'material':
                         return String(item.material?.material || '').toLowerCase().includes(filterVal);
+                    case 'tanggal':
+                        return String(item.tanggal || '').toLowerCase().includes(filterVal);
+                    case 'kode':
+                        return String(item.kode || '').toLowerCase().includes(filterVal);
+                    case 'kendaraan':
+                        return String(item.kendaraan?.nomor || '').toLowerCase().includes(filterVal);
+                    case 'driver':
+                        return String(item.driver?.nama || '').toLowerCase().includes(filterVal);
+                    case 'suplier':
+                        return String(item.suplier?.nama || '').toLowerCase().includes(filterVal);
+                    case 'volume':
+                        return String(item.volume || '').toLowerCase().includes(filterVal);
+                    case 'berattotal':
+                        return String(item.berattotal || '').toLowerCase().includes(filterVal);
+                    case 'beratkendaraan':
+                        return String(item.beratkendaraan || '').toLowerCase().includes(filterVal);
+                    case 'beratmuatan':
+                        return String(item.beratmuatan || '').toLowerCase().includes(filterVal);
                     // ... case kolom lainnya
                     default: return true;
                 }

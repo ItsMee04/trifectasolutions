@@ -100,7 +100,7 @@
                             <td>
                                 <button @click="resetColumnFilters" class="btn btn-outline-danger btn-sm"
                                     title="Reset Filter">
-                                    <i class="fas fa-undo"></i>
+                                    <i class="fas fa-times"></i>
                                 </button>
                             </td>
                         </tr>

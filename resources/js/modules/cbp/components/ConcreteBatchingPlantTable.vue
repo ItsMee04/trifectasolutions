@@ -58,21 +58,51 @@
 
             <div class="table-responsive">
                 <table class="table table-nowrap table-hover mb-0">
-                    <thead>
+                    <thead class="bg-light">
                         <tr class="text-center">
                             <th style="width: 5%">#</th>
-                            <th style="width: 20%">Material</th>
-                            <th style="width: 20%">Tanggal</th>
-                            <th style="width: 20%">Kode</th>
-                            <th style="width: 20%">No. Polisi</th>
-                            <th style="width: 20%">Driver</th>
-                            <th style="width: 20%">Suplier</th>
-                            <th style="width: 20%">Volume</th>
-                            <th style="width: 20%">Berat Total</th>
-                            <th style="width: 20%">Berat Kendaraan</th>
-                            <th style="width: 20%">Berat Muatan</th>
-                            <th style="width: 20%">Status</th>
-                            <th style="width: 20%">Action</th>
+                            <th>Material</th>
+                            <th>Tanggal</th>
+                            <th>Kode</th>
+                            <th>No. Polisi</th>
+                            <th>Driver</th>
+                            <th>Suplier</th>
+                            <th>Volume</th>
+                            <th>Berat Total</th>
+                            <th>Berat Kendaraan</th>
+                            <th>Berat Muatan</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                        <tr class="text-center bg-white">
+                            <td></td>
+                            <td><input v-model="columnFilters.material" class="form-control form-control-sm"
+                                    placeholder="Filter..."></td>
+                            <td><input v-model="columnFilters.tanggal" type="date" class="form-control form-control-sm">
+                            </td>
+                            <td><input v-model="columnFilters.kode" class="form-control form-control-sm"
+                                    placeholder="Filter..."></td>
+                            <td><input v-model="columnFilters.kendaraan" class="form-control form-control-sm"
+                                    placeholder="Filter..."></td>
+                            <td><input v-model="columnFilters.driver" class="form-control form-control-sm"
+                                    placeholder="Filter..."></td>
+                            <td><input v-model="columnFilters.suplier" class="form-control form-control-sm"
+                                    placeholder="Filter..."></td>
+                            <td><input v-model="columnFilters.volume" class="form-control form-control-sm"
+                                    placeholder="Filter..."></td>
+                            <td><input v-model="columnFilters.berattotal" class="form-control form-control-sm"
+                                    placeholder="Filter..."></td>
+                            <td><input v-model="columnFilters.beratkendaraan" class="form-control form-control-sm"
+                                    placeholder="Filter..."></td>
+                            <td><input v-model="columnFilters.beratmuatan" class="form-control form-control-sm"
+                                    placeholder="Filter..."></td>
+                            <td></td>
+                            <td>
+                                <button @click="resetColumnFilters" class="btn btn-outline-danger btn-sm"
+                                    title="Reset Filter">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </td>
                         </tr>
                     </thead>
                     <tbody>
@@ -192,6 +222,8 @@ const {
     handleDelete,
     handleRefresh,
     formatNumber,
+    columnFilters,
+    resetColumnFilters,
 
     startDate,
     endDate,
