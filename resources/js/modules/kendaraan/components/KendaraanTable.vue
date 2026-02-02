@@ -62,7 +62,7 @@
                                 <td>{{ ((currentPage - 1) * 10) + (index + 1) }}</td>
                                 <td>{{ item.kode }}</td>
                                 <td>{{ item.kendaraan }}</td>
-                                <td>{{ item.bahanbakar?.jenis }}</td>
+                                <td>{{ item.jeniskendaraan?.jenis }}</td>
                                 <td>{{ item.nomor }}</td>
                                 <td>
                                     <span v-if="item.status == 1" class="badge bg-success">

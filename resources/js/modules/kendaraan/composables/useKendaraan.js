@@ -1,12 +1,12 @@
 import { ref, computed, reactive } from 'vue';
 import { kendaraanService } from '../services/kendaraanService';
-import { bahanbakarService } from '../../bahanbakar/services/bahanbakarService';
+import { jenisKendaraanService } from '../../jeniskendaraan/services/jeniskendaraanService';
 import { notify } from '../../../helper/notification';
 import Swal from 'sweetalert2';
 
 // Shared State
 const kendaraans = ref([]);
-const bahanbakarList = ref([])
+const jeniskendaranList = ref([])
 const isLoading = ref(false);
 const searchQuery = ref('');
 const currentPage = ref(1);
@@ -36,16 +36,16 @@ export function useKendaraan() {
         }
     };
 
-    const fetchBahanBakar = async () => {
+    const fetchJenisKendaraan = async () => {
         try {
-            const response = await bahanbakarService.getBahanBakar();
+            const response = await jenisKendaraanService.getJenisKendaraan();
             // Map data agar formatnya { value: id, label: 'nama' } sesuai standar Multiselect
-            bahanbakarList.value = response.data.map(bahanbakarList => ({
-                value: bahanbakarList.id,
-                label: bahanbakarList.jenis // Sesuaikan field 'role' dengan nama kolom di tabel roles Anda
+            jeniskendaranList.value = response.data.map(jeniskendaranList => ({
+                value: jeniskendaranList.id,
+                label: jeniskendaranList.jenis // Sesuaikan field 'role' dengan nama kolom di tabel roles Anda
             }));
         } catch (error) {
-            console.error("Gagal memuat bahan bakar:", error);
+            console.error("Gagal memuat Jenis Kendaraan:", error);
         }
     };
 
@@ -60,7 +60,7 @@ export function useKendaraan() {
         }
         // 4. TAMBAHKAN validasi kategori
         if (!formKendaraan.jenis) {
-            errors.value.jenis = 'Pilih Bahan Bakar terlebih dahulu.';
+            errors.value.jenis = 'Pilih Jenis Kendaraan terlebih dahulu.';
         }
         if (!formKendaraan.nomor || formKendaraan.nomor.trim() === '') {
             errors.value.nomor = 'Nomor Kendaraan tidak boleh kosong.';
@@ -217,14 +217,14 @@ export function useKendaraan() {
     });
 
     return {
-        kendaraans, bahanbakarList, isLoading, searchQuery, currentPage, isEdit, formKendaraan, errors, totalPages, displayedPages,
+        kendaraans, jeniskendaranList, isLoading, searchQuery, currentPage, isEdit, formKendaraan, errors, totalPages, displayedPages,
         filteredKendaraan: computed(() => {
             const query = searchQuery.value.toLowerCase();
             return kendaraans.value.filter(item => {
                 return (
                     (item.kode || '').toLowerCase().includes(query) ||
                     (item.kendaraan || '').toLowerCase().includes(query) ||
-                    (item.bahanbakar?.jenis || '').toLowerCase().includes(query) ||
+                    (item.jeniskendaraan?.jenis || '').toLowerCase().includes(query) ||
                     (item.nomor || '').toLowerCase().includes(query) // Pastikan path relasi role benar
                 );
             });
@@ -235,13 +235,13 @@ export function useKendaraan() {
                 return (
                     (item.kode || '').toLowerCase().includes(query) ||
                     (item.kendaraan || '').toLowerCase().includes(query) ||
-                    (item.jenis?.jenis || '').toLowerCase().includes(query) ||
+                    (item.jeniskendaraan?.jenis || '').toLowerCase().includes(query) ||
                     (item.nomor || '').toLowerCase().includes(query)
                 );
             });
             const start = (currentPage.value - 1) * itemsPerPage;
             return filtered.slice(start, start + itemsPerPage);
         }),
-        fetchKendaraan, fetchBahanBakar, handleCreate, handleEdit, handleDelete, handleRefresh, submitKendaraan
+        fetchKendaraan, fetchJenisKendaraan, handleCreate, handleEdit, handleDelete, handleRefresh, submitKendaraan
     };
 }

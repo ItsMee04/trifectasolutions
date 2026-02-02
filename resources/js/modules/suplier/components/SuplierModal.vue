@@ -5,7 +5,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title text-primary">
-                        {{ isEdit ? 'EDIT SUPLIER' : 'TAMBAH SUPLIER' }}
+                        {{ isEdit ? 'EDIT SUPLIER / CUSTOMER' : 'TAMBAH SUPLIER / CUSTOMER' }}
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -46,7 +46,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary" :disabled="isLoading">
-                            {{ isLoading ? 'Memuat data...' : (isEdit ? 'Update Suplier' : 'Simpan Suplier') }}
+                            {{ isLoading ? 'Memuat data...' : (isEdit ? 'Update Suplier / Customer' : 'Simpan Suplier / Customer') }}
                         </button>
                     </div>
                 </form>

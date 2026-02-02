@@ -4,7 +4,7 @@
             <div class="page-header">
                 <div class="row align-items-center">
                     <div class="col">
-                        <h5 class="card-title">Daftar Suplier</h5>
+                        <h5 class="card-title">Daftar Suplier / Customer</h5>
                     </div>
 
                     <div class="col-auto d-flex align-items-center flex-wrap">
@@ -37,7 +37,7 @@
                     <thead>
                         <tr class="text-center">
                             <th style="width: 5%">#</th>
-                            <th style="width: 20%">Kode Suplier</th>
+                            <th style="width: 20%">Kode Suplier / Customer</th>
                             <th style="width: 20%">Nama</th>
                             <th style="width: 20%">Kontak</th>
                             <th style="width: 20%;">Status</th>

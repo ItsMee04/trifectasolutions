@@ -1,10 +1,10 @@
 import { ref, computed, reactive } from 'vue';
-import { bahanbakarService } from '../services/bahanbakarService';
+import { beratjenisService } from '../services/beratjenisService';
 import { notify } from '../../../helper/notification';
 import Swal from 'sweetalert2';
 
 // Shared State
-const bahanbakars = ref([]);
+const BeratJeniss = ref([]);
 const isLoading = ref(false);
 const searchQuery = ref('');
 const currentPage = ref(1);
@@ -12,21 +12,20 @@ const itemsPerPage = 10;
 const isEdit = ref(false);
 const errors = ref({}); // Error ditaruh di shared state agar sinkron dengan modal
 
-const formBahanBakar = reactive({
+const formBeratJenis = reactive({
     id: null,
-    jenis: '',
-    indexperkm: '',
+    beratjenis: '',
 });
 
-export function useBahanBakar() {
+export function useBeratJenis() {
 
-    const fetchBahanBakar = async () => {
+    const fetchBeratJenis = async () => {
         isLoading.value = true;
         try {
-            const response = await bahanbakarService.getBahanBakar();
-            bahanbakars.value = Array.isArray(response) ? response : (response.data || []);
+            const response = await beratjenisService.getBeratJenis();
+            BeratJeniss.value = Array.isArray(response) ? response : (response.data || []);
         } catch (error) {
-            bahanbakars.value = [];
+            BeratJeniss.value = [];
         } finally {
             isLoading.value = false;
         }
@@ -35,46 +34,42 @@ export function useBahanBakar() {
     // --- LOGIKA VALIDASI ---
     const validateForm = () => {
         errors.value = {}; // Reset error
-        if (!formBahanBakar.jenis || formBahanBakar.jenis.trim() === '') {
-            errors.value.jenis = 'Jenis tidak boleh kosong.';
-        }
-        if (formBahanBakar.indexperkm === null || formBahanBakar.indexperkm === '') {
-            errors.value.indexperkm = 'Index Per KM tidak boleh kosong.';
+        if (!formBeratJenis.beratjenis || formBeratJenis.beratjenis === null) {
+            errors.value.nomor = 'Berat Jenis tidak boleh kosong.';
         }
         return Object.keys(errors.value).length === 0;
     };
 
     // --- LOGIKA SUBMIT (STORE & UPDATE) ---
-    const submitBahanBakar = async () => {
+    const submitBeratJenis = async () => {
         if (!validateForm()) return false;
 
         isLoading.value = true;
         try {
             // 📦 Siapkan Payload
             const payload = {
-                jenis: formBahanBakar.jenis,
-                indexperkm: formBahanBakar.indexperkm,
+                beratjenis: formBeratJenis.beratjenis,
             };
 
             let response;
             if (isEdit.value) {
                 // Mode Edit: Kirim ID dan Payload
-                payload.id = formBahanBakar.id;
-                response = await bahanbakarService.updateBahanBakar(payload);
+                payload.id = formBeratJenis.id;
+                response = await beratjenisService.updateBeratJenis(payload);
             } else {
                 // Mode Tambah: Kirim Payload saja
-                response = await bahanbakarService.storeBahanBakar(payload);
+                response = await beratjenisService.storeBeratJenis(payload);
             }
 
             notify.success(response.message || 'Data berhasil disimpan');
 
             // Tutup Modal
-            const modalElement = document.getElementById('modalBahanBakar');
+            const modalElement = document.getElementById('modalBeratJenis');
             const modalInstance = bootstrap.Modal.getInstance(modalElement);
             if (modalInstance) modalInstance.hide();
 
             // Refresh tabel tanpa reload halaman [cite: 2025-10-25]
-            await fetchBahanBakar();
+            await fetchBeratJenis();
 
             return true;
         } catch (error) {
@@ -97,30 +92,26 @@ export function useBahanBakar() {
 
     const handleCreate = () => {
         isEdit.value = false;
-        formBahanBakar.id = null;
-        formBahanBakar.jenis = '';
-        formBahanBakar.indexperkm = '';
-
+        formBeratJenis.id = null;
+        formBeratJenis.beratjenis = '';
         errors.value = {};
-        const modal = new bootstrap.Modal(document.getElementById('modalBahanBakar'));
+        const modal = new bootstrap.Modal(document.getElementById('modalBeratJenis'));
         modal.show();
     };
 
     const handleEdit = (item) => {
         isEdit.value = true;
         errors.value = {};
-        formBahanBakar.id = item.id;
-        formBahanBakar.jenis = item.jenis;
-        formBahanBakar.indexperkm = item.indexperkm;
-
-        const modal = new bootstrap.Modal(document.getElementById('modalBahanBakar'));
+        formBeratJenis.id = item.id;
+        formBeratJenis.beratjenis = item.beratjenis;
+        const modal = new bootstrap.Modal(document.getElementById('modalBeratJenis'));
         modal.show();
     };
 
     const handleDelete = async (item) => {
         const result = await Swal.fire({
             title: 'Apakah Anda yakin?',
-            text: `Data Bahan Bakar "${item.jenis}" yang dihapus tidak dapat dikembalikan!`,
+            text: `Data Berat Jenis "${item.beratjenis}" yang dihapus tidak dapat dikembalikan!`,
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
@@ -137,15 +128,15 @@ export function useBahanBakar() {
                     id: item.id,
                 };
                 // Mengirim payload id sesuai kebutuhan service Anda
-                await bahanbakarService.deleteBahanBakar(payload);
+                await beratjenisService.deleteBeratJenis(payload);
 
-                notify.success('Bahan Bakar berhasil dihapus.');
+                notify.success('Berat Jenis berhasil dihapus.');
 
-                // Memanggil fetchDriver agar tabel terupdate otomatis tanpa reload
-                await fetchBahanBakar();
+                // Memanggil fetch Berat Jenis agar tabel terupdate otomatis tanpa reload
+                await fetchBeratJenis();
             } catch (error) {
-                console.error('Gagal menghapus data Bahan Bakar:', error);
-                notify.error('Gagal menghapus data Bahan Bakar.');
+                console.error('Gagal menghapus data Berat Jenis:', error);
+                notify.error('Gagal menghapus data Berat Jenis.');
             } finally {
                 isLoading.value = false;
             }
@@ -153,23 +144,27 @@ export function useBahanBakar() {
     };
 
     const handleRefresh = async () => {
-        await fetchBahanBakar();
+        await fetchBeratJenis();
     }
 
+    // Helper function untuk konversi string secara aman
+    const getSafeString = (val) => String(val ?? '').toLowerCase();
+
     const totalPages = computed(() => {
-        const query = searchQuery.value.toLowerCase(); // Ambil string pencarian
-        const filteredCount = bahanbakars.value.filter(item =>
-            (item.jenis || '').toLowerCase().includes(query) ||
-            (item.indexperkm || '').toLowerCase().includes(query)
+        const query = searchQuery.value.toLowerCase();
+        const filteredCount = BeratJeniss.value.filter(item =>
+            // PERBAIKAN: Gunakan String()
+            getSafeString(item.beratjenis).includes(query)
         ).length;
 
         return Math.ceil(filteredCount / itemsPerPage) || 1;
     });
 
     const displayedPages = computed(() => {
+        // ... (logic pagination tetap sama)
         const total = totalPages.value;
         const current = currentPage.value;
-        const maxVisible = 5; // Jumlah nomor yang ingin ditampilkan
+        const maxVisible = 5;
 
         let start = Math.max(current - Math.floor(maxVisible / 2), 1);
         let end = start + maxVisible - 1;
@@ -187,22 +182,28 @@ export function useBahanBakar() {
     });
 
     return {
-        bahanbakars, isLoading, searchQuery, currentPage, isEdit, formBahanBakar, errors, totalPages, displayedPages,
-        filteredBahanBakar: computed(() => {
+        BeratJeniss, isLoading, searchQuery, currentPage, isEdit, formBeratJenis, errors, totalPages, displayedPages,
+
+        filteredBeratJenis: computed(() => {
             const query = searchQuery.value.toLowerCase();
-            return bahanbakars.value.filter(item =>
-                (item.jenis || '').toLowerCase().includes(query) ||
-                (item.indexperkm || '').toLowerCase().includes(query)
+            return BeratJeniss.value.filter(item =>
+                // PERBAIKAN: Gunakan String()
+                getSafeString(item.beratjenis).includes(query)
             );
         }),
-        paginatedBahanBakar: computed(() => {
+
+        paginatedBeratJenis: computed(() => {
+            const query = searchQuery.value.toLowerCase();
             const start = (currentPage.value - 1) * itemsPerPage;
-            return (bahanbakars.value.filter(item =>
-                (item.jenis || '').toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-                (item.indexperkm || '').toLowerCase().includes(searchQuery.value.toLowerCase())
-            ))
-                .slice(start, start + itemsPerPage);
+
+            // PERBAIKAN: Gunakan String() dan pastikan logic filter dilakukan sebelum slice
+            const filtered = BeratJeniss.value.filter(item =>
+                getSafeString(item.beratjenis).includes(query)
+            );
+
+            return filtered.slice(start, start + itemsPerPage);
         }),
-        fetchBahanBakar, handleCreate, handleEdit, handleDelete, handleRefresh, submitBahanBakar
+
+        fetchBeratJenis, handleCreate, handleEdit, handleDelete, handleRefresh, submitBeratJenis
     };
 }

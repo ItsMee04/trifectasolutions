@@ -4,7 +4,7 @@
             <div class="page-header">
                 <div class="row align-items-center">
                     <div class="col">
-                        <h5 class="card-title">Daftar Bahan Bakar</h5>
+                        <h5 class="card-title">Daftar Berat Jenis</h5>
                     </div>
 
                     <div class="col-auto d-flex align-items-center flex-wrap">
@@ -37,29 +37,27 @@
                     <thead>
                         <tr class="text-center">
                             <th style="width: 5%">#</th>
-                            <th style="width: 20%">Jenis</th>
-                            <th style="width: 20%">Index Per KM</th>
+                            <th style="width: 20%">Berat Jenis</th>
                             <th style="width: 20%">Status</th>
                             <th style="width: 20%">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-if="isLoading">
-                            <td colspan="5" class="text-center p-5">
+                            <td colspan="4" class="text-center p-5">
                                 <div class="spinner-border text-primary" role="status"></div>
                                 <p class="mt-2 mb-0">Memuat data...</p>
                             </td>
                         </tr>
 
-                        <tr v-else-if="!paginatedBahanBakar || paginatedBahanBakar.length === 0">
-                            <td colspan="5" class="text-center p-5">Tidak ada data.</td>
+                        <tr v-else-if="!paginatedBeratJenis || paginatedBeratJenis.length === 0">
+                            <td colspan="4" class="text-center p-5">Tidak ada data.</td>
                         </tr>
 
                         <template v-else>
-                            <tr v-for="(item, index) in paginatedBahanBakar" :key="item.id" class="text-center">
+                            <tr v-for="(item, index) in paginatedBeratJenis" :key="item.id" class="text-center">
                                 <td>{{ ((currentPage - 1) * 10) + (index + 1) }}</td>
-                                <td>{{ item.jenis }}</td>
-                                <td>{{ item.indexperkm }}</td>
+                                <td>{{ item.beratjenis }}</td>
                                 <td>
                                     <span v-if="item.status == 1" class="badge bg-success">
                                         ACTIVE
@@ -84,12 +82,12 @@
                 </table>
             </div>
 
-            <div v-if="filteredBahanBakar.length > 0" class="d-flex justify-content-between align-items-center p-3">
+            <div v-if="filteredBeratJenis.length > 0" class="d-flex justify-content-between align-items-center p-3">
 
                 <div class="text-muted small">
                     Showing {{ ((currentPage - 1) * 10) + 1 }}
-                    to {{ Math.min(currentPage * 10, filteredBahanBakar.length) }}
-                    of {{ filteredBahanBakar.length }} entries
+                    to {{ Math.min(currentPage * 10, filteredBeratJenis.length) }}
+                    of {{ filteredBeratJenis.length }} entries
                 </div>
 
                 <ul class="pagination mb-0">
@@ -131,7 +129,7 @@
 </template>
 
 <script setup>
-import { useBahanBakar } from '../composables/useBahanBakar';
+import { useBeratJenis } from '../composables/useBeratJenis';
 // Destructure semua yang dibutuhkan dari composable
 const {
     handleCreate,
@@ -140,11 +138,11 @@ const {
     handleRefresh,
 
     displayedPages,
-    filteredBahanBakar,
-    paginatedBahanBakar,
+    filteredBeratJenis,
+    paginatedBeratJenis,
     searchQuery,
     isLoading,
     currentPage,
     totalPages
-} = useBahanBakar();
+} = useBeratJenis();
 </script>

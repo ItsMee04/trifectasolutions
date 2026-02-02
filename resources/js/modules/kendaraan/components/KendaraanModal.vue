@@ -13,7 +13,7 @@
                     <div class="modal-body p-4">
                         <div class="row">
                             <div class="col-md-12">
-                                <div class="form-group local-forms mb-3">
+                                <div class="form-group local-forms mb-4">
                                     <label>Kode <span class="login-danger">*</span></label>
                                     <input v-model="formKendaraan.kode" type="text" class="form-control"
                                         :class="{ 'is-invalid': errors.kode }">
@@ -23,7 +23,7 @@
                                 </div>
                             </div>
                             <div class="col-md-12">
-                                <div class="form-group local-forms mb-3">
+                                <div class="form-group local-forms mb-4">
                                     <label>Kendaraan <span class="login-danger">*</span></label>
                                     <input v-model="formKendaraan.kendaraan" type="text" class="form-control"
                                         :class="{ 'is-invalid': errors.kendaraan }">
@@ -33,9 +33,9 @@
                                 </div>
                             </div>
                             <div class="col-md-12">
-                                <div class="form-group local-forms mb-3">
+                                <div class="form-group local-forms mb-4">
                                     <label>Jenis <span class="login-danger">*</span></label>
-                                    <Multiselect v-model="formKendaraan.jenis" :options="bahanbakarList"
+                                    <Multiselect v-model="formKendaraan.jenis" :options="jeniskendaranList"
                                         :searchable="true" placeholder="Pilih Jenis" noOptionsText="Memuat data..." />
                                     <div class="invalid-feedback" v-if="errors.jenis">
                                         {{ Array.isArray(errors.jenis) ? errors.jenis[0] : errors.jenis }}
@@ -43,7 +43,7 @@
                                 </div>
                             </div>
                             <div class="col-md-12">
-                                <div class="form-group local-forms mb-3">
+                                <div class="form-group local-forms mb-4">
                                     <label>Nomor <span class="login-danger">*</span></label>
                                     <input v-model="formKendaraan.nomor" type="text" class="form-control"
                                         :class="{ 'is-invalid': errors.nomor }">
@@ -73,7 +73,7 @@ import '@vueform/multiselect/themes/default.css';
 import { useKendaraan } from '../composables/useKendaraan';
 
 // Ambil state dan action dari composable
-const { isEdit, formKendaraan, fetchBahanBakar, bahanbakarList, isLoading, errors, submitKendaraan } = useKendaraan();
+const { isEdit, formKendaraan, fetchJenisKendaraan, jeniskendaranList, isLoading, errors, submitKendaraan } = useKendaraan();
 
 const handleSubmit = async () => {
     // submitRole akan mengembalikan true jika berhasil
@@ -81,6 +81,6 @@ const handleSubmit = async () => {
 };
 
 onMounted(() => {
-    fetchBahanBakar();
+    fetchJenisKendaraan();
 });
 </script>

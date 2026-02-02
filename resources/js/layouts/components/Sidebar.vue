@@ -91,11 +91,12 @@ const masterItems = [
     { name: 'Pegawai', path: '/pegawai' },
     { name: 'Users', path: '/users' },
     { name: 'Driver', path: '/driver' },
-    { name: 'Suplier', path: '/suplier' },
-    { name: 'Bahan Bakar', path: '/bahanbakar'},
+    { name: 'Suplier / Customer', path: '/suplier' },
+    { name: 'Jenis Kendaraan', path: '/jeniskendaraan'},
     { name: 'Kendaraan', path: '/kendaraan' },
     { name: 'Kategori', path: '/kategori' },
     { name: 'Material', path: '/material' },
+    { name: 'Berat Jenis', path: '/beratjenis' },
 ];
 
 const timbanganItems = [

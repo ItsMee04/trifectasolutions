@@ -16,7 +16,7 @@ class Kendaraan extends Model
     protected $fillable = [
         'kode',
         'kendaraan',
-        'jenis_id',
+        'jeniskendaraan_id',
         'nomor',
         'status',
     ];
@@ -36,8 +36,8 @@ class Kendaraan extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function bahanbakar(): BelongsTo
+    public function jeniskendaraan(): BelongsTo
     {
-        return $this->belongsTo(BahanBakar::class, 'jenis_id', 'id');
+        return $this->belongsTo(JenisKendaraan::class, 'jeniskendaraan_id', 'id');
     }
 }

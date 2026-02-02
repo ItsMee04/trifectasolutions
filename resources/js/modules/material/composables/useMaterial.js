@@ -19,6 +19,7 @@ const formMaterial = reactive({
     kode: '',
     kategori_id: null,
     material: '', // 2. UBAH 'role' menjadi 'role_id' agar cocok dengan value Multiselect (ID)
+    satuan:''
 });
 
 export function useMaterial() {
@@ -69,7 +70,8 @@ export function useMaterial() {
             const payload = {
                 id: formMaterial.id,
                 material: formMaterial.material,
-                kategori: formMaterial.kategori_id // 5. Kirim role_id (integer) ke backend
+                kategori: formMaterial.kategori_id, // 5. Kirim role_id (integer) ke backend
+                satuan: formMaterial.satuan,
             };
 
             let response;
@@ -113,6 +115,7 @@ export function useMaterial() {
         formMaterial.id = null;
         formMaterial.material = '';
         formMaterial.kategori_id = null; // 7. Pastikan mengambil role_id, bukan objek role
+        formMaterial.satuan = ''
 
         const modal = new bootstrap.Modal(document.getElementById('modalMaterial'));
         modal.show();
@@ -124,6 +127,7 @@ export function useMaterial() {
         formMaterial.id = item.id;
         formMaterial.material = item.material;
         formMaterial.kategori_id = item.kategori_id; // 7. Pastikan mengambil role_id, bukan objek role
+        formMaterial.satuan = item.satuan;
 
         const modal = new bootstrap.Modal(document.getElementById('modalMaterial'));
         modal.show();
@@ -205,7 +209,8 @@ export function useMaterial() {
             return materials.value.filter(item => {
                 return (
                     (item.kategori?.kategori || '').toLowerCase().includes(query) ||
-                    (item.material || '').toLowerCase().includes(query) // Pastikan path relasi role benar
+                    (item.material || '').toLowerCase().includes(query) || // Pastikan path relasi role benar
+                    (item.satuan || '').toLowerCase().includes(query)
                 );
             }
             );
@@ -215,7 +220,8 @@ export function useMaterial() {
             const filtered = materials.value.filter(item => {
                 return (
                     (item.kategori?.kategori || '').toLowerCase().includes(query) ||
-                    (item.material || '').toLowerCase().includes(query)
+                    (item.material || '').toLowerCase().includes(query) ||
+                    (item.satuan || '').toLowerCase().includes(query)
                 );
             });
             const start = (currentPage.value - 1) * itemsPerPage;

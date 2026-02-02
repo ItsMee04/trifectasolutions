@@ -16,7 +16,7 @@ class RoleController extends Controller
             return response()->json([
                 'status'    => 404,
                 'success'   => false,
-                'message'   => 'No active roles found',
+                'message'   => 'Data role tidak ditemukan',
                 'data'      => []
             ]);
         }
@@ -24,7 +24,7 @@ class RoleController extends Controller
         return response()->json([
             'status'    => 200,
             'success'   => true,
-            'message'   => 'Active roles retrieved successfully',
+            'message'   => 'Data role berhasil ditemukan',
             'data'      => $data
         ], 200);
     }
@@ -42,30 +42,9 @@ class RoleController extends Controller
         return response()->json([
             'status'    => 201,
             'success'   => true,
-            'message'   => 'Role created successfully',
+            'message'   => 'Data role berhasil disimpan',
             'data'      => $role
         ], 201);
-    }
-
-    public function editRole($id)
-    {
-        $role = Role::find($id);
-
-        if (!$role) {
-            return response()->json([
-                'status'    => 404,
-                'success'   => false,
-                'message'   => 'Role not found',
-                'data'      => null
-            ]);
-        }
-
-        return response()->json([
-            'status'    => 200,
-            'success'   => true,
-            'message'   => 'Role retrieved successfully',
-            'data'      => $role
-        ], 200);
     }
 
     public function updateRole(Request $request)
@@ -80,7 +59,7 @@ class RoleController extends Controller
             return response()->json([
                 'status'    => 404,
                 'success'   => false,
-                'message'   => 'Role not found',
+                'message'   => 'Data role tidak ditemukan',
                 'data'      => null
             ]);
         }
@@ -91,7 +70,7 @@ class RoleController extends Controller
         return response()->json([
             'status'    => 200,
             'success'   => true,
-            'message'   => 'Role updated successfully',
+            'message'   => 'Data role berhasil diupdate',
             'data'      => $role
         ], 200);
     }
@@ -104,7 +83,7 @@ class RoleController extends Controller
             return response()->json([
                 'status'    => 404,
                 'success'   => false,
-                'message'   => 'Role not found',
+                'message'   => 'Data role tidak ditemukan',
                 'data'      => null
             ]);
         }
@@ -115,7 +94,7 @@ class RoleController extends Controller
         return response()->json([
             'status'    => 200,
             'success'   => true,
-            'message'   => 'Role deleted successfully',
+            'message'   => 'Data role berhasil dihapus',
         ], 200);
     }
 }

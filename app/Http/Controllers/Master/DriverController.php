@@ -16,7 +16,7 @@ class DriverController extends Controller
             return response()->json([
                 'status'    => 404,
                 'success'   => false,
-                'message'   => 'No active drivers found.',
+                'message'   => 'Data driver tidak ditemukan.',
                 'data'      => []
             ]);
         }
@@ -24,7 +24,7 @@ class DriverController extends Controller
         return response()->json([
             'status' => 200,
             'success' => true,
-            'message' => 'Active drivers retrieved successfully.',
+            'message' => 'Data driver berhasil ditemukan.',
             'data' => $data
         ], 200);
     }
@@ -48,7 +48,7 @@ class DriverController extends Controller
         return response()->json([
             'status' => 201,
             'success' => true,
-            'message' => 'Driver created successfully.',
+            'message' => 'data driver berhasil disimpan.',
             'data' => $driver
         ], 201);
     }
@@ -68,7 +68,7 @@ class DriverController extends Controller
             return response()->json([
                 'status' => 404,
                 'success' => false,
-                'message' => 'Driver not found.',
+                'message' => 'Data driver tidak ditemukan.',
                 'data' => null
             ], 404);
         }
@@ -83,7 +83,7 @@ class DriverController extends Controller
         return response()->json([
             'status' => 200,
             'success' => true,
-            'message' => 'Driver updated successfully.',
+            'message' => 'Data driver berhasil diupdate.',
             'data' => $driver
         ], 200);
     }
@@ -96,7 +96,7 @@ class DriverController extends Controller
             return response()->json([
                 'status' => 404,
                 'success' => false,
-                'message' => 'Driver not found.',
+                'message' => 'Data driver tidak ditemukan.',
                 'data' => null
             ], 404);
         }
@@ -106,7 +106,7 @@ class DriverController extends Controller
         return response()->json([
             'status' => 200,
             'success' => true,
-            'message' => 'Driver deleted successfully.',
+            'message' => 'Data driver berhasil dihapus.',
             'data' => null
         ], 200);
     }

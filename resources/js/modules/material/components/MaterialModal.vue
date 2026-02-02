@@ -13,7 +13,7 @@
                     <div class="modal-body p-4">
                         <div class="row">
                             <div class="col-md-12">
-                                <div class="form-group local-forms mb-3">
+                                <div class="form-group local-forms mb-4">
                                     <label>Material <span class="login-danger">*</span></label>
                                     <input v-model="formMaterial.material" type="text" class="form-control"
                                         :class="{ 'is-invalid': errors.material }">
@@ -23,10 +23,25 @@
                                 </div>
                             </div>
                             <div class="col-md-12">
-                                <div class="form-group local-forms mb-3">
+                                <div class="form-group local-forms mb-4">
                                     <label>Kategori <span class="login-danger">*</span></label>
                                     <Multiselect v-model="formMaterial.kategori_id" :options="kategori"
-                                        :searchable="true" placeholder="Pilih Kategori" noOptionsText="Memuat data..." />
+                                        :searchable="true" placeholder="Pilih Kategori"
+                                        noOptionsText="Memuat data..." />
+                                    <div class="invalid-feedback" v-if="errors.material_id">
+                                        {{ Array.isArray(errors.kategori_id) ? errors.kategori_id[0] :
+                                            errors.kategori_id }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group local-forms mb-4">
+                                    <label>Satuan <span class="login-danger">*</span></label>
+                                    <input v-model="formMaterial.satuan" type="text" class="form-control"
+                                        :class="{ 'is-invalid': errors.satuan }">
+                                    <div class="invalid-feedback" v-if="errors.satuan">
+                                        {{ Array.isArray(errors.satuan) ? errors.satuan[0] : errors.satuan }}
+                                    </div>
                                 </div>
                             </div>
                         </div>

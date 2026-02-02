@@ -4,6 +4,7 @@ import { materialService } from '../../material/services/materialService';
 import { kendaraanService } from '../../kendaraan/services/kendaraanService'
 import { driverService } from '../../driver/services/driverService'
 import { suplierService } from '../../suplier/services/suplierService'
+import { beratjenisService } from '../../beratjenis/services/beratjenisService'
 import { notify } from '../../../helper/notification';
 import Swal from 'sweetalert2';
 
@@ -13,6 +14,7 @@ const materialList = ref([]);
 const kendaraanList = ref([]);
 const driverList = ref([]);
 const suplierList = ref([]);
+const beratjenisList = ref([]);
 const currentTab = ref('IN');
 const startDate = ref(''); // State Baru
 const endDate = ref('');   // State Baru
@@ -22,6 +24,7 @@ const currentPage = ref(1);
 const itemsPerPage = 10;
 const isEdit = ref(false);
 const errors = ref({});
+const materialDataRaw = ref([]);
 
 const formAMP = reactive({
     id: null,
@@ -31,6 +34,7 @@ const formAMP = reactive({
     kendaraan_id: null,
     driver_id: null,
     suplier_id: null,
+    beratjenis_id: null,
     jenis: '',
     volume: '',
     berattotal: '',
@@ -65,14 +69,45 @@ export function useAMP() {
     const fetchMaterial = async () => {
         try {
             const response = await materialService.getMaterial();
+            materialDataRaw.value = response.data; // Simpan data asli untuk cek satuan nanti
             materialList.value = response.data.map(item => ({
                 value: item.id,
                 label: item.material
-            }))
+            }));
         } catch (error) {
-            console.log("Gagal memuat material:", error)
+            console.log("Gagal memuat material:", error);
         }
-    }
+    };
+
+    // Helper untuk mendapatkan satuan material yang sedang dipilih
+    const selectedMaterialSatuan = computed(() => {
+        const material = materialDataRaw.value.find(m => m.id === formAMP.material_id);
+        return material ? material.satuan.toLowerCase() : '';
+    });
+
+    // Logika Perhitungan Volume Otomatis
+    watch(
+        () => [formAMP.beratmuatan, formAMP.beratjenis_id, formAMP.material_id],
+        () => {
+            const beratMuatan = parseFloat(formAMP.beratmuatan) || 0;
+            const satuan = selectedMaterialSatuan.value;
+
+            // Cari nilai nominal berat jenis dari list berdasarkan ID yang dipilih
+            const bjTerpilih = beratjenisList.value.find(b => b.value === formAMP.beratjenis_id);
+            const nilaiBJ = bjTerpilih ? parseFloat(bjTerpilih.label) : 0;
+
+            if (satuan === 'm3') {
+                formAMP.volume = nilaiBJ > 0 ? (beratMuatan / nilaiBJ).toFixed(2) : 0;
+            } else if (satuan === 'kg') {
+                formAMP.volume = beratMuatan;
+            } else if (satuan === 'liter' || satuan === 'pcs') {
+                // Biarkan user input manual, jangan override jika sudah ada isinya
+                // kecuali jika baru pindah ke satuan ini
+            } else {
+                formAMP.volume = 0;
+            }
+        }
+    );
 
     const fetchKendaraan = async () => {
         try {
@@ -110,6 +145,18 @@ export function useAMP() {
         }
     };
 
+    const fetchBeratJenis = async () => {
+        try {
+            const response = await beratjenisService.getBeratJenis();
+            beratjenisList.value = response.data.map(item => ({
+                value: item.id,
+                label: item.beratjenis
+            }));
+        } catch (error) {
+            console.error("Gagal memuat berat jenis:", error);
+        }
+    };
+
     const validateForm = () => {
         errors.value = {};
 
@@ -142,6 +189,7 @@ export function useAMP() {
                 kendaraan: formAMP.kendaraan_id,
                 driver: formAMP.driver_id,
                 suplier: formAMP.suplier_id,
+                beratjenis: formAMP.beratjenis_id,
                 jenis: formAMP.jenis,
                 volume: formAMP.volume,
                 berattotal: formAMP.berattotal,
@@ -185,6 +233,7 @@ export function useAMP() {
         formAMP.kendaraan_id = null;
         formAMP.driver_id = null;
         formAMP.suplier_id = null;
+        formAMP.beratjenis_id = null;
         formAMP.jenis = currentTab.value;
         formAMP.volume = '';
         formAMP.berattotal = '';
@@ -216,6 +265,7 @@ export function useAMP() {
         formAMP.kendaraan_id = item.kendaraan_id;
         formAMP.driver_id = item.driver_id;
         formAMP.suplier_id = item.suplier_id;
+        formAMP.beratjenis_id = item.beratjenis_id;
         formAMP.jenis = item.jenis;
         formAMP.volume = item.volume;
         formAMP.berattotal = item.berattotal;
@@ -346,13 +396,13 @@ export function useAMP() {
     });
 
     return {
-        AsphaltMixingPlants, materialList, kendaraanList, driverList, suplierList, isLoading, searchQuery, currentPage, currentTab, startDate, endDate, displayedPages,
+        AsphaltMixingPlants, materialList, kendaraanList, driverList, suplierList, beratjenisList, selectedMaterialSatuan, isLoading, searchQuery, currentPage, currentTab, startDate, endDate, displayedPages,
         switchTab, isEdit, formAMP, errors,
         totalPages,
         totalFooter,
         formatNumber,
         filteredAsphaltMixingPlant,
         paginatedAsphaltMixingPlant,
-        fetchAMP, fetchMaterial, fetchKendaraan, fetchDriver, fetchSuplier, handleCreate, handleEdit, handleDelete, handleRefresh, submitAMP, resetDateFilter
+        fetchAMP, fetchMaterial, fetchKendaraan, fetchDriver, fetchSuplier, fetchBeratJenis, handleCreate, handleEdit, handleDelete, handleRefresh, submitAMP, resetDateFilter
     };
 }

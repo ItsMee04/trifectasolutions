@@ -3,20 +3,20 @@
 namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\Controller;
-use App\Models\Master\BahanBakar;
+use App\Models\Master\JenisKendaraan;
 use Illuminate\Http\Request;
 
-class BahanBakarController extends Controller
+class JenisKendaraanController extends Controller
 {
-    public function getBahanBakar()
+    public function getJenisKendaraan()
     {
-        $data = BahanBakar::where('status', 1)->get();
+        $data = JenisKendaraan::where('status', 1)->get();
 
         if ($data->isEmpty()) {
             return response()->json([
                 'status'    => 404,
                 'success'   => false,
-                'message'   => 'Data Bahan Bakar tidak ditemukan',
+                'message'   => 'Data jenis kendaraan tidak ditemukan',
                 'data'      => []
             ]);
         }
@@ -24,19 +24,19 @@ class BahanBakarController extends Controller
         return response()->json([
             'status'    => 200,
             'success'   => true,
-            'message'   => 'Data Bahan Bakar berhasil ditemukan',
+            'message'   => 'Data jenis kendaraan berhasil ditemukan',
             'data'      => $data
         ]);
     }
 
-    public function storeBahanBakar(Request $request)
+    public function storeJenisKendaraan(Request $request)
     {
         $request->validate([
             'jenis'         => 'required',
             'indexperkm'    => 'required|integer'
         ]);
 
-        $data = BahanBakar::create([
+        $data = JenisKendaraan::create([
             'jenis'         => strtoupper($request->jenis),
             'indexperkm'    => $request->indexperkm,
         ]);
@@ -44,25 +44,25 @@ class BahanBakarController extends Controller
         return response()->json([
             'status'    => 200,
             'success'   => true,
-            'message'   => 'Data Bahan Bakar berhasil disimpan',
+            'message'   => 'Data jenis kendaraan berhasil disimpan',
             'data'      => $data
         ]);
     }
 
-    public function updateBahanBakar(Request $request)
+    public function updateJenisKendaraan(Request $request)
     {
         $request->validate([
             'jenis' => 'required',
             'indexperkm'    => 'required|integer'
         ]);
 
-        $data = BahanBakar::find($request->id);
+        $data = JenisKendaraan::find($request->id);
 
         if (!$data) {
             return response()->json([
                 'status'    => 400,
                 'success'   => false,
-                'message'   => 'Data Bahan Bakar tidak ditemukan',
+                'message'   => 'Data jenis kendaraan tidak ditemukan',
             ]);
         }
 
@@ -74,20 +74,20 @@ class BahanBakarController extends Controller
         return response()->json([
             'status'    => 200,
             'success'   => true,
-            'message'   => 'Data Berhasil Diupdate',
+            'message'   => 'Data jenis kendaraan Berhasil Diupdate',
             'Data'      => $data
         ]);
     }
 
-    public function deleteBahanBakar(Request $request)
+    public function deleteJenisKendaraan(Request $request)
     {
-        $data = BahanBakar::find($request->id);
+        $data = JenisKendaraan::find($request->id);
 
         if (!$data) {
             return response()->json([
                 'status' => 404,
                 'success' => false,
-                'message' => 'Data Bahan Bakar tidak ditemukan.',
+                'message' => 'Data jenis kendaraan tidak ditemukan.',
                 'data' => null
             ]);
         }
@@ -97,7 +97,7 @@ class BahanBakarController extends Controller
         return response()->json([
             'status' => 200,
             'success' => true,
-            'message' => 'Data Bahan Bakar berhasil dihapus.',
+            'message' => 'Data jenis kendaraan berhasil dihapus.',
             'data' => null
         ], 200);
     }

@@ -75,7 +75,7 @@ class UserController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => "Data User Berhasil Diperbarui"
+            'message' => "Data user berhasil diupdate"
         ], 200);
     }
 }

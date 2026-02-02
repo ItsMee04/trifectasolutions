@@ -4,7 +4,7 @@
             <div class="page-header">
                 <div class="row align-items-center">
                     <div class="col">
-                        <h5 class="card-title">Daftar Material</h5>
+                        <h5 class="card-title">Daftar Jenis Kendaraan</h5>
                     </div>
 
                     <div class="col-auto d-flex align-items-center flex-wrap">
@@ -37,33 +37,29 @@
                     <thead>
                         <tr class="text-center">
                             <th style="width: 5%">#</th>
-                            <th style="width: 20%">Kode Material</th>
-                            <th style="width: 20%">Kategori</th>
-                            <th style="width: 20%">Material</th>
-                            <th style="width: 20%">Satuan</th>
+                            <th style="width: 20%">Jenis</th>
+                            <th style="width: 20%">Index Per KM</th>
                             <th style="width: 20%">Status</th>
                             <th style="width: 20%">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-if="isLoading">
-                            <td colspan="6" class="text-center p-5">
-                                <div class="spinner-border text-primary" users="status"></div>
+                            <td colspan="5" class="text-center p-5">
+                                <div class="spinner-border text-primary" role="status"></div>
                                 <p class="mt-2 mb-0">Memuat data...</p>
                             </td>
                         </tr>
 
-                        <tr v-else-if="!paginatedMaterial || paginatedMaterial.length === 0">
-                            <td colspan="6" class="text-center p-5">Tidak ada data.</td>
+                        <tr v-else-if="!paginatedJenisKendaraan || paginatedJenisKendaraan.length === 0">
+                            <td colspan="5" class="text-center p-5">Tidak ada data.</td>
                         </tr>
 
                         <template v-else>
-                            <tr v-for="(item, index) in paginatedMaterial" :key="item.id" class="text-center">
+                            <tr v-for="(item, index) in paginatedJenisKendaraan" :key="item.id" class="text-center">
                                 <td>{{ ((currentPage - 1) * 10) + (index + 1) }}</td>
-                                <td>{{ item.kode }}</td>
-                                <td>{{ item.kategori.kategori }}</td>
-                                <td>{{ item.material }}</td>
-                                <td>{{ item.satuan }}</td>
+                                <td>{{ item.jenis }}</td>
+                                <td>{{ item.indexperkm }}</td>
                                 <td>
                                     <span v-if="item.status == 1" class="badge bg-success">
                                         ACTIVE
@@ -88,12 +84,12 @@
                 </table>
             </div>
 
-            <div v-if="filteredMaterial.length > 0" class="d-flex justify-content-between align-items-center p-3">
+            <div v-if="filteredJenisKendaraan.length > 0" class="d-flex justify-content-between align-items-center p-3">
 
                 <div class="text-muted small">
                     Showing {{ ((currentPage - 1) * 10) + 1 }}
-                    to {{ Math.min(currentPage * 10, filteredMaterial.length) }}
-                    of {{ filteredMaterial.length }} entries
+                    to {{ Math.min(currentPage * 10, filteredJenisKendaraan.length) }}
+                    of {{ filteredJenisKendaraan.length }} entries
                 </div>
 
                 <ul class="pagination mb-0">
@@ -135,7 +131,7 @@
 </template>
 
 <script setup>
-import { useMaterial } from '../composables/useMaterial';
+import { useJenisKendaraan } from '../composables/useJenisKendaraan';
 // Destructure semua yang dibutuhkan dari composable
 const {
     handleCreate,
@@ -144,11 +140,11 @@ const {
     handleRefresh,
 
     displayedPages,
-    filteredMaterial,
-    paginatedMaterial,
+    filteredJenisKendaraan,
+    paginatedJenisKendaraan,
     searchQuery,
     isLoading,
     currentPage,
     totalPages
-} = useMaterial();
+} = useJenisKendaraan();
 </script>

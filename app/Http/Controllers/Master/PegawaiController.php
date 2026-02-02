@@ -17,7 +17,7 @@ class PegawaiController extends Controller
             return response()->json([
                 'status'    => 404,
                 'success'   => false,
-                'message'   => 'Data Pegawai Tidak Ditemukan',
+                'message'   => 'Data pegawai tidak ditemukan',
                 'data'      => []
             ]);
         }
@@ -25,7 +25,7 @@ class PegawaiController extends Controller
         return response()->json([
             'status' => 200,
             'success' => true,
-            'message' => 'Data Pegawai Ditemukan',
+            'message' => 'Data berhasil ditemukan',
             'data' => $data
         ], 200);
     }
@@ -95,7 +95,7 @@ class PegawaiController extends Controller
             return response()->json([
                 'status' => 404,
                 'success' => false,
-                'message' => 'Data Pegawai Tidak Ditemukan'
+                'message' => 'Data pegawai tidak ditemukan'
             ], 404);
         }
 
@@ -128,7 +128,7 @@ class PegawaiController extends Controller
         return response()->json([
             'status'    => 200,
             'success'   => true,
-            'message'   => 'Data Pegawai Berhasil Diupdate',
+            'message'   => 'Data pegawai berhasil diupdate',
             'data'      => $pegawai
         ], 200);
     }
@@ -140,7 +140,7 @@ class PegawaiController extends Controller
             return response()->json([
                 'status' => 404,
                 'success' => false,
-                'message' => 'Data Pegawai Tidak Ditemukan'
+                'message' => 'Data pegawai tidak ditemukan'
             ], 404);
         }
 
@@ -151,7 +151,7 @@ class PegawaiController extends Controller
         return response()->json([
             'status'    => 200,
             'success'   => true,
-            'message'   => 'Data Pegawai Berhasil Dihapus'
+            'message'   => 'Data pegawai berhasil dihapus'
         ], 200);
     }
 }

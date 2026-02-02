@@ -15,6 +15,8 @@ use App\Http\Controllers\KegiatanArmada\InvoiceController;
 use App\Http\Controllers\KegiatanArmada\JarakDanHargaController;
 use App\Http\Controllers\KegiatanArmada\KegiatanArmadaController;
 use App\Http\Controllers\Master\BahanBakarController;
+use App\Http\Controllers\Master\BeratJenisController;
+use App\Http\Controllers\Master\JenisKendaraanController;
 use App\Http\Controllers\Timbangan\AsphaltMixingPlantController;
 use App\Http\Controllers\Timbangan\ConcreteBatchingPlantController;
 use App\Http\Controllers\Timbangan\StoneCrusherController;
@@ -64,10 +66,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('suplier/deleteSuplier', [SuplierController::class, 'deleteSuplier']);
 
     //API BAHAN BAKAR
-    Route::get('bahanbakar/getBahanBakar', [BahanBakarController::class, 'getBahanBakar']);
-    Route::post('bahanbakar/storeBahanBakar', [BahanBakarController::class, 'storeBahanBakar']);
-    Route::post('bahanbakar/updateBahanBakar', [BahanBakarController::class, 'updateBahanBakar']);
-    Route::post('bahanbakar/deleteBahanBakar', [BahanBakarController::class, 'deleteBahanBakar']);
+    Route::get('jeniskendaraan/getJenisKendaraan', [JenisKendaraanController::class, 'getJenisKendaraan']);
+    Route::post('jeniskendaraan/storeJenisKendaraan', [JenisKendaraanController::class, 'storeJenisKendaraan']);
+    Route::post('jeniskendaraan/updateJenisKendaraan', [JenisKendaraanController::class, 'updateJenisKendaraan']);
+    Route::post('jeniskendaraan/deleteJenisKendaraan', [JenisKendaraanController::class, 'deleteJenisKendaraan']);
 
     // API KENDARAAN
     Route::get('kendaraan/getKendaraan', [KendaraanController::class, 'getKendaraan']);
@@ -86,6 +88,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('material/storeMaterial', [MaterialController::class, 'storeMaterial']);
     Route::post('material/updateMaterial', [MaterialController::class, 'updateMaterial']);
     Route::post('material/deleteMaterial', [MaterialController::class, 'deleteMaterial']);
+
+    //API BERAT JENIS
+    Route::get('beratjenis/getBeratJenis', [BeratJenisController::class, 'getBeratJenis']);
+    Route::post('beratjenis/storeBeratJenis', [BeratJenisController::class, 'storeBeratJenis']);
+    Route::post('beratjenis/updateBeratJenis', [BeratJenisController::class, 'updateBeratJenis']);
+    Route::post('beratjenis/deleteBeratJenis', [BeratJenisController::class, 'deleteBeratJenis']);
 
     //API STONECRUSHER
     Route::post('stonecrusher/getStoneCrusher', [StoneCrusherController::class, 'getStoneCrusher']);

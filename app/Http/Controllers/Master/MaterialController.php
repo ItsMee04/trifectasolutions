@@ -16,7 +16,7 @@ class MaterialController extends Controller
             return response()->json([
                 'status'    => 404,
                 'success'   => false,
-                'message'   => 'No active materials found.',
+                'message'   => 'Data material tidak ditemukan.',
                 'data'      => []
             ]);
         }
@@ -24,7 +24,7 @@ class MaterialController extends Controller
         return response()->json([
             'status' => 200,
             'success' => true,
-            'message' => 'Active materials retrieved successfully.',
+            'message' => 'Data material berhasil ditemukan.',
             'data' => $data
         ], 200);
     }
@@ -34,18 +34,20 @@ class MaterialController extends Controller
         $request->validate([
             'kategori'      => 'required|exists:kategori,id',
             'material'      => 'required|string|max:255',
+            'satuan'        => 'required|string',
         ]);
 
         $material = Material::create([
             'kategori_id'   => $request->kategori,
             'material'      => strtoupper($request->material),
+            'satuan'        => strtoupper($request->satuan),
         ]);
 
         return response()->json([
-            'status' => 201,
-            'success' => true,
-            'message' => 'Material berhasil disimpan.',
-            'data' => $material
+            'status'        => 201,
+            'success'       => true,
+            'message'       => 'Data material berhasil disimpan.',
+            'data'          => $material
         ], 201);
     }
 
@@ -57,24 +59,26 @@ class MaterialController extends Controller
             return response()->json([
                 'status' => 404,
                 'success' => false,
-                'message' => 'Material not found.',
+                'message' => 'Data Material tidak ditemukan.',
             ]);
         }
 
         $request->validate([
             'kategori' => 'required|exists:kategori,id',
             'material' => 'required|string|max:255',
+            'satuan'   => 'required|string',
         ]);
 
         $material->update([
             'kategori_id'   => $request->kategori,
             'material'      => strtoupper($request->material),
+            'satuan'        => strtoupper($request->satuan),
         ]);
 
         return response()->json([
             'status' => 200,
             'success' => true,
-            'message' => 'Material berhasil diupdate.',
+            'message' => 'Data material berhasil diupdate.',
             'data' => $material
         ], 200);
     }
@@ -87,7 +91,7 @@ class MaterialController extends Controller
             return response()->json([
                 'status' => 404,
                 'success' => false,
-                'message' => 'Material tidak ditemukan.',
+                'message' => 'Data material tidak ditemukan.',
             ]);
         }
 
@@ -96,7 +100,7 @@ class MaterialController extends Controller
         return response()->json([
             'status' => 200,
             'success' => true,
-            'message' => 'Material berhasil dihapus.',
+            'message' => 'Data material berhasil dihapus.',
         ], 200);
     }
 }

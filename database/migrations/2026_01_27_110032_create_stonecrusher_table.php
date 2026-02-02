@@ -20,6 +20,7 @@ return new class extends Migration
             $table->unsignedBigInteger('driver_id');
             $table->unsignedBigInteger('suplier_id');
             $table->string('jenis');
+            $table->unsignedBigInteger('beratjenis_id');
             $table->decimal('volume', 8, 2)->default(0.0);
             $table->integer('berattotal')->default(0);
             $table->integer('beratkendaraan')->default(0);
@@ -31,6 +32,7 @@ return new class extends Migration
             $table->foreign('kendaraan_id')->references('id')->on('kendaraan')->onDelete('cascade');
             $table->foreign('driver_id')->references('id')->on('kendaraan')->onDelete('cascade');
             $table->foreign('suplier_id')->references('id')->on('kendaraan')->onDelete('cascade');
+            $table->foreign('beratjenis_id')->references('id')->on('beratjenis')->onDelete('cascade');
         });
     }
 

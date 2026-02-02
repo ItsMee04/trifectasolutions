@@ -4,10 +4,10 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="page-sub-header">
-                        <h3 class="page-title">Halaman Bahan Bakar</h3>
+                        <h3 class="page-title">Halaman Jenis Kendaraan</h3>
                         <ul class="breadcrumb">
                             <li class="breadcrumb-item">Master</li>
-                            <li class="breadcrumb-item active">Bahan Bakar</li>
+                            <li class="breadcrumb-item active">Jenis Kendaraan</li>
                         </ul>
                     </div>
                 </div>
@@ -16,23 +16,23 @@
 
         <div class="row">
             <div class="col-lg-12">
-                <BahanBakarTable />
+                <JenisKendaraanTable />
             </div>
         </div>
 
-        <BahanBakarModal />
+        <JenisKendaraanModal />
     </div>
 </template>
 
 <script setup>
 import { onMounted } from 'vue';
-import { useBahanBakar } from '../composables/useBahanBakar';
-import BahanBakarTable from '../components/BahanBakarTable.vue';
-import BahanBakarModal from '../components/BahanBakarModal.vue';
+import { useJenisKendaraan } from '../composables/useJenisKendaraan';
+import JenisKendaraanTable from '../components/JenisKendaraanTable.vue';
+import JenisKendaraanModal from '../components/JenisKendaraanModal.vue';
 
-const { fetchBahanBakar } = useBahanBakar();
+const { fetchJenisKendaraan } = useJenisKendaraan();
 
 onMounted(() => {
-    fetchBahanBakar();
+    fetchJenisKendaraan();
 });
 </script>

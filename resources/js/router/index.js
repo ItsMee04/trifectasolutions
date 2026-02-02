@@ -62,10 +62,10 @@ const routes = [
                     import("@/modules/suplier/views/SuplierView.vue"),
             },
             {
-                path: "bahanbakar",
-                name: "bahanbakar",
+                path: "jeniskendaraan",
+                name: "jeniskendaraan",
                 component: () =>
-                    import("@/modules/bahanbakar/views/BahanBakarView.vue"),
+                    import("@/modules/jeniskendaraan/views/JenisKendaraanView.vue"),
             },
             {
                 path: "kendaraan",
@@ -84,6 +84,12 @@ const routes = [
                 name: "material",
                 component: () =>
                     import("@/modules/material/views/MaterialView.vue"),
+            },
+            {
+                path: "beratjenis",
+                name: "beratjenis",
+                component: () =>
+                    import("@/modules/beratjenis/views/BeratJenisView.vue"),
             },
             {
                 path: "stonecrusher",

@@ -75,35 +75,6 @@
                             <div class="col-md-6">
                                 <div class="mb-4">
                                     <div class="form-group local-forms mb-3">
-                                        <label>Suplier <span class="login-danger">*</span></label>
-                                        <Multiselect v-model="formAMP.suplier_id" :options="suplierList"
-                                            :searchable="true" placeholder="Pilih Suplier"
-                                            noOptionsText="Memuat data..."
-                                            :class="{ 'is-invalid': errors.suplier_id }" />
-                                        <div class="invalid-feedback d-block" v-if="errors.suplier_id">
-                                            {{ Array.isArray(errors.suplier_id) ? errors.suplier_id[0] :
-                                                errors.suplier_id }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-4">
-                                    <div class="form-group local-forms mb-3">
-                                        <label>Volume <span class="login-danger">*</span></label>
-                                        <input v-model="formAMP.volume" type="text" class="form-control"
-                                            :class="{ 'is-invalid': errors.volume }">
-                                        <div class="invalid-feedback" v-if="errors.volume">
-                                            {{ Array.isArray(errors.volume) ? errors.volume[0] : errors.volume }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-4">
-                                    <div class="form-group local-forms mb-3">
                                         <label>Berat Total <span class="login-danger">*</span></label>
                                         <input v-model="formAMP.berattotal" type="text" class="form-control"
                                             :class="{ 'is-invalid': errors.berattotal }">
@@ -132,12 +103,61 @@
                             <div class="col-md-6">
                                 <div class="mb-4">
                                     <div class="form-group local-forms mb-3">
+                                        <label>Berat Jenis <span class="login-danger">*</span></label>
+                                        <Multiselect v-model="formAMP.beratjenis_id" :options="beratjenisList"
+                                            :searchable="true" placeholder="Pilih Berat Jenis"
+                                            noOptionsText="Memuat data..."
+                                            :class="{ 'is-invalid': errors.beratjenis_id }" />
+                                        <div class="invalid-feedback d-block" v-if="errors.beratjenis_id">
+                                            {{ Array.isArray(errors.beratjenis_id) ? errors.beratjenis_id[0] :
+                                                errors.beratjenis_id }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <div class="form-group local-forms mb-3">
+                                        <label>Suplier / Customer <span class="login-danger">*</span></label>
+                                        <Multiselect v-model="formAMP.suplier_id" :options="suplierList"
+                                            :searchable="true" placeholder="Pilih Suplier"
+                                            noOptionsText="Memuat data..."
+                                            :class="{ 'is-invalid': errors.suplier_id }" />
+                                        <div class="invalid-feedback d-block" v-if="errors.suplier_id">
+                                            {{ Array.isArray(errors.suplier_id) ? errors.suplier_id[0] :
+                                                errors.suplier_id }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-4">
+                                    <div class="form-group local-forms mb-3">
+                                        <label>Volume ({{ selectedMaterialSatuan }}) <span
+                                                class="login-danger">*</span></label>
+                                        <input v-model="formAMP.volume" type="number" step="0.01" class="form-control"
+                                            :class="{ 'is-invalid': errors.volume }"
+                                            :readonly="selectedMaterialSatuan === 'm3' || selectedMaterialSatuan === 'kg'">
+                                        <div class="invalid-feedback" v-if="errors.volume">
+                                            {{ Array.isArray(errors.volume) ? errors.volume[0] : errors.volume }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <div class="form-group local-forms mb-3">
+                                        <label>Berat Muatan <span class="login-danger">*</span></label>
                                         <label>Berat Muatan <span class="login-danger">*</span></label>
                                         <input v-model="formAMP.beratmuatan" type="text" class="form-control"
                                             :class="{ 'is-invalid': errors.beratmuatan }" readonly>
                                         <div class="invalid-feedback" v-if="errors.beratmuatan">
                                             {{ Array.isArray(errors.beratmuatan) ? errors.beratmuatan[0] :
-                                            errors.beratmuatan }}
+                                                errors.beratmuatan }}
                                         </div>
                                     </div>
                                 </div>
@@ -147,7 +167,7 @@
                                     <div class="form-group local-forms mb-3">
                                         <label>Jenis <span class="login-danger">*</span></label>
                                         <input v-model="formAMP.jenis" type="text" class="form-control"
-                                            :class="{ 'is-invalid': errors.jenis }" readonly="">
+                                        :class="{ 'is-invalid': errors.jenis }" readonly>
                                         <div class="invalid-feedback" v-if="errors.jenis">
                                             {{ Array.isArray(errors.jenis) ? errors.jenis[0] :
                                                 errors.jenis }}
@@ -160,8 +180,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary" :disabled="isLoading">
-                            {{ isLoading ? 'Memuat data...' : (isEdit ? 'Update Asphalt Mixing Plant' : 'Simpan Asphalt Mixing Plant')
-                            }}
+                            {{ isLoading ? 'Memuat data...' : (isEdit ? 'Update Asphalt Mixing Plant' : 'Simpan Asphalt Mixing Plant')}}
                         </button>
                     </div>
                 </form>
@@ -183,11 +202,14 @@ const {
     kendaraanList,
     driverList,
     suplierList,
+    beratjenisList,
     errors,
+    selectedMaterialSatuan,
     fetchMaterial,
     fetchKendaraan,
     fetchDriver,
     fetchSuplier,
+    fetchBeratJenis,
     submitAMP,
     isLoading
 } = useAMP();
@@ -201,5 +223,6 @@ onMounted(() => {
     fetchKendaraan();
     fetchDriver();
     fetchSuplier();
+    fetchBeratJenis();
 });
 </script>

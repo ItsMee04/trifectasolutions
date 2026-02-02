@@ -16,14 +16,14 @@ class SuplierController extends Controller
             return response()->json([
                 'status'    => 404,
                 'success'   => false,
-                'message' => 'No active suppliers found.',
+                'message' => 'Data suplier / customer tidak ditemukan.',
                 'data' => [],
             ]);
         }
         return response()->json([
             'status'    => 200,
             'success'   => true,
-            'message' => 'Active suppliers retrieved successfully.',
+            'message' => 'Data suplier / customer berhasil ditemukan.',
             'data' => $data,
         ], 200);
     }
@@ -45,7 +45,7 @@ class SuplierController extends Controller
         return response()->json([
             'status' => 201,
             'success' => true,
-            'message' => 'Suplier created successfully.',
+            'message' => 'Data suplier / customer berhasil disimpan.',
             'data' => $suplier
         ], 201);
     }
@@ -58,7 +58,7 @@ class SuplierController extends Controller
             return response()->json([
                 'status' => 404,
                 'success' => false,
-                'message' => 'Suplier not found.',
+                'message' => 'Data suplier / customer tidak ditemukan.',
                 'data' => null
             ], 404);
         }
@@ -78,7 +78,7 @@ class SuplierController extends Controller
         return response()->json([
             'status' => 200,
             'success' => true,
-            'message' => 'Suplier updated successfully.',
+            'message' => 'Data suplier / customer berhasil diupdate.',
             'data' => $suplier
         ], 200);
     }
@@ -91,7 +91,7 @@ class SuplierController extends Controller
             return response()->json([
                 'status' => 404,
                 'success' => false,
-                'message' => 'Suplier not found.',
+                'message' => 'Data suplier / customer tidak ditemukan.',
                 'data' => null
             ], 404);
         }
@@ -101,7 +101,7 @@ class SuplierController extends Controller
         return response()->json([
             'status' => 200,
             'success' => true,
-            'message' => 'Suplier deleted successfully.',
+            'message' => 'Data suplier / customer berhasil dihapus.',
             'data' => null
         ], 200);
     }

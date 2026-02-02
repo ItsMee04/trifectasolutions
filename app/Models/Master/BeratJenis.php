@@ -2,29 +2,28 @@
 
 namespace App\Models\Master;
 
-use App\Models\Master\Kendaraan;
+use App\Models\Timbangan\AsphaltMixingPlant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class BahanBakar extends Model
+class BeratJenis extends Model
 {
     use HasFactory;
-    protected $table = 'bahanbakar';
+    protected $table = 'beratjenis';
     protected $hidden = ['created_at', 'updated_at'];
     protected $fillable = [
-        'jenis',
-        'indexperkm',
+        'beratjenis',
         'status',
     ];
 
     /**
-     * Get all of the kendaraan for the BahanBakar
+     * Get all of the amp for the BeratJenis
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function kendaraan(): HasMany
+    public function amp(): HasMany
     {
-        return $this->hasMany(Kendaraan::class, 'jenis_id', 'id');
+        return $this->hasMany(AsphaltMixingPlant::class, 'beratjenis_id', 'id');
     }
 }

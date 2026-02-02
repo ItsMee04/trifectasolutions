@@ -19,6 +19,7 @@ class Material extends Model
         'kode',
         'kategori_id',
         'material',
+        'satuan',
         'status',
     ];
 

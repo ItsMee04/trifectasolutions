@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('kode', 100)->nullable()->default('text');
             $table->unsignedBigInteger('kategori_id');
             $table->string('material');
+            $table->string('satuan', 100);
             $table->integer('status')->unsigned()->default(1);
             $table->timestamps();
 
