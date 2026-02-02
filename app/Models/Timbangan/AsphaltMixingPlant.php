@@ -61,7 +61,7 @@ class AsphaltMixingPlant extends Model
         // Format angka dengan leading zeros (3 digit)
         $formattedNumber = str_pad($number, 8, '0', STR_PAD_LEFT);
 
-        return 'CBPID-' . $formattedNumber;
+        return 'AMPID-' . $formattedNumber;
     }
 
     /**

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('kendaraan_id');
             $table->unsignedBigInteger('driver_id');
             $table->unsignedBigInteger('suplier_id');
-            $table->unsignedBigInteger('beratjenis_id');
+            $table->unsignedBigInteger('beratjenis_id')->nullable();
             $table->string('jenis');
             $table->decimal('volume', 8, 2)->default(0.0);
             $table->integer('berattotal')->default(0);

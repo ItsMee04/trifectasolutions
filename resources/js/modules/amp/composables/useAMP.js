@@ -25,6 +25,18 @@ const itemsPerPage = 10;
 const isEdit = ref(false);
 const errors = ref({});
 const materialDataRaw = ref([]);
+const columnFilters = reactive({
+    material: '',
+    tanggal: '',
+    kode: '',
+    kendaraan: '',
+    driver: '',
+    suplier: '',
+    volume: '',
+    berattotal: '',
+    beratkendaraan: '',
+    beratmuatan: ''
+});
 
 const formAMP = reactive({
     id: null,
@@ -335,8 +347,10 @@ export function useAMP() {
         const query = searchQuery.value.toLowerCase();
 
         return AsphaltMixingPlants.value.filter(item => {
+            // 1. FILTER SEARCH GLOBAL (Cari di semua field)
             const matchesSearch = searchMatch(item, query);
 
+            // 2. FILTER TANGGAL (Range)
             let matchesDate = true;
             if (startDate.value && endDate.value) {
                 matchesDate = item.tanggal >= startDate.value && item.tanggal <= endDate.value;
@@ -346,7 +360,24 @@ export function useAMP() {
                 matchesDate = item.tanggal <= endDate.value;
             }
 
-            return matchesSearch && matchesDate;
+            // 3. FILTER PER KOLOM (Spesifik)
+            // .every() memastikan SEMUA inputan kolom yang diisi harus terpenuhi
+            const matchesColumns = Object.keys(columnFilters).every(key => {
+                const filterVal = columnFilters[key].toLowerCase();
+                if (!filterVal) return true; // Jika filter kosong, loloskan data
+
+                switch (key) {
+                    case 'driver':
+                        return String(item.driver?.nama || '').toLowerCase().includes(filterVal);
+                    case 'material':
+                        return String(item.material?.material || '').toLowerCase().includes(filterVal);
+                    // ... case kolom lainnya
+                    default: return true;
+                }
+            });
+
+            // KEMBALIKAN DATA HANYA JIKA SEMUA KONDISI TRUE
+            return matchesSearch && matchesDate && matchesColumns;
         });
     });
 
@@ -375,6 +406,11 @@ export function useAMP() {
         currentPage.value = 1;
     };
 
+    // Tambahkan reset filter kolom
+    const resetColumnFilters = () => {
+        Object.keys(columnFilters).forEach(key => columnFilters[key] = '');
+    };
+
     const displayedPages = computed(() => {
         const total = totalPages.value;
         const current = currentPage.value;
@@ -400,6 +436,8 @@ export function useAMP() {
         switchTab, isEdit, formAMP, errors,
         totalPages,
         totalFooter,
+        columnFilters,
+        resetColumnFilters,
         formatNumber,
         filteredAsphaltMixingPlant,
         paginatedAsphaltMixingPlant,
