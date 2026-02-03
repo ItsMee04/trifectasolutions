@@ -20,7 +20,7 @@ class ConcreteBatchingPlantController extends Controller
 
         $data = ConcreteBatchingPlant::where('status', 1)
             ->where('jenis', $request->jenis)
-            ->with(['material', 'kendaraan', 'driver', 'suplier'])
+            ->with(['material', 'kendaraan', 'driver', 'suplier','beratjenis'])
             ->get();
 
         if ($data->isEmpty()) {
@@ -48,6 +48,7 @@ class ConcreteBatchingPlantController extends Controller
             'kendaraan'      => 'required|exists:kendaraan,id',
             'driver'         => 'required|exists:driver,id',
             'suplier'        => 'required|exists:suplier,id',
+            'beratjenis'     => 'required|exists:beratjenis,id',
             'jenis'          => 'required|in:IN,OUT',
             'volume'         => 'required|numeric',
             'berattotal'     => 'required|numeric',
@@ -67,6 +68,7 @@ class ConcreteBatchingPlantController extends Controller
                     'kendaraan_id'   => $request->kendaraan,
                     'driver_id'      => $request->driver,
                     'suplier_id'     => $request->suplier,
+                    'beratjenis_id'  => $request->beratjenis,
                     'jenis'          => $request->jenis,
                     'volume'         => $request->volume,
                     'berattotal'     => $request->berattotal,
@@ -119,6 +121,7 @@ class ConcreteBatchingPlantController extends Controller
             'kendaraan'         => 'required|exists:kendaraan,id',
             'driver'            => 'required|exists:driver,id',
             'suplier'           => 'required|exists:suplier,id',
+            'beratjenis'        => 'required|exists:beratjenis,id',
             'jenis'             => 'required|in:IN,OUT',
             'volume'            => 'required|numeric',
             'berattotal'        => 'required|numeric',
@@ -149,6 +152,7 @@ class ConcreteBatchingPlantController extends Controller
                     'kendaraan_id'   => $request->kendaraan,
                     'driver_id'      => $request->driver,
                     'suplier_id'     => $request->suplier,
+                    'beratjenis_id'  => $request->beratjenis,
                     'jenis'          => $request->jenis,
                     'volume'         => $request->volume,
                     'berattotal'     => $request->berattotal,

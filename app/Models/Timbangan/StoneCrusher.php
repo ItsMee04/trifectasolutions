@@ -8,6 +8,7 @@ use App\Models\Master\Material;
 use App\Models\Master\Kendaraan;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\KegiatanArmada\JarakHarga;
+use App\Models\Master\BeratJenis;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -23,6 +24,7 @@ class StoneCrusher extends Model
         'kendaraan_id',
         'driver_id',
         'suplier_id',
+        'beratjenis_id',
         'jenis',
         'volume',
         'berattotal',
@@ -105,5 +107,15 @@ class StoneCrusher extends Model
     public function jarakHarga()
     {
         return $this->morphOne(JarakHarga::class, 'source');
+    }
+
+    /**
+     * Get the user that owns the StoneCrusher
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(BeratJenis::class, 'beratjenis_id', 'id');
     }
 }

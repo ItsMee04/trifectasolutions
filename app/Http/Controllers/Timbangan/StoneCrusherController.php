@@ -22,7 +22,7 @@ class StoneCrusherController extends Controller
 
         $data = StoneCrusher::where('status', 1)
             ->where('jenis', $request->jenis)
-            ->with(['material', 'kendaraan', 'driver', 'suplier'])
+            ->with(['material', 'kendaraan', 'driver', 'suplier', 'beratjenis'])
             ->get();
 
         if ($data->isEmpty()) {
@@ -50,6 +50,7 @@ class StoneCrusherController extends Controller
             'kendaraan'      => 'required|exists:kendaraan,id',
             'driver'         => 'required|exists:driver,id',
             'suplier'        => 'required|exists:suplier,id',
+            'beratjenis'     => 'required|exists:beratjenis,id',
             'jenis'          => 'required|in:IN,OUT',
             'volume'         => 'required|numeric',
             'berattotal'     => 'required|numeric',
@@ -69,6 +70,7 @@ class StoneCrusherController extends Controller
                     'kendaraan_id'   => $request->kendaraan,
                     'driver_id'      => $request->driver,
                     'suplier_id'     => $request->suplier,
+                    'beratjenis_id'  => $request->beratjenis,
                     'jenis'          => $request->jenis,
                     'volume'         => $request->volume,
                     'berattotal'     => $request->berattotal,
@@ -121,6 +123,7 @@ class StoneCrusherController extends Controller
             'kendaraan'         => 'required|exists:kendaraan,id',
             'driver'            => 'required|exists:driver,id',
             'suplier'           => 'required|exists:suplier,id',
+            'beratjenis'        => 'required|exists:beratjenis,id',
             'jenis'             => 'required|in:IN,OUT',
             'volume'            => 'required|numeric',
             'berattotal'        => 'required|numeric',
@@ -151,6 +154,7 @@ class StoneCrusherController extends Controller
                     'kendaraan_id'   => $request->kendaraan,
                     'driver_id'      => $request->driver,
                     'suplier_id'     => $request->suplier,
+                    'beratjenis_id'  => $request->beratjenis,
                     'jenis'          => $request->jenis,
                     'volume'         => $request->volume,
                     'berattotal'     => $request->berattotal,

@@ -75,35 +75,6 @@
                             <div class="col-md-6">
                                 <div class="mb-4">
                                     <div class="form-group local-forms mb-3">
-                                        <label>Suplier <span class="login-danger">*</span></label>
-                                        <Multiselect v-model="formStoneCrusher.suplier_id" :options="suplierList"
-                                            :searchable="true" placeholder="Pilih Suplier"
-                                            noOptionsText="Memuat data..."
-                                            :class="{ 'is-invalid': errors.suplier_id }" />
-                                        <div class="invalid-feedback d-block" v-if="errors.suplier_id">
-                                            {{ Array.isArray(errors.suplier_id) ? errors.suplier_id[0] :
-                                                errors.suplier_id }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-4">
-                                    <div class="form-group local-forms mb-3">
-                                        <label>Volume <span class="login-danger">*</span></label>
-                                        <input v-model="formStoneCrusher.volume" type="text" class="form-control"
-                                            :class="{ 'is-invalid': errors.volume }">
-                                        <div class="invalid-feedback" v-if="errors.volume">
-                                            {{ Array.isArray(errors.volume) ? errors.volume[0] : errors.volume }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-4">
-                                    <div class="form-group local-forms mb-3">
                                         <label>Berat Total <span class="login-danger">*</span></label>
                                         <input v-model="formStoneCrusher.berattotal" type="text" class="form-control"
                                             :class="{ 'is-invalid': errors.berattotal }">
@@ -123,6 +94,54 @@
                                         <div class="invalid-feedback" v-if="errors.beratkendaraan">
                                             {{ Array.isArray(errors.beratkendaraan) ? errors.beratkendaraan[0] :
                                                 errors.beratkendaraan }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <div class="form-group local-forms mb-3">
+                                        <label>Berat Jenis <span class="login-danger">*</span></label>
+                                        <Multiselect v-model="formStoneCrusher.beratjenis_id" :options="beratjenisList"
+                                            :searchable="true" placeholder="Pilih Berat Jenis"
+                                            noOptionsText="Memuat data..."
+                                            :class="{ 'is-invalid': errors.beratjenis_id }" />
+                                        <div class="invalid-feedback d-block" v-if="errors.beratjenis_id">
+                                            {{ Array.isArray(errors.beratjenis_id) ? errors.beratjenis_id[0] :
+                                                errors.beratjenis_id }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <div class="form-group local-forms mb-3">
+                                        <label>Suplier <span class="login-danger">*</span></label>
+                                        <Multiselect v-model="formStoneCrusher.suplier_id" :options="suplierList"
+                                            :searchable="true" placeholder="Pilih Suplier"
+                                            noOptionsText="Memuat data..."
+                                            :class="{ 'is-invalid': errors.suplier_id }" />
+                                        <div class="invalid-feedback d-block" v-if="errors.suplier_id">
+                                            {{ Array.isArray(errors.suplier_id) ? errors.suplier_id[0] :
+                                                errors.suplier_id }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-4">
+                                    <div class="form-group local-forms mb-3">
+                                        <label>Volume ({{ selectedMaterialSatuan }}) <span
+                                                class="login-danger">*</span></label>
+                                        <input v-model="formStoneCrusher.volume" type="number" step="0.01" class="form-control"
+                                            :class="{ 'is-invalid': errors.volume }"
+                                            :readonly="selectedMaterialSatuan === 'm3' || selectedMaterialSatuan === 'kg'">
+                                        <div class="invalid-feedback" v-if="errors.volume">
+                                            {{ Array.isArray(errors.volume) ? errors.volume[0] : errors.volume }}
                                         </div>
                                     </div>
                                 </div>
@@ -176,7 +195,24 @@ import Multiselect from '@vueform/multiselect';
 import '@vueform/multiselect/themes/default.css';
 import { useStoneCrusher } from '../composables/useSC';
 
-const { isEdit, formStoneCrusher, materialList, kendaraanList, driverList, suplierList, errors, fetchMaterial, fetchKendaraan, fetchDriver, fetchSuplier, submitStoneCrusher, isLoading } = useStoneCrusher();
+const {
+    isEdit,
+    formStoneCrusher,
+    materialList,
+    kendaraanList,
+    driverList,
+    suplierList,
+    beratjenisList,
+    errors,
+    selectedMaterialSatuan,
+    fetchMaterial,
+    fetchKendaraan,
+    fetchDriver,
+    fetchSuplier,
+    fetchBeratJenis,
+    submitStoneCrusher,
+    isLoading
+} = useStoneCrusher();
 
 const handleSubmit = async () => {
     await submitStoneCrusher();
@@ -187,5 +223,6 @@ onMounted(() => {
     fetchKendaraan();
     fetchDriver();
     fetchSuplier();
+    fetchBeratJenis();
 });
 </script>
