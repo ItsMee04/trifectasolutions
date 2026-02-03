@@ -34,7 +34,7 @@
 
             <div class="table-responsive">
                 <table class="table table-nowrap table-hover mb-0">
-                    <thead>
+                    <thead class="bg-light">
                         <tr class="text-center">
                             <th style="width: 5%">#</th>
                             <th style="width: 20%">Kode Material</th>
@@ -47,14 +47,14 @@
                     </thead>
                     <tbody>
                         <tr v-if="isLoading">
-                            <td colspan="6" class="text-center p-5">
+                            <td colspan="7" class="text-center p-5">
                                 <div class="spinner-border text-primary" users="status"></div>
                                 <p class="mt-2 mb-0">Memuat data...</p>
                             </td>
                         </tr>
 
                         <tr v-else-if="!paginatedMaterial || paginatedMaterial.length === 0">
-                            <td colspan="6" class="text-center p-5">Tidak ada data.</td>
+                            <td colspan="7" class="text-center p-5">Tidak ada data.</td>
                         </tr>
 
                         <template v-else>

@@ -34,7 +34,7 @@
 
             <div class="table-responsive">
                 <table class="table table-nowrap table-hover mb-0">
-                    <thead>
+                    <thead class="bg-light">
                         <tr class="text-center">
                             <th style="width: 5%">#</th>
                             <th style="width: 20%">Jenis</th>
