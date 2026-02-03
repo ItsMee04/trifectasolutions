@@ -23,7 +23,8 @@ class JarakDanHargaController extends Controller
                     \App\Models\Timbangan\ConcreteBatchingPlant::class => ['material', 'kendaraan', 'driver', 'suplier'],
                     \App\Models\Timbangan\AsphaltMixingPlant::class => ['material', 'kendaraan', 'driver', 'suplier'],
                 ]);
-            }
+            },
+            'kegiatanArmada' // <--- Tambahkan relasi ini di sini
         ])
             ->where('status', 1)
             ->get();
@@ -85,7 +86,7 @@ class JarakDanHargaController extends Controller
     public function updateJarakDanHarga(Request $request)
     {
         // 1. Eager Load relasi sampai ke tabel BahanBakar
-        $jarakdanharga = JarakHarga::with(['source.kendaraan.bahanbakar'])->find($request->id);
+        $jarakdanharga = JarakHarga::with(['source.kendaraan.jeniskendaraan'])->find($request->id);
 
         if (!$jarakdanharga) {
             return response()->json(['status' => 404, 'success' => false, 'message' => 'Data tidak ditemukan']);
@@ -99,7 +100,7 @@ class JarakDanHargaController extends Controller
         ]);
 
         // 2. Ambil data indexperkm dari relasi (Gunakan 1 sebagai default untuk menghindari pembagian dengan nol)
-        $indexPerKm = $jarakdanharga->source->kendaraan->bahanbakar->indexperkm ?? 0;
+        $indexPerKm = $jarakdanharga->source->kendaraan->jeniskendaraan->indexperkm ?? 0;
 
         // 3. Hitung Biaya Bahan Bakar
         // Rumus: (($jarak * 2) / indexperkm) * harga_bbm

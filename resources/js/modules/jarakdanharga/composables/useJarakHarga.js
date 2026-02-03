@@ -14,6 +14,16 @@ const currentPage = ref(1);
 const itemsPerPage = 10;
 const isEdit = ref(false);
 const errors = ref({});
+const columnFilters = reactive({
+    kode: '',
+    material: '',
+    pengambilan: '',
+    tujuan: '',
+    jarak: '',
+    hargaupah: '',
+    hargajasa: '',
+});
+
 
 const formJarakDanHarga = reactive({
     id: null,
@@ -119,7 +129,7 @@ export function useJarakDanHarga() {
         formJarakDanHarga.jarak = item.jarak;
         formJarakDanHarga.hargaupah = item.hargaupah;
         formJarakDanHarga.hargajasa = item.hargajasa;
-        formJarakDanHarga.hargasolar = item.hargasolar;
+        formJarakDanHarga.hargasolar = item.kegiatan_armada?.hargasolar;
 
         const modal = new bootstrap.Modal(document.getElementById('modalJarak'));
         modal.show();
@@ -151,13 +161,35 @@ export function useJarakDanHarga() {
         );
     }
 
+    // // --- FILTER UTAMA (Text + Date Range) ---
+    // const filteredJarakDanHarga = computed(() => {
+    //     const query = searchQuery.value.toLowerCase();
+
+    //     return JarakHarga.value.filter(item => {
+    //         const matchesSearch = searchMatch(item, query);
+
+    //         let matchesDate = true;
+    //         if (startDate.value && endDate.value) {
+    //             matchesDate = item.tanggal >= startDate.value && item.tanggal <= endDate.value;
+    //         } else if (startDate.value) {
+    //             matchesDate = item.tanggal >= startDate.value;
+    //         } else if (endDate.value) {
+    //             matchesDate = item.tanggal <= endDate.value;
+    //         }
+
+    //         return matchesSearch && matchesDate;
+    //     });
+    // });
+
     // --- FILTER UTAMA (Text + Date Range) ---
     const filteredJarakDanHarga = computed(() => {
         const query = searchQuery.value.toLowerCase();
 
         return JarakHarga.value.filter(item => {
+            // 1. FILTER SEARCH GLOBAL (Cari di semua field)
             const matchesSearch = searchMatch(item, query);
 
+            // 2. FILTER TANGGAL (Range)
             let matchesDate = true;
             if (startDate.value && endDate.value) {
                 matchesDate = item.tanggal >= startDate.value && item.tanggal <= endDate.value;
@@ -167,7 +199,34 @@ export function useJarakDanHarga() {
                 matchesDate = item.tanggal <= endDate.value;
             }
 
-            return matchesSearch && matchesDate;
+            // 3. FILTER PER KOLOM (Spesifik)
+            // .every() memastikan SEMUA inputan kolom yang diisi harus terpenuhi
+            const matchesColumns = Object.keys(columnFilters).every(key => {
+                const filterVal = columnFilters[key].toLowerCase();
+                if (!filterVal) return true; // Jika filter kosong, loloskan data
+
+                switch (key) {
+                    case 'kode':
+                        return String(item.kode || '').toLowerCase().includes(filterVal);
+                    case 'material':
+                        return String(item?.source?.material.material || '').toLowerCase().includes(filterVal);
+                    case 'pengambilan':
+                        return String(item.pengambilan || '').toLowerCase().includes(filterVal);
+                    case 'tujuan':
+                        return String(item.tujuan || '').toLowerCase().includes(filterVal);
+                    case 'jarak':
+                        return String(item.jarak || '').toLowerCase().includes(filterVal);
+                    case 'hargaupah':
+                        return String(item.hargaupah || '').toLowerCase().includes(filterVal);
+                    case 'hargajasa':
+                        return String(item.hargajasa || '').toLowerCase().includes(filterVal);
+                    // ... case kolom lainnya
+                    default: return true;
+                }
+            });
+
+            // KEMBALIKAN DATA HANYA JIKA SEMUA KONDISI TRUE
+            return matchesSearch && matchesDate && matchesColumns;
         });
     });
 
@@ -194,6 +253,11 @@ export function useJarakDanHarga() {
         startDate.value = '';
         endDate.value = '';
         currentPage.value = 1;
+    };
+
+    // Tambahkan reset filter kolom
+    const resetColumnFilters = () => {
+        Object.keys(columnFilters).forEach(key => columnFilters[key] = '');
     };
 
     // Computed untuk memfilter supplier berdasarkan input "Pengambilan"
@@ -232,7 +296,14 @@ export function useJarakDanHarga() {
     });
 
     return {
-        JarakHarga, isLoading, searchQuery, currentPage, startDate, endDate, isEdit, formJarakDanHarga,
+        JarakHarga,
+        isLoading,
+        searchQuery,
+        currentPage,
+        startDate,
+        endDate,
+        isEdit,
+        formJarakDanHarga,
         errors,
         displayedPages,
         totalPages,
@@ -243,6 +314,12 @@ export function useJarakDanHarga() {
         showSuggestionsPengambilan,
         filteredSupplierSuggestions,
         selectPengambilan,
-        fetchJarakDanHarga, handleEdit, handleRefresh, submitJarakDanHarga, resetDateFilter
+        fetchJarakDanHarga,
+        handleEdit,
+        handleRefresh,
+        submitJarakDanHarga,
+        resetDateFilter,
+        columnFilters,
+        resetColumnFilters,
     };
 }

@@ -54,7 +54,7 @@ class AsphaltMixingPlant extends Model
         } else {
             // Ambil angka dari kode driver terakhir
             $lastCode = $aspahltmixingplantID->kode;
-            $lastNumber = (int) substr($lastCode, 4); // DRV-001 -> ambil 001
+            $lastNumber = (int) substr($lastCode, 8); // DRV-001 -> ambil 001
             $number = $lastNumber + 1;
         }
 

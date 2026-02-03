@@ -53,18 +53,56 @@
 
             <div class="table-responsive">
                 <table class="table table-nowrap table-hover mb-0">
-                    <thead>
+                    <thead class="bg-light">
                         <tr class="text-center">
                             <th style="width: 5%">#</th>
-                            <th style="width: 20%">Kode</th>
-                            <th style="width: 20%">Material</th>
-                            <th style="width: 20%">Pengambilan</th>
-                            <th style="width: 20%">Tujuan</th>
-                            <th style="width: 20%">Jarak (km)</th>
-                            <th style="width: 20%">Upah Driver</th>
-                            <th style="width: 20%">Jasa Angkut Total</th>
-                            <th style="width: 20%">Status</th>
-                            <th style="width: 20%">Action</th>
+                            <th>Kode</th>
+                            <th>Material</th>
+                            <th>Pengambilan</th>
+                            <th>Tujuan</th>
+                            <th>Jarak (km)</th>
+                            <th>Upah Driver</th>
+                            <th>Jasa Angkut</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                        <tr class="text-center bg-white">
+                            <td></td>
+                            <td>
+                                <input v-model="columnFilters.kode" class="form-control form-control-sm"
+                                    placeholder="Filter...">
+                            </td>
+                            <td>
+                                <input v-model="columnFilters.material" class="form-control form-control-sm"
+                                    placeholder="Filter...">
+                            </td>
+                            <td>
+                                <input v-model="columnFilters.pengambilan" class="form-control form-control-sm"
+                                    placeholder="Filter...">
+                            </td>
+                            <td>
+                                <input v-model="columnFilters.tujuan" class="form-control form-control-sm"
+                                    placeholder="Filter...">
+                            </td>
+                            <td>
+                                <input v-model="columnFilters.jarak" class="form-control form-control-sm"
+                                    placeholder="Filter...">
+                            </td>
+                            <td>
+                                <input v-model="columnFilters.hargaupah" class="form-control form-control-sm"
+                                    placeholder="Filter...">
+                            </td>
+                            <td>
+                                <input v-model="columnFilters.hargajasa" class="form-control form-control-sm"
+                                    placeholder="Filter...">
+                            </td>
+                            <td></td>
+                            <td>
+                                <button @click="resetColumnFilters" class="btn btn-outline-danger btn-sm"
+                                    title="Reset Filter">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </td>
                         </tr>
                     </thead>
                     <tbody>
@@ -86,9 +124,32 @@
                                 <td>{{ item?.source?.material.material }}</td>
                                 <td>{{ item.pengambilan }}</td>
                                 <td>{{ item.tujuan }}</td>
-                                <td>{{ item.jarak }}</td>
-                                <td>{{ formatNumber(item.hargaupah) }}</td>
-                                <td>{{ formatNumber(item.hargajasa) }}</td>
+                                <td>
+                                    <span v-if="parseFloat(item.jarak) === 0" class="badge bg-danger">
+                                        0
+                                    </span>
+                                    <span v-else>
+                                        {{ item.jarak }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span v-if="Number(item.hargaupah) === 0" class="badge bg-danger">
+                                        0
+                                    </span>
+                                    <span v-else>
+                                        {{ formatNumber(item.hargaupah) }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span v-if="Number(item.hargajasa) === 0" class="badge bg-danger">
+                                        0
+                                    </span>
+                                    <span v-else>
+                                        {{ formatNumber(item.hargajasa) }}
+                                    </span>
+                                </td>
                                 <td>
                                     <span v-if="item.status == 1" class="badge bg-success">
                                         ACTIVE
@@ -102,6 +163,9 @@
                                         <a @click="handleEdit(item)" class="btn btn-sm bg-success-light me-2">
                                             <i class="feather-edit"></i>
                                         </a>
+                                        <!-- <a @click="handleEdit(item)" class="btn btn-sm bg-success-light me-2">
+                                            <i class="feather-copy"></i>
+                                        </a> -->
                                     </div>
                                 </td>
                             </tr>
@@ -175,6 +239,8 @@ const {
     handleDelete,
     handleRefresh,
     formatNumber,
+    columnFilters,
+    resetColumnFilters,
 
     displayedPages,
     startDate,
