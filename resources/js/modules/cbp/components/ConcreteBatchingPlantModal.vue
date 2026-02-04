@@ -17,7 +17,7 @@
                                     <div class="form-group local-forms mb-3">
                                         <label>Tanggal <span class="login-danger">*</span></label>
                                         <input v-model="formCBP.tanggal" type="date" class="form-control"
-                                            :class="{ 'is-invalid': errors.tanggal }">
+                                            :class="{ 'is-invalid': errors.tanggal }" readonly>
                                         <div class="invalid-feedback" v-if="errors.tanggal">
                                             {{ Array.isArray(errors.tanggal) ? errors.tanggal[0] : errors.tanggal }}
                                         </div>
@@ -132,7 +132,48 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <div class="form-group local-forms mb-3">
+                                        <label>KM Awal <span class="login-danger">*</span></label>
+                                        <input v-model="formCBP.jarakawal" type="text" class="form-control"
+                                            :class="{ 'is-invalid': errors.jarakawal }">
+                                        <div class="invalid-feedback" v-if="errors.jarakawal">
+                                            {{ Array.isArray(errors.jarakawal) ? errors.jarakawal[0] :
+                                                errors.jarakawal }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <div class="form-group local-forms mb-3">
+                                        <label>KM Akhir <span class="login-danger">*</span></label>
+                                        <input v-model="formCBP.jarakakhir" type="text" class="form-control"
+                                            :class="{ 'is-invalid': errors.jarakakhir }">
+                                        <div class="invalid-feedback" v-if="errors.jarakakhir">
+                                            {{ Array.isArray(errors.jarakakhir) ? errors.jarakakhir[0] :
+                                                errors.jarakakhir }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <div class="form-group local-forms mb-3">
+                                        <label>Jarak <span
+                                                class="login-danger">*</span></label>
+                                        <input v-model="formCBP.jarak" type="number" step="0.01" class="form-control"
+                                            :class="{ 'is-invalid': errors.jarak }" readonly>
+                                        <div class="invalid-feedback" v-if="errors.jarak">
+                                            {{ Array.isArray(errors.jarak) ? errors.volume[0] : errors.jarak }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
                                 <div class="mb-4">
                                     <div class="form-group local-forms mb-3">
                                         <label>Volume ({{ selectedMaterialSatuan }}) <span

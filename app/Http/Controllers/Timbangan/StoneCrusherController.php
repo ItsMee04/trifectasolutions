@@ -57,8 +57,8 @@ class StoneCrusherController extends Controller
             'berattotal'     => 'required|numeric',
             'beratkendaraan' => 'required|numeric',
             'beratmuatan'    => 'required|numeric',
-            'jarakawal'      => 'required|integer',
-            'jarakakhir'     => 'required|integer'
+            'jarakawal'      => 'required|numeric|min:0',
+            'jarakakhir'     => 'required|numeric|min:0|gte:jarakawal',
         ]);
 
         try {
@@ -138,8 +138,8 @@ class StoneCrusherController extends Controller
             'berattotal'        => 'required|numeric',
             'beratkendaraan'    => 'required|numeric',
             'beratmuatan'       => 'required|numeric',
-            'jarakawal'         => 'required|integer',
-            'jarakakhir'        => 'required|integer'
+            'jarakawal'         => 'required|numeric|min:0',
+            'jarakakhir'        => 'required|numeric|min:0|gte:jarakawal',
         ]);
 
         // Load relasi agar proses update lebih efisien

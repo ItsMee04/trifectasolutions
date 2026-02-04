@@ -55,8 +55,8 @@ class ConcreteBatchingPlantController extends Controller
             'berattotal'     => 'required|numeric',
             'beratkendaraan' => 'required|numeric',
             'beratmuatan'    => 'required|numeric',
-            'jarakawal'      => 'required|integer',
-            'jarakakhir'     => 'required|integer'
+            'jarakawal'      => 'required|numeric|min:0',
+            'jarakakhir'     => 'required|numeric|min:0|gte:jarakawal',
         ]);
 
         try {
@@ -136,8 +136,8 @@ class ConcreteBatchingPlantController extends Controller
             'berattotal'        => 'required|numeric',
             'beratkendaraan'    => 'required|numeric',
             'beratmuatan'       => 'required|numeric',
-            'jarakawal'         => 'required|integer',
-            'jarakakhir'        => 'required|integer',
+            'jarakawal'         => 'required|numeric|min:0',
+            'jarakakhir'        => 'required|numeric|min:0|gte:jarakawal',
         ]);
 
         // Ambil data beserta relasi Jarak dan Kegiatan

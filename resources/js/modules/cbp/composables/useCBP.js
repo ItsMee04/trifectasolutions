@@ -51,8 +51,15 @@ const formCBP = reactive({
     volume: '',
     berattotal: '',
     beratkendaraan: '',
-    beratmuatan: ''
+    beratmuatan: '',
+    jarakawal: '',
+    jarakakhir: '',
+    jarak: '',
 });
+
+const getTodayDate = () => {
+    return new Date().toISOString().split('T')[0];
+};
 
 export function useCBP() {
 
@@ -207,6 +214,9 @@ export function useCBP() {
                 berattotal: formCBP.berattotal,
                 beratkendaraan: formCBP.beratkendaraan,
                 beratmuatan: formCBP.beratmuatan,
+                jarakawal: formCBP.jarakawal,
+                jarakakhir: formCBP.jarakakhir,
+                jarak: formCBP.jarak,
             };
 
             let response;
@@ -240,7 +250,7 @@ export function useCBP() {
         isEdit.value = false;
         errors.value = {};
         formCBP.id = null;
-        formCBP.tanggal = '';
+        formCBP.tanggal = getTodayDate();
         formCBP.material_id = null;
         formCBP.kendaraan_id = null;
         formCBP.driver_id = null;
@@ -251,6 +261,9 @@ export function useCBP() {
         formCBP.berattotal = '';
         formCBP.beratkendaraan = '';
         formCBP.beratmuatan = '';
+        formCBP.jarakawal = '';
+        formCBP.jarakakhir = '';
+        formCBP.jarak = '';
 
         const modal = new bootstrap.Modal(document.getElementById('modalCBP'));
         modal.show();
@@ -265,6 +278,24 @@ export function useCBP() {
 
             // Set hasil ke beratmuatan (jika hasil negatif set ke 0 atau biarkan saja)
             formCBP.beratmuatan = hasil > 0 ? hasil : 0;
+        }
+    );
+
+    // Tambahkan WATCH baru untuk perhitungan jarak otomatis
+    watch(
+        () => [formCBP.jarakawal, formCBP.jarakakhir],
+        ([awal, akhir]) => {
+            const valAwal = parseFloat(awal) || 0;
+            const valAkhir = parseFloat(akhir) || 0;
+            const hasil = valAkhir - valAwal;
+
+            if (hasil > 0) {
+                // Gunakan .toFixed(2) untuk mendapatkan 2 angka di belakang koma
+                // Kemudian bungkus dengan Number() agar tipenya kembali menjadi angka, bukan string
+                formCBP.jarak = Number(hasil.toFixed(2));
+            } else {
+                formCBP.jarak = 0;
+            }
         }
     );
 
@@ -283,6 +314,9 @@ export function useCBP() {
         formCBP.berattotal = item.berattotal;
         formCBP.beratkendaraan = item.beratkendaraan;
         formCBP.beratmuatan = item.beratmuatan;
+        formCBP.jarakawal = item.jarakawal;
+        formCBP.jarakakhir = item.jarakakhir;
+        formCBP.jarak = item.jarak;
 
         const modal = new bootstrap.Modal(document.getElementById('modalCBP'));
         modal.show();
@@ -448,8 +482,24 @@ export function useCBP() {
     });
 
     return {
-        ConcreteBatchingPlants, materialList, kendaraanList, driverList, suplierList, beratjenisList, selectedMaterialSatuan, isLoading, searchQuery, currentPage, currentTab, startDate, endDate,
-        switchTab, isEdit, formCBP, errors, displayedPages,
+        ConcreteBatchingPlants,
+        materialList,
+        kendaraanList,
+        driverList,
+        suplierList,
+        beratjenisList,
+        selectedMaterialSatuan,
+        isLoading,
+        searchQuery,
+        currentPage,
+        currentTab,
+        startDate,
+        endDate,
+        switchTab,
+        isEdit,
+        formCBP,
+        errors,
+        displayedPages,
         totalPages,
         totalFooter,
         columnFilters,
@@ -457,6 +507,17 @@ export function useCBP() {
         formatNumber,
         filteredConcreteBatchingPlant,
         paginatedConcreteBatchingPlant,
-        fetchCBP, fetchMaterial, fetchKendaraan, fetchDriver, fetchSuplier, fetchBeratJenis, handleCreate, handleEdit, handleDelete, handleRefresh, submitCBP, resetDateFilter
+        fetchCBP,
+        fetchMaterial,
+        fetchKendaraan,
+        fetchDriver,
+        fetchSuplier,
+        fetchBeratJenis,
+        handleCreate,
+        handleEdit,
+        handleDelete,
+        handleRefresh,
+        submitCBP,
+        resetDateFilter
     };
 }

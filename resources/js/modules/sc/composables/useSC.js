@@ -51,8 +51,15 @@ const formStoneCrusher = reactive({
     volume: '',
     berattotal: '',
     beratkendaraan: '',
-    beratmuatan: ''
+    beratmuatan: '',
+    jarakawal: '',
+    jarakakhir: '',
+    jarak: '',
 });
+
+const getTodayDate = () => {
+    return new Date().toISOString().split('T')[0];
+};
 
 export function useStoneCrusher() {
 
@@ -207,6 +214,9 @@ export function useStoneCrusher() {
                 berattotal: formStoneCrusher.berattotal,
                 beratkendaraan: formStoneCrusher.beratkendaraan,
                 beratmuatan: formStoneCrusher.beratmuatan,
+                jarakawal: formStoneCrusher.jarakawal,
+                jarakakhir: formStoneCrusher.jarakakhir,
+                jarak: formStoneCrusher.jarak,
             };
 
             let response;
@@ -240,17 +250,20 @@ export function useStoneCrusher() {
         isEdit.value = false;
         errors.value = {};
         formStoneCrusher.id = null;
-        formStoneCrusher.tanggal = '';
+        formStoneCrusher.tanggal = getTodayDate();
         formStoneCrusher.material_id = null;
         formStoneCrusher.kendaraan_id = null;
         formStoneCrusher.driver_id = null;
         formStoneCrusher.suplier_id = null;
         formStoneCrusher.beratjenis_id = null,
-            formStoneCrusher.jenis = currentTab.value;
+        formStoneCrusher.jenis = currentTab.value;
         formStoneCrusher.volume = '';
         formStoneCrusher.berattotal = '';
         formStoneCrusher.beratkendaraan = '';
         formStoneCrusher.beratmuatan = '';
+        formStoneCrusher.jarakawal = '';
+        formStoneCrusher.jarakakhir = '';
+        formStoneCrusher.jarak = '';
 
         const modal = new bootstrap.Modal(document.getElementById('modalStoneCrusher'));
         modal.show();
@@ -265,6 +278,24 @@ export function useStoneCrusher() {
 
             // Set hasil ke beratmuatan (jika hasil negatif set ke 0 atau biarkan saja)
             formStoneCrusher.beratmuatan = hasil > 0 ? hasil : 0;
+        }
+    );
+
+    // Tambahkan WATCH baru untuk perhitungan jarak otomatis
+    watch(
+        () => [formStoneCrusher.jarakawal, formStoneCrusher.jarakakhir],
+        ([awal, akhir]) => {
+            const valAwal = parseFloat(awal) || 0;
+            const valAkhir = parseFloat(akhir) || 0;
+            const hasil = valAkhir - valAwal;
+
+            if (hasil > 0) {
+                // Gunakan .toFixed(2) untuk mendapatkan 2 angka di belakang koma
+                // Kemudian bungkus dengan Number() agar tipenya kembali menjadi angka, bukan string
+                formStoneCrusher.jarak = Number(hasil.toFixed(2));
+            } else {
+                formStoneCrusher.jarak = 0;
+            }
         }
     );
 

@@ -507,6 +507,17 @@ export function useAMP() {
         formatNumber,
         filteredAsphaltMixingPlant,
         paginatedAsphaltMixingPlant,
-        fetchAMP, fetchMaterial, fetchKendaraan, fetchDriver, fetchSuplier, fetchBeratJenis, handleCreate, handleEdit, handleDelete, handleRefresh, submitAMP, resetDateFilter
+        fetchAMP,
+        fetchMaterial,
+        fetchKendaraan,
+        fetchDriver,
+        fetchSuplier,
+        fetchBeratJenis,
+        handleCreate,
+        handleEdit,
+        handleDelete,
+        handleRefresh,
+        submitAMP,
+        resetDateFilter
     };
 }
