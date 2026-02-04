@@ -11,11 +11,11 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="mt-2">
-                        <span class="badge bg-info-light text-info me-2">
+                        <span class="badge bg-primary-light text-info me-2">
                             <i class="fas fa-truck me-1"></i> Kendaraan: {{ formJarakDanHarga.jenisKendaraan || '-' }}
                         </span>
-                        <span class="badge bg-secondary-light text-secondary">
-                            <i class="fas fa-box me-1"></i> Material: {{ formJarakDanHarga.kategoriMaterial || '-' }}
+                        <span class="badge bg-warning-light text-secondary">
+                            <i class="fas fa-box me-1"></i> Kategori Material: {{ formJarakDanHarga.kategoriMaterial || '-' }}
                         </span>
                     </div>
                 </div>

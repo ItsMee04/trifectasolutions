@@ -203,43 +203,35 @@ export function useJarakDanHarga() {
         modalHitungEl.addEventListener('hidden.bs.modal', handleHidden);
     };
 
-    // 1. Hitung WAKTU JARAK = (Jarak * 2) / 30
-    // KONDISI: Kendaraan DT DAN Material BUKAN ASPAL
-    watch(() => formJarakDanHarga.jarak, (newJarak) => {
-        const jarak = parseFloat(newJarak) || 0;
+    watch([
+        () => formJarakDanHarga.jarak,
+        () => formJarakDanHarga.jamkerja,
+        () => formJarakDanHarga.waktubongkarmuatmaterial,
+        () => formJarakDanHarga.jenisKendaraan,
+        () => formJarakDanHarga.kategoriMaterial
+    ], () => {
+        const jarak = parseFloat(formJarakDanHarga.jarak) || 0;
+        const jam = parseFloat(formJarakDanHarga.jamkerja) || 0;
+        const wBongkar = parseFloat(formJarakDanHarga.waktubongkarmuatmaterial) || 0;
 
-        // Normalisasi teks ke uppercase untuk menghindari kesalahan ketik (dt vs DT)
+        // 1. Hitung Waktu Jarak (Murni tanpa toFixed untuk perhitungan selanjutnya)
         const isDT = formJarakDanHarga.jenisKendaraan?.toUpperCase() === 'DT';
         const isNotAspal = formJarakDanHarga.kategoriMaterial?.toUpperCase() !== 'ASPAL';
 
+        let rawWaktuJarak = 0;
         if (isDT && isNotAspal) {
-            formJarakDanHarga.waktujarak = parseFloat(((jarak * 2) / 30).toFixed(2));
-        } else {
-            // Jika tidak memenuhi syarat, Anda bisa set ke 0 atau nilai default lainnya
-            formJarakDanHarga.waktujarak = 0;
+            rawWaktuJarak = (jarak * 2) / 30; // Hasil murni: 0.7066666666666667
         }
-    }, { immediate: true }); // Tambahkan immediate agar terhitung saat modal dibuka
+        formJarakDanHarga.waktujarak = parseFloat(rawWaktuJarak.toFixed(3)); // Tampilan: 0.707
 
-    // 2. Hitung KEBUTUHAN WAKTU = Waktu Jarak + Waktu Bongkar Muat
-    watch([
-        () => formJarakDanHarga.waktujarak,
-        () => formJarakDanHarga.waktubongkarmuatmaterial
-    ], ([newWaktuJarak, newWaktuBongkar]) => {
-        const wJarak = parseFloat(newWaktuJarak) || 0;
-        const wBongkar = parseFloat(newWaktuBongkar) || 0;
-        formJarakDanHarga.kebutuhanwaktujarakwaktubongkarmuat = parseFloat((wJarak + wBongkar).toFixed(2));
-    }, { immediate: true });
+        // 2. Hitung Kebutuhan Waktu (Gunakan rawWaktuJarak agar akurat)
+        const rawKebutuhan = rawWaktuJarak + wBongkar; // 0.7066... + 0.3 = 1.00666...
+        formJarakDanHarga.kebutuhanwaktujarakwaktubongkarmuat = parseFloat(rawKebutuhan.toFixed(3)); // Tampilan: 1.007
 
-    // 3. Hitung PERKIRAAN RITASE = Jam Kerja / Kebutuhan Waktu
-    watch([
-        () => formJarakDanHarga.jamkerja,
-        () => formJarakDanHarga.kebutuhanwaktujarakwaktubongkarmuat
-    ], ([newJamKerja, newKebutuhan]) => {
-        const jam = parseFloat(newJamKerja) || 0;
-        const kebutuhan = parseFloat(newKebutuhan) || 0;
-
-        if (kebutuhan > 0) {
-            formJarakDanHarga.perkiraanperolehanritase = parseFloat((jam / kebutuhan).toFixed(2));
+        // 3. Hitung Perkiraan Ritase (Gunakan rawKebutuhan agar identik dengan Excel)
+        if (rawKebutuhan > 0) {
+            const rawRitase = jam / rawKebutuhan; // 8 / 1.00666... = 7.94705...
+            formJarakDanHarga.perkiraanperolehanritase = parseFloat(rawRitase.toFixed(3)); // Hasil: 7.947
         } else {
             formJarakDanHarga.perkiraanperolehanritase = 0;
         }
