@@ -49,6 +49,9 @@ const formJarakDanHarga = reactive({
     perkiraanperolehanritase: '',
     pembulatan: '',
 
+    solarjarak: '',
+    upahhariandriver: '',
+
 
 });
 
