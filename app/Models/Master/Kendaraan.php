@@ -2,6 +2,7 @@
 
 namespace App\Models\Master;
 
+use App\Models\User;
 use App\Models\Master\Material;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -18,6 +19,7 @@ class Kendaraan extends Model
         'kendaraan',
         'jeniskendaraan_id',
         'nomor',
+        'oleh',
         'status',
     ];
 
@@ -39,5 +41,15 @@ class Kendaraan extends Model
     public function jeniskendaraan(): BelongsTo
     {
         return $this->belongsTo(JenisKendaraan::class, 'jeniskendaraan_id', 'id');
+    }
+
+    /**
+     * Get the oleh that owns the Kendaraan
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function oleh(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'oleh', 'id');
     }
 }

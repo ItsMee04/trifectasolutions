@@ -20,6 +20,7 @@ class BeratJenisSeeder extends Seeder
         for ($i = $start; $i <= $end; $i += $step) {
             DB::table('beratjenis')->insert([
                 'beratjenis' => $i,
+                'oleh'       => 1,
                 'status'     => 1,
                 'created_at' => now(),
                 'updated_at' => now(),

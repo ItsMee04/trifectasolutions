@@ -18,8 +18,11 @@ return new class extends Migration
             $table->string('kontak', 100);
             $table->text('alamat');
             $table->string('rekening', 100)->nullable();
+            $table->unsignedBigInteger('oleh');
             $table->integer('status')->unsigned()->default(1);
             $table->timestamps();
+
+            $table->foreign('oleh')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

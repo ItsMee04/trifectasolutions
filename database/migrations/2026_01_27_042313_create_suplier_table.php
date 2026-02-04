@@ -17,8 +17,11 @@ return new class extends Migration
             $table->string('nama', 100);
             $table->string('kontak', 100);
             $table->text('alamat', 200);
+            $table->unsignedBigInteger('oleh');
             $table->integer('status')->unsigned()->default(1);
             $table->timestamps();
+
+            $table->foreign('oleh')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

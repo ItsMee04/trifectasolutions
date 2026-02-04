@@ -2,6 +2,7 @@
 
 namespace App\Models\KegiatanArmada;
 
+use App\Models\User;
 use App\Models\Master\Driver;
 use App\Models\Master\Kendaraan;
 use Illuminate\Database\Eloquent\Model;
@@ -25,6 +26,7 @@ class KegiatanArmada extends Model
         'upah',
         'jumlah',
         'penjualan',
+        'oleh',
         'status'
     ];
 
@@ -67,5 +69,15 @@ class KegiatanArmada extends Model
             'kegiatanarmada_id',
             'invoice_id'
         );
+    }
+
+    /**
+     * Get the oleh that owns the KegiatanArmada
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function oleh(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'oleh', 'id');
     }
 }

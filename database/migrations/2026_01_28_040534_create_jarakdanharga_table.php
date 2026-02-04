@@ -21,8 +21,11 @@ return new class extends Migration
             $table->decimal('jarak', 5, 2)->default(0.0);
             $table->integer('hargaupah')->default(0);
             $table->integer('hargajasa')->default(0);
+            $table->unsignedBigInteger('oleh');
             $table->integer('status')->default(1);
             $table->timestamps();
+
+            $table->foreign('oleh')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

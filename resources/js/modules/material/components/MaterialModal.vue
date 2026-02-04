@@ -37,10 +37,12 @@
                             <div class="col-md-12">
                                 <div class="form-group local-forms mb-4">
                                     <label>Satuan <span class="login-danger">*</span></label>
-                                    <input v-model="formMaterial.satuan" type="text" class="form-control"
-                                        :class="{ 'is-invalid': errors.satuan }">
+                                    <Multiselect v-model="formMaterial.satuan" :options="satuanList"
+                                        :searchable="true" placeholder="Pilih Satuan"
+                                        noOptionsText="Memuat data..." />
                                     <div class="invalid-feedback" v-if="errors.satuan">
-                                        {{ Array.isArray(errors.satuan) ? errors.satuan[0] : errors.satuan }}
+                                        {{ Array.isArray(errors.satuan) ? errors.satuan[0] :
+                                            errors.satuan }}
                                     </div>
                                 </div>
                             </div>
@@ -64,7 +66,7 @@ import Multiselect from '@vueform/multiselect';
 import '@vueform/multiselect/themes/default.css';
 import { useMaterial } from '../composables/useMaterial';
 
-const { isEdit, formMaterial, kategori, errors, fetchKategori, submitMaterial, isLoading } = useMaterial();
+const { isEdit, formMaterial, kategori, satuanList, errors, fetchKategori, submitMaterial, isLoading } = useMaterial();
 
 const handleSubmit = async () => {
     await submitMaterial();

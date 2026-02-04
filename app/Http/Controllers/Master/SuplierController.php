@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Master;
 use Illuminate\Http\Request;
 use App\Models\Master\Suplier;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class SuplierController extends Controller
 {
@@ -37,9 +38,10 @@ class SuplierController extends Controller
         ]);
 
         $suplier = Suplier::create([
-            'nama' => strtoupper($request->nama),
+            'nama'   => strtoupper($request->nama),
             'kontak' => strtoupper($request->kontak),
             'alamat' => strtoupper($request->alamat),
+            'oleh'   => Auth::user()->id,
         ]);
 
         return response()->json([

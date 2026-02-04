@@ -26,10 +26,12 @@ return new class extends Migration
             $table->integer('penjualan')->default(0);
             $table->integer('hargasolar')->default(0);
             $table->integer('nominalbiayasolar')->default(0);
+            $table->unsignedBigInteger('oleh');
             $table->integer('status')->default(1);
             $table->timestamps();
 
             $table->foreign('jarak_id')->references('id')->on('jarakdanharga')->onDelete('cascade');
+            $table->foreign('oleh')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

@@ -19,7 +19,10 @@ return new class extends Migration
             $table->string('kategori', 100);
             $table->date('periodeawal');
             $table->date('periodeakhir');
+            $table->unsignedBigInteger('oleh');
             $table->timestamps();
+
+            $table->foreign('oleh')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

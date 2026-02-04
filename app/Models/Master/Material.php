@@ -2,6 +2,7 @@
 
 namespace App\Models\Master;
 
+use App\Models\User;
 use App\Models\Master\Kategori;
 use App\Models\Timbangan\StoneCrusher;
 use Illuminate\Database\Eloquent\Model;
@@ -20,6 +21,7 @@ class Material extends Model
         'kategori_id',
         'material',
         'satuan',
+        'oleh',
         'status',
     ];
 
@@ -80,5 +82,15 @@ class Material extends Model
     public function asphaltPlants()
     {
         return $this->hasMany(AsphaltMixingPlant::class, 'material_id');
+    }
+
+    /**
+     * Get the oleh that owns the Material
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function oleh(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'oleh', 'id');
     }
 }

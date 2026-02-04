@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\Master;
 
-use App\Http\Controllers\Controller;
-use App\Models\Master\JenisKendaraan;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Master\JenisKendaraan;
 
 class JenisKendaraanController extends Controller
 {
@@ -39,6 +40,7 @@ class JenisKendaraanController extends Controller
         $data = JenisKendaraan::create([
             'jenis'         => strtoupper($request->jenis),
             'indexperkm'    => $request->indexperkm,
+            'oleh'          => Auth::user()->id,
         ]);
 
         return response()->json([

@@ -15,8 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('jenis', 100);
             $table->integer('indexperkm')->default(0);
+            $table->unsignedBigInteger('oleh');
             $table->integer('status')->default(1);
             $table->timestamps();
+
+            $table->foreign('oleh')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

@@ -14,8 +14,11 @@ return new class extends Migration
         Schema::create('beratjenis', function (Blueprint $table) {
             $table->id();
             $table->integer('beratjenis');
+            $table->unsignedBigInteger('oleh');
             $table->integer('status')->unsigned()->default(1);
             $table->timestamps();
+
+            $table->foreign('oleh')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

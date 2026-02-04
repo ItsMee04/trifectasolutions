@@ -2,8 +2,10 @@
 
 namespace App\Models\Master;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Suplier extends Model
 {
@@ -15,6 +17,7 @@ class Suplier extends Model
         'nama',
         'kontak',
         'alamat',
+        'oleh',
         'status',
     ];
 
@@ -47,5 +50,15 @@ class Suplier extends Model
         $formattedNumber = str_pad($number, 3, '0', STR_PAD_LEFT);
 
         return 'SUP-' . $formattedNumber;
+    }
+
+    /**
+     * Get the oleh that owns the Suplier
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function oleh(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'oleh', 'id');
     }
 }

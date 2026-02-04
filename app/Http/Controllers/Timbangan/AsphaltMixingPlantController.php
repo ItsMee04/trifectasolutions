@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Master\Suplier;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Models\KegiatanArmada\JarakHarga;
 use App\Models\Timbangan\AsphaltMixingPlant;
 use App\Models\KegiatanArmada\KegiatanArmada;
@@ -53,7 +54,9 @@ class AsphaltMixingPlantController extends Controller
             'volume'         => 'required|numeric',
             'berattotal'     => 'required|numeric',
             'beratkendaraan' => 'required|numeric',
-            'beratmuatan'    => 'required|numeric'
+            'beratmuatan'    => 'required|numeric',
+            'jarakawal'      => 'required|integer',
+            'jarakakhir'     => 'required|integer',
         ]);
 
         try {
@@ -74,6 +77,9 @@ class AsphaltMixingPlantController extends Controller
                     'berattotal'     => $request->berattotal,
                     'beratkendaraan' => $request->beratkendaraan,
                     'beratmuatan'    => $request->beratmuatan,
+                    'jarakawal'      => $request->jarakawal,
+                    'jarakakhir'     => $request->jarakakhir,
+                    'oleh'           => Auth::user()->id,
                 ]);
 
                 // 3. Logika Penentuan Lokasi (Basecamp AMP biasanya disebut SBPS AMP)
@@ -86,16 +92,17 @@ class AsphaltMixingPlantController extends Controller
                     'tanggal'     => $request->tanggal,
                     'pengambilan' => $pengambilan,
                     'tujuan'      => $tujuan,
-                    'jarak'       => 0, // Nilai awal sebelum diedit
+                    'jarak'       => $request->jarak, // Nilai awal sebelum diedit
                     'hargaupah'   => 0,
                     'hargajasa'   => 0,
-                    'status'      => 1,
+                    'oleh'        => Auth::user()->id,
                 ]);
 
                 // 5. Simpan ke KegiatanArmada (Chaining level 2)
                 // Eloquent akan otomatis mengisi jarak_id menggunakan ID dari $jarakHarga
                 $jarakHarga->kegiatanArmada()->create([
-                    'tanggal' => $request->tanggal,
+                    'tanggal'   => $request->tanggal,
+                    'oleh'      => Auth::user()->id,
                 ]);
 
                 return $amp;

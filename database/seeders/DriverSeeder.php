@@ -52,6 +52,7 @@ class DriverSeeder extends Seeder
                 'rekening' => $data['rekening'],
                 'kontak'   => '-',
                 'alamat'   => '-',
+                'oleh'     => 1,
                 'status'   => 1,
             ]);
         }

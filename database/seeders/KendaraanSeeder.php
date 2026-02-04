@@ -44,13 +44,14 @@ class KendaraanSeeder extends Seeder
 
         foreach ($data as $item) {
             DB::table('kendaraan')->insert([
-                'kode' => $item['kode'],
-                'kendaraan' => $item['kendaraan'],
+                'kode'              => $item['kode'],
+                'kendaraan'         => $item['kendaraan'],
                 'jeniskendaraan_id' => $item['jeniskendaraan_id'],
-                'nomor' => $item['nomor'],
-                'status' => 1,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'nomor'             => $item['nomor'],
+                'oleh'              => 1,
+                'status'            => 1,
+                'created_at'        => now(),
+                'updated_at'        => now(),
             ]);
         }
     }

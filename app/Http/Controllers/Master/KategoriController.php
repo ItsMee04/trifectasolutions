@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Master;
 use Illuminate\Http\Request;
 use App\Models\Master\Kategori;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class KategoriController extends Controller
 {
@@ -37,6 +38,7 @@ class KategoriController extends Controller
 
         $kategori = Kategori::create([
             'kategori'      => strtoupper($request->kategori),
+            'oleh'          => Auth::user()->id,
         ]);
 
         return response()->json([

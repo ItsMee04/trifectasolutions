@@ -51,8 +51,15 @@ const formAMP = reactive({
     volume: '',
     berattotal: '',
     beratkendaraan: '',
-    beratmuatan: ''
+    beratmuatan: '',
+    jarakawal: '',
+    jarakakhir: '',
+    jarak: '',
 });
+
+const getTodayDate = () => {
+    return new Date().toISOString().split('T')[0];
+};
 
 export function useAMP() {
 
@@ -207,6 +214,9 @@ export function useAMP() {
                 berattotal: formAMP.berattotal,
                 beratkendaraan: formAMP.beratkendaraan,
                 beratmuatan: formAMP.beratmuatan,
+                jarakawal: formAMP.jarakawal,
+                jarakakhir: formAMP.jarakakhir,
+                jarak: formAMP.jarak,
             };
 
             let response;
@@ -240,7 +250,7 @@ export function useAMP() {
         isEdit.value = false;
         errors.value = {};
         formAMP.id = null;
-        formAMP.tanggal = '';
+        formAMP.tanggal = getTodayDate();
         formAMP.material_id = null;
         formAMP.kendaraan_id = null;
         formAMP.driver_id = null;
@@ -251,6 +261,9 @@ export function useAMP() {
         formAMP.berattotal = '';
         formAMP.beratkendaraan = '';
         formAMP.beratmuatan = '';
+        formAMP.jarakawal = '';
+        formAMP.jarakakhir = '';
+        formAMP.jarak = '';
 
         const modal = new bootstrap.Modal(document.getElementById('modalAMP'));
         modal.show();
@@ -265,6 +278,19 @@ export function useAMP() {
 
             // Set hasil ke beratmuatan (jika hasil negatif set ke 0 atau biarkan saja)
             formAMP.beratmuatan = hasil > 0 ? hasil : 0;
+        }
+    );
+
+    // Tambahkan WATCH baru untuk perhitungan jarak otomatis
+    watch(
+        () => [formAMP.jarakawal, formAMP.jarakakhir],
+        ([awal, akhir]) => {
+            const valAwal = parseFloat(awal) || 0;
+            const valAkhir = parseFloat(akhir) || 0;
+            const hasil = valAkhir - valAwal;
+
+            // Math.round untuk pembulatan ke bilangan bulat terdekat
+            formAMP.jarak = hasil > 0 ? Math.round(hasil) : 0;
         }
     );
 
@@ -283,6 +309,9 @@ export function useAMP() {
         formAMP.berattotal = item.berattotal;
         formAMP.beratkendaraan = item.beratkendaraan;
         formAMP.beratmuatan = item.beratmuatan;
+        formAMP.jarakawal = item.jarakawal;
+        formAMP.jarakakhir = item.jarakakhir;
+        formAMP.jarak = item.jarak;
 
         const modal = new bootstrap.Modal(document.getElementById('modalAMP'));
         modal.show();

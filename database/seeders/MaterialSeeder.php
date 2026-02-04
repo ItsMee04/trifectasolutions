@@ -201,12 +201,13 @@ class MaterialSeeder extends Seeder
 
         foreach ($materials as $item) {
             Material::create([
-                'material' => $item['material'],
-                'kategori_id' => $item['kategori_id'],
-                'satuan' => $item['satuan'],
-                'status' => 1,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'material'      => $item['material'],
+                'kategori_id'   => $item['kategori_id'],
+                'satuan'        => $item['satuan'],
+                'oleh'          => 1,
+                'status'        => 1,
+                'created_at'    => now(),
+                'updated_at'    => now(),
             ]);
         }
     }

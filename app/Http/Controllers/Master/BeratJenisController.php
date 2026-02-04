@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\Master;
 
-use App\Http\Controllers\Controller;
-use App\Models\Master\BeratJenis;
 use Illuminate\Http\Request;
+use App\Models\Master\BeratJenis;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class BeratJenisController extends Controller
 {
@@ -37,6 +38,7 @@ class BeratJenisController extends Controller
 
         $data = BeratJenis::create([
             'beratjenis'    => $request->beratjenis,
+            'oleh'          => Auth::user()->id,
         ]);
 
         return response()->json([

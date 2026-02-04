@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Master;
 use Illuminate\Http\Request;
 use App\Models\Master\Kendaraan;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class KendaraanController extends Controller
 {
@@ -45,6 +46,7 @@ class KendaraanController extends Controller
         $kendaraan->kendaraan           = strtoupper($request->input('kendaraan'));
         $kendaraan->jeniskendaraan_id   = strtoupper($request->input('jenis'));
         $kendaraan->nomor               = strtoupper($request->input('nomor'));
+        $kendaraan->oleh                = Auth::user()->id;
         $kendaraan->save();
 
         return response()->json([

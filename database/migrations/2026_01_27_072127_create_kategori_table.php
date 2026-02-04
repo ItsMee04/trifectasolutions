@@ -14,8 +14,11 @@ return new class extends Migration
         Schema::create('kategori', function (Blueprint $table) {
             $table->id();
             $table->string('kategori', 100);
+            $table->unsignedBigInteger('oleh');
             $table->integer('status')->default(1);
             $table->timestamps();
+
+            $table->foreign('oleh')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

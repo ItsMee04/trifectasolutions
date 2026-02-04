@@ -2,6 +2,7 @@
 
 namespace App\Models\KegiatanArmada;
 
+use App\Models\User;
 use App\Models\Master\Material;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\KegiatanArmada\KegiatanArmada;
@@ -21,6 +22,7 @@ class JarakHarga extends Model
         'jarak',
         'hargaupah',
         'hargajasa',
+        'oleh',
         'status'
     ];
 
@@ -73,5 +75,15 @@ class JarakHarga extends Model
     public function source()
     {
         return $this->morphTo();
+    }
+
+    /**
+     * Get the oleh that owns the JarakHarga
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function oleh(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'oleh', 'id');
     }
 }

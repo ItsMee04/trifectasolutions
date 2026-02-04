@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Master;
 use Illuminate\Http\Request;
 use App\Models\Master\Driver;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class DriverController extends Controller
 {
@@ -39,10 +40,11 @@ class DriverController extends Controller
         ]);
 
         $driver = Driver::create([
-            'nama' => strtoupper($request->nama),
-            'kontak' => strtoupper($request->kontak),
-            'alamat' => strtoupper($request->alamat),
-            'rekening' => strtoupper($request->rekening),
+            'nama'      => strtoupper($request->nama),
+            'kontak'    => strtoupper($request->kontak),
+            'alamat'    => strtoupper($request->alamat),
+            'rekening'  => strtoupper($request->rekening),
+            'oleh'      => Auth::user()->id,
         ]);
 
         return response()->json([

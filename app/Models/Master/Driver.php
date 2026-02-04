@@ -2,8 +2,10 @@
 
 namespace App\Models\Master;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Driver extends Model
 {
@@ -16,6 +18,7 @@ class Driver extends Model
         'kontak',
         'alamat',
         'rekening',
+        'oleh',
         'status',
     ];
 
@@ -48,5 +51,15 @@ class Driver extends Model
         $formattedNumber = str_pad($number, 3, '0', STR_PAD_LEFT);
 
         return 'DRV-' . $formattedNumber;
+    }
+
+    /**
+     * Get the oleh that owns the Driver
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function oleh(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'oleh', 'id');
     }
 }

@@ -14,6 +14,13 @@ const itemsPerPage = 10;
 const isEdit = ref(false);
 const errors = ref({});
 
+const satuanList = [
+    { value: 'M3', label: 'M3' },
+    { value: 'KG', label: 'KG' },
+    { value: 'LITER', label: 'LITER' },
+    { value: 'PCS', label: 'PCS' },
+];
+
 const formMaterial = reactive({
     id: null,
     kode: '',
@@ -203,7 +210,7 @@ export function useMaterial() {
     });
 
     return {
-        materials, kategori, isLoading, searchQuery, currentPage, isEdit, formMaterial, errors, totalPages, displayedPages,
+        materials, kategori, satuanList, isLoading, searchQuery, currentPage, isEdit, formMaterial, errors, totalPages, displayedPages,
         filteredMaterial: computed(() => {
             const query = searchQuery.value.toLowerCase();
             return materials.value.filter(item => {

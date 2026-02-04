@@ -2,13 +2,14 @@
 
 namespace App\Models\Timbangan;
 
+use App\Models\User;
 use App\Models\Master\Driver;
 use App\Models\Master\Suplier;
 use App\Models\Master\Material;
 use App\Models\Master\Kendaraan;
+use App\Models\Master\BeratJenis;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\KegiatanArmada\JarakHarga;
-use App\Models\Master\BeratJenis;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -30,6 +31,9 @@ class AsphaltMixingPlant extends Model
         'berattotal',
         'beratkendaraan',
         'beratmuatan',
+        'jarakawal',
+        'jarakakhir',
+        'oleh',
         'status',
     ];
 
@@ -117,5 +121,15 @@ class AsphaltMixingPlant extends Model
     public function beratjenis(): BelongsTo
     {
         return $this->belongsTo(BeratJenis::class, 'beratjenis_id', 'id');
+    }
+
+    /**
+     * Get the oleh that owns the AsphaltMixingPlant
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function oleh(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'oleh', 'id');
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Master;
 use Illuminate\Http\Request;
 use App\Models\Master\Material;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class MaterialController extends Controller
 {
@@ -41,6 +42,7 @@ class MaterialController extends Controller
             'kategori_id'   => $request->kategori,
             'material'      => strtoupper($request->material),
             'satuan'        => strtoupper($request->satuan),
+            'oleh'          => Auth::user()->id,
         ]);
 
         return response()->json([
