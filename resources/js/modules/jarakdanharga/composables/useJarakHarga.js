@@ -1,4 +1,4 @@
-import { ref, computed, reactive } from 'vue';
+import { ref, computed, reactive, watch } from 'vue';
 import { jarakdanhargaService } from '../services/jarakdanhargaService';
 import { notify } from '../../../helper/notification';
 import Swal from 'sweetalert2';
@@ -32,14 +32,24 @@ const formJarakDanHarga = reactive({
     jarak: '',
     hargaupah: '',
     hargajasa: '',
+    jenisKendaraan: '',
+    kategoriMaterial: '',
 
     upahharian: '',
     jamkerja: '',
     jarakindexkm: '',
     hargasolar: '',
     indexsolarkm: '',
-    tonase:'',
-    upahharianinvoice:''
+    tonase: '',
+    upahharianinvoice: '',
+
+    waktujarak: '',
+    waktubongkarmuatmaterial: '',
+    kebutuhanwaktujarakwaktubongkarmuat: '',
+    perkiraanperolehanritase: '',
+    pembulatan: '',
+
+
 });
 
 export function useJarakDanHarga() {
@@ -130,24 +140,32 @@ export function useJarakDanHarga() {
     const handleEdit = (item) => {
         isEdit.value = true;
         errors.value = {};
+
+        // 1. ISI SYARAT KONDISI TERLEBIH DAHULU (PENTING)
+        // Sesuaikan path 'item.source...' dengan response API asli Anda
+        formJarakDanHarga.jenisKendaraan = item.source?.kendaraan?.jeniskendaraan?.jenis || '';
+        formJarakDanHarga.kategoriMaterial = item.source?.material?.kategori?.kategori || '';
+
+        // 2. ISI DATA FORM
         formJarakDanHarga.id = item.id;
         formJarakDanHarga.pengambilan = item.pengambilan;
         formJarakDanHarga.tujuan = item.tujuan;
         formJarakDanHarga.hargaupah = item.hargaupah;
         formJarakDanHarga.hargajasa = item.hargajasa;
 
-
-        // -- HITUNG -- //
-        formJarakDanHarga.jarak = item.jarak;
+        // 3. ISI DATA PERHITUNGAN
+        formJarakDanHarga.jarak = item.jarak; // Nilai ini akan mentrigger watch pertama
         formJarakDanHarga.upahharian = item.upahharian || 0;
         formJarakDanHarga.jamkerja = item.jamkerja || 0;
         formJarakDanHarga.hargasolar = item.kegiatan_armada?.hargasolar || 0;
         formJarakDanHarga.jarakindexkm = 240;
         formJarakDanHarga.indexsolarkm = item.source?.kendaraan?.jeniskendaraan?.indexperkm || 0;
-        formJarakDanHarga.tonase = item.tonase || 0;
+        formJarakDanHarga.tonase = item.source?.volume || 0;
         formJarakDanHarga.upahharianinvoice = item.upahharianinvoice || 0;
-        // --------------------------
-        // ---------------------
+
+        formJarakDanHarga.waktujarak = item.waktujarak || 0;
+        formJarakDanHarga.waktubongkarmuatmaterial = item.waktubongkarmuatmaterial || 0;
+        formJarakDanHarga.pembulatan = item.pembulatan || 0;
 
         const modal = new bootstrap.Modal(document.getElementById('modalJarak'));
         modal.show();
@@ -181,6 +199,48 @@ export function useJarakDanHarga() {
 
         modalHitungEl.addEventListener('hidden.bs.modal', handleHidden);
     };
+
+    // 1. Hitung WAKTU JARAK = (Jarak * 2) / 30
+    // KONDISI: Kendaraan DT DAN Material BUKAN ASPAL
+    watch(() => formJarakDanHarga.jarak, (newJarak) => {
+        const jarak = parseFloat(newJarak) || 0;
+
+        // Normalisasi teks ke uppercase untuk menghindari kesalahan ketik (dt vs DT)
+        const isDT = formJarakDanHarga.jenisKendaraan?.toUpperCase() === 'DT';
+        const isNotAspal = formJarakDanHarga.kategoriMaterial?.toUpperCase() !== 'ASPAL';
+
+        if (isDT && isNotAspal) {
+            formJarakDanHarga.waktujarak = parseFloat(((jarak * 2) / 30).toFixed(2));
+        } else {
+            // Jika tidak memenuhi syarat, Anda bisa set ke 0 atau nilai default lainnya
+            formJarakDanHarga.waktujarak = 0;
+        }
+    }, { immediate: true }); // Tambahkan immediate agar terhitung saat modal dibuka
+
+    // 2. Hitung KEBUTUHAN WAKTU = Waktu Jarak + Waktu Bongkar Muat
+    watch([
+        () => formJarakDanHarga.waktujarak,
+        () => formJarakDanHarga.waktubongkarmuatmaterial
+    ], ([newWaktuJarak, newWaktuBongkar]) => {
+        const wJarak = parseFloat(newWaktuJarak) || 0;
+        const wBongkar = parseFloat(newWaktuBongkar) || 0;
+        formJarakDanHarga.kebutuhanwaktujarakwaktubongkarmuat = parseFloat((wJarak + wBongkar).toFixed(2));
+    }, { immediate: true });
+
+    // 3. Hitung PERKIRAAN RITASE = Jam Kerja / Kebutuhan Waktu
+    watch([
+        () => formJarakDanHarga.jamkerja,
+        () => formJarakDanHarga.kebutuhanwaktujarakwaktubongkarmuat
+    ], ([newJamKerja, newKebutuhan]) => {
+        const jam = parseFloat(newJamKerja) || 0;
+        const kebutuhan = parseFloat(newKebutuhan) || 0;
+
+        if (kebutuhan > 0) {
+            formJarakDanHarga.perkiraanperolehanritase = parseFloat((jam / kebutuhan).toFixed(2));
+        } else {
+            formJarakDanHarga.perkiraanperolehanritase = 0;
+        }
+    }, { immediate: true });
 
     const handleRefresh = async () => {
         await fetchJarakDanHarga();
