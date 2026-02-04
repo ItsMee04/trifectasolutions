@@ -21,7 +21,7 @@ class AsphaltMixingPlantController extends Controller
 
         $data = AsphaltMixingPlant::where('status', 1)
             ->where('jenis', $request->jenis)
-            ->with(['material', 'kendaraan', 'driver', 'suplier','beratjenis'])
+            ->with(['material', 'kendaraan', 'driver', 'suplier', 'beratjenis'])
             ->get();
 
         if ($data->isEmpty()) {
@@ -55,8 +55,8 @@ class AsphaltMixingPlantController extends Controller
             'berattotal'     => 'required|numeric',
             'beratkendaraan' => 'required|numeric',
             'beratmuatan'    => 'required|numeric',
-            'jarakawal'      => 'required|integer',
-            'jarakakhir'     => 'required|integer',
+            'jarakawal'      => 'required|numeric|min:0',
+            'jarakakhir'     => 'required|numeric|min:0|gte:jarakawal',
         ]);
 
         try {
@@ -138,8 +138,8 @@ class AsphaltMixingPlantController extends Controller
             'berattotal'        => 'required|numeric',
             'beratkendaraan'    => 'required|numeric',
             'beratmuatan'       => 'required|numeric',
-            'jarakawal'         => 'required|integer',
-            'jarakakhir'        => 'required|integer'
+            'jarakawal'         => 'required|numeric|min:0',
+            'jarakakhir'        => 'required|numeric|min:0|gte:jarakawal',
         ]);
 
         // Eager load relasi untuk mempercepat proses update

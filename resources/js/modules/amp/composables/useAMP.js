@@ -289,8 +289,13 @@ export function useAMP() {
             const valAkhir = parseFloat(akhir) || 0;
             const hasil = valAkhir - valAwal;
 
-            // Math.round untuk pembulatan ke bilangan bulat terdekat
-            formAMP.jarak = hasil > 0 ? Math.round(hasil) : 0;
+            if (hasil > 0) {
+                // Gunakan .toFixed(2) untuk mendapatkan 2 angka di belakang koma
+                // Kemudian bungkus dengan Number() agar tipenya kembali menjadi angka, bukan string
+                formAMP.jarak = Number(hasil.toFixed(2));
+            } else {
+                formAMP.jarak = 0;
+            }
         }
     );
 
