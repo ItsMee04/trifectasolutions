@@ -125,11 +125,11 @@
                                 <td>{{ item.pengambilan }}</td>
                                 <td>{{ item.tujuan }}</td>
                                 <td>
-                                    <span v-if="parseFloat(item.jarak) === 0" class="badge bg-danger">
+                                    <span v-if="Number(item.jarak) === 0" class="badge bg-danger">
                                         0
                                     </span>
                                     <span v-else>
-                                        {{ item.jarak }}
+                                        {{ formatNumber(item.jarak) }}
                                     </span>
                                 </td>
 
@@ -175,7 +175,7 @@
                     <tfoot v-if="!isLoading && paginatedJarakDanHarga.length > 0">
                         <tr class="text-center fw-bold bg-light">
                             <td colspan="5" class="text-end">TOTAL</td>
-                            <td>{{ formatNumber(totalFooter.jarakTotal, 2) }}</td>
+                            <td>{{ formatNumber(totalFooter.jarakTotal) }}</td>
                             <td>{{ formatNumber(totalFooter.upahTotal) }}</td>
                             <td>{{ formatNumber(totalFooter.jasaTotal) }}</td>
                             <td colspan="2"></td>

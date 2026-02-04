@@ -135,7 +135,7 @@
                             <div class="col-md-6">
                                 <div class="mb-4">
                                     <div class="form-group local-forms mb-3">
-                                        <label>Jarak Awal <span class="login-danger">*</span></label>
+                                        <label>KM Awal <span class="login-danger">*</span></label>
                                         <input v-model="formAMP.jarakawal" type="text" class="form-control"
                                             :class="{ 'is-invalid': errors.jarakawal }">
                                         <div class="invalid-feedback" v-if="errors.jarakawal">
@@ -148,7 +148,7 @@
                             <div class="col-md-6">
                                 <div class="mb-4">
                                     <div class="form-group local-forms mb-3">
-                                        <label>Jarak Akhir <span class="login-danger">*</span></label>
+                                        <label>KM Akhir <span class="login-danger">*</span></label>
                                         <input v-model="formAMP.jarakakhir" type="text" class="form-control"
                                             :class="{ 'is-invalid': errors.jarakakhir }">
                                         <div class="invalid-feedback" v-if="errors.jarakakhir">
