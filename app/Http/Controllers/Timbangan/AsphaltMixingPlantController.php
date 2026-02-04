@@ -137,7 +137,9 @@ class AsphaltMixingPlantController extends Controller
             'volume'            => 'required|numeric',
             'berattotal'        => 'required|numeric',
             'beratkendaraan'    => 'required|numeric',
-            'beratmuatan'       => 'required|numeric'
+            'beratmuatan'       => 'required|numeric',
+            'jarakawal'         => 'required|integer',
+            'jarakakhir'        => 'required|integer'
         ]);
 
         // Eager load relasi untuk mempercepat proses update
@@ -169,6 +171,8 @@ class AsphaltMixingPlantController extends Controller
                     'berattotal'     => $request->berattotal,
                     'beratkendaraan' => $request->beratkendaraan,
                     'beratmuatan'    => $request->beratmuatan,
+                    'jarakawal'      => $request->jarakawal,
+                    'jarakakhir'     => $request->jarakakhir,
                 ]);
 
                 // 3. Logika Penentuan Lokasi Khusus AMP
@@ -181,6 +185,7 @@ class AsphaltMixingPlantController extends Controller
                         'tanggal'     => $request->tanggal,
                         'pengambilan' => $pengambilan,
                         'tujuan'      => $tujuan,
+                        'jarak'       => $request->jarak,
                     ]);
 
                     // 5. Update Tanggal di KegiatanArmada terkait agar sinkron di laporan

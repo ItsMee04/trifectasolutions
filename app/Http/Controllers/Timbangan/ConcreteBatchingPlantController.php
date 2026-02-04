@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Master\Suplier;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Models\KegiatanArmada\JarakHarga;
 use App\Models\KegiatanArmada\KegiatanArmada;
 use App\Models\Timbangan\ConcreteBatchingPlant;
@@ -53,7 +54,9 @@ class ConcreteBatchingPlantController extends Controller
             'volume'         => 'required|numeric',
             'berattotal'     => 'required|numeric',
             'beratkendaraan' => 'required|numeric',
-            'beratmuatan'    => 'required|numeric'
+            'beratmuatan'    => 'required|numeric',
+            'jarakawal'      => 'required|integer',
+            'jarakakhir'     => 'required|integer'
         ]);
 
         try {
@@ -74,6 +77,9 @@ class ConcreteBatchingPlantController extends Controller
                     'berattotal'     => $request->berattotal,
                     'beratkendaraan' => $request->beratkendaraan,
                     'beratmuatan'    => $request->beratmuatan,
+                    'jarakawal'      => $request->jarakawal,
+                    'jarakakhir'     => $request->jarakakhir,
+                    'oleh'           => Auth::user()->id,
                 ]);
 
                 // 3. Logika Lokasi untuk CBP
@@ -86,12 +92,15 @@ class ConcreteBatchingPlantController extends Controller
                     'tanggal'     => $request->tanggal,
                     'pengambilan' => $pengambilan,
                     'tujuan'      => $tujuan,
+                    'jarak'       => $request->jarak,
+                    'oleh'        => Auth::user()->id,
                 ]);
 
                 // 5. Simpan ke KegiatanArmada (Chaining Level 2)
                 // Menggunakan instance $jarakHarga agar jarak_id terhubung sempurna
                 $jarakHarga->kegiatanArmada()->create([
                     'tanggal' => $request->tanggal,
+                    'oleh'    => Auth::user()->id,
                 ]);
 
                 return $cbp;
@@ -126,7 +135,9 @@ class ConcreteBatchingPlantController extends Controller
             'volume'            => 'required|numeric',
             'berattotal'        => 'required|numeric',
             'beratkendaraan'    => 'required|numeric',
-            'beratmuatan'       => 'required|numeric'
+            'beratmuatan'       => 'required|numeric',
+            'jarakawal'         => 'required|integer',
+            'jarakakhir'        => 'required|integer',
         ]);
 
         // Ambil data beserta relasi Jarak dan Kegiatan
@@ -158,6 +169,8 @@ class ConcreteBatchingPlantController extends Controller
                     'berattotal'     => $request->berattotal,
                     'beratkendaraan' => $request->beratkendaraan,
                     'beratmuatan'    => $request->beratmuatan,
+                    'jarakawal'      => $request->jarakawal,
+                    'jarakakhir'     => $request->jarakakhir,
                 ]);
 
                 // 3. Tentukan ulang Pengambilan & Tujuan jika Jenis/Supplier berubah
@@ -170,6 +183,7 @@ class ConcreteBatchingPlantController extends Controller
                         'tanggal'     => $request->tanggal,
                         'pengambilan' => $pengambilan,
                         'tujuan'      => $tujuan,
+                        'jarak'       => $request->jarak
                     ]);
 
                     // 5. Update Tanggal di KegiatanArmada terkait

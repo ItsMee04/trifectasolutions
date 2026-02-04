@@ -8,6 +8,7 @@ use App\Models\Master\Kendaraan;
 use App\Models\Master\BahanBakar;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Timbangan\StoneCrusher;
 use App\Models\KegiatanArmada\JarakHarga;
 use App\Models\KegiatanArmada\KegiatanArmada;
@@ -55,7 +56,9 @@ class StoneCrusherController extends Controller
             'volume'         => 'required|numeric',
             'berattotal'     => 'required|numeric',
             'beratkendaraan' => 'required|numeric',
-            'beratmuatan'    => 'required|numeric'
+            'beratmuatan'    => 'required|numeric',
+            'jarakawal'      => 'required|integer',
+            'jarakakhir'     => 'required|integer'
         ]);
 
         try {
@@ -76,6 +79,9 @@ class StoneCrusherController extends Controller
                     'berattotal'     => $request->berattotal,
                     'beratkendaraan' => $request->beratkendaraan,
                     'beratmuatan'    => $request->beratmuatan,
+                    'jarakawal'      => $request->jarakawal,
+                    'jarakakhir'     => $request->jarakakhir,
+                    'oleh'           => Auth::user()->id,
                 ]);
 
                 // 3. Logika Penentuan Pengambilan & Tujuan
@@ -88,11 +94,14 @@ class StoneCrusherController extends Controller
                     'tanggal'     => $request->tanggal,
                     'pengambilan' => $pengambilan,
                     'tujuan'      => $tujuan,
+                    'jarak'       => $request->jarak,
+                    'oleh'        => Auth::user()->id,
                 ]);
 
                 // 5. Simpan ke KegiatanArmada menggunakan ID dari JarakHarga yang baru dibuat
                 $jarakHarga->kegiatanArmada()->create([
                     'tanggal' => $request->tanggal,
+                    'oleh'    => Auth::user()->id,
                     // 'jarak_id' akan otomatis terisi oleh Eloquent
                 ]);
 
@@ -128,7 +137,9 @@ class StoneCrusherController extends Controller
             'volume'            => 'required|numeric',
             'berattotal'        => 'required|numeric',
             'beratkendaraan'    => 'required|numeric',
-            'beratmuatan'       => 'required|numeric'
+            'beratmuatan'       => 'required|numeric',
+            'jarakawal'         => 'required|integer',
+            'jarakakhir'        => 'required|integer'
         ]);
 
         // Load relasi agar proses update lebih efisien
@@ -160,6 +171,8 @@ class StoneCrusherController extends Controller
                     'berattotal'     => $request->berattotal,
                     'beratkendaraan' => $request->beratkendaraan,
                     'beratmuatan'    => $request->beratmuatan,
+                    'jarakawal'      => $request->jarakawal,
+                    'jarakakhir'     => $request->jarakakhir,
                 ]);
 
                 // 3. Logika Lokasi untuk Stone Crusher (SBPS SC)
@@ -172,6 +185,7 @@ class StoneCrusherController extends Controller
                         'tanggal'     => $request->tanggal,
                         'pengambilan' => $pengambilan,
                         'tujuan'      => $tujuan,
+                        'jarak'       => $request->jarak,
                     ]);
 
                     // 5. Update Tanggal di KegiatanArmada terkait

@@ -25,6 +25,8 @@ return new class extends Migration
             $table->integer('berattotal')->default(0);
             $table->integer('beratkendaraan')->default(0);
             $table->integer('beratmuatan')->default(0);
+            $table->integer('jarakawal')->default(0);
+            $table->integer('jarakakhir')->default(0);
             $table->unsignedBigInteger('oleh');
             $table->integer('status')->default(1);
             $table->timestamps();
