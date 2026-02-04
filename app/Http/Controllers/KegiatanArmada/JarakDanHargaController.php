@@ -19,9 +19,9 @@ class JarakDanHargaController extends Controller
         $data = JarakHarga::with([
             'source' => function ($morphTo) {
                 $morphTo->morphWith([
-                    \App\Models\Timbangan\StoneCrusher::class => ['material', 'kendaraan', 'driver', 'suplier'],
-                    \App\Models\Timbangan\ConcreteBatchingPlant::class => ['material', 'kendaraan', 'driver', 'suplier'],
-                    \App\Models\Timbangan\AsphaltMixingPlant::class => ['material', 'kendaraan', 'driver', 'suplier'],
+                    \App\Models\Timbangan\StoneCrusher::class => ['material', 'material.kategori', 'kendaraan', 'kendaraan.jeniskendaraan', 'driver', 'suplier'],
+                    \App\Models\Timbangan\ConcreteBatchingPlant::class => ['material', 'material.kategori', 'kendaraan', 'kendaraan.jeniskendaraan', 'driver', 'suplier'],
+                    \App\Models\Timbangan\AsphaltMixingPlant::class => ['material', 'material.kategori', 'kendaraan', 'kendaraan.jeniskendaraan', 'driver', 'suplier'],
                 ]);
             },
             'kegiatanArmada' // <--- Tambahkan relasi ini di sini
@@ -96,7 +96,7 @@ class JarakDanHargaController extends Controller
             'jarak'     => 'required|numeric',
             'hargaupah' => 'required|integer',
             'hargajasa' => 'required|integer',
-            'hargasolar'=> 'required|integer', // Harga BBM per liter (misal 13000)
+            'hargasolar' => 'required|integer', // Harga BBM per liter (misal 13000)
         ]);
 
         // 2. Ambil data indexperkm dari relasi (Gunakan 1 sebagai default untuk menghindari pembagian dengan nol)

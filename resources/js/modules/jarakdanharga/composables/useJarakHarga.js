@@ -32,7 +32,14 @@ const formJarakDanHarga = reactive({
     jarak: '',
     hargaupah: '',
     hargajasa: '',
-    hargasolar: ''
+
+    upahharian: '',
+    jamkerja: '',
+    jarakindexkm: '',
+    hargasolar: '',
+    indexsolarkm: '',
+    tonase:'',
+    upahharianinvoice:''
 });
 
 export function useJarakDanHarga() {
@@ -126,13 +133,53 @@ export function useJarakDanHarga() {
         formJarakDanHarga.id = item.id;
         formJarakDanHarga.pengambilan = item.pengambilan;
         formJarakDanHarga.tujuan = item.tujuan;
-        formJarakDanHarga.jarak = item.jarak;
         formJarakDanHarga.hargaupah = item.hargaupah;
         formJarakDanHarga.hargajasa = item.hargajasa;
-        formJarakDanHarga.hargasolar = item.kegiatan_armada?.hargasolar;
+
+
+        // -- HITUNG -- //
+        formJarakDanHarga.jarak = item.jarak;
+        formJarakDanHarga.upahharian = item.upahharian || 0;
+        formJarakDanHarga.jamkerja = item.jamkerja || 0;
+        formJarakDanHarga.hargasolar = item.kegiatan_armada?.hargasolar || 0;
+        formJarakDanHarga.jarakindexkm = 240;
+        formJarakDanHarga.indexsolarkm = item.source?.kendaraan?.jeniskendaraan?.indexperkm || 0;
+        formJarakDanHarga.tonase = item.tonase || 0;
+        formJarakDanHarga.upahharianinvoice = item.upahharianinvoice || 0;
+        // --------------------------
+        // ---------------------
 
         const modal = new bootstrap.Modal(document.getElementById('modalJarak'));
         modal.show();
+    };
+
+    const handleHitungUpahDriver = () => {
+        // 1. Kita tidak butuh 'item' di sini karena data sudah ada di formJarakDanHarga
+        // hasil dari fungsi handleEdit sebelumnya.
+
+        isEdit.value = true;
+        errors.value = {};
+
+        // 2. Logika Perpindahan Modal
+        const modalJarakEl = document.getElementById('modalJarak');
+        const modalJarakInstance = bootstrap.Modal.getOrCreateInstance(modalJarakEl);
+
+        const modalHitungEl = document.getElementById('modalHitungUpdahDriver');
+        const modalHitungInstance = bootstrap.Modal.getOrCreateInstance(modalHitungEl);
+
+        // Sembunyikan Modal Pertama, Tampilkan Modal Kedua
+        modalJarakInstance.hide();
+        modalHitungInstance.show();
+
+        // 3. Listener untuk kembali ke Modal Pertama
+        const handleHidden = () => {
+            setTimeout(() => {
+                modalJarakInstance.show();
+            }, 150);
+            modalHitungEl.removeEventListener('hidden.bs.modal', handleHidden);
+        };
+
+        modalHitungEl.addEventListener('hidden.bs.modal', handleHidden);
     };
 
     const handleRefresh = async () => {
@@ -316,6 +363,7 @@ export function useJarakDanHarga() {
         selectPengambilan,
         fetchJarakDanHarga,
         handleEdit,
+        handleHitungUpahDriver,
         handleRefresh,
         submitJarakDanHarga,
         resetDateFilter,

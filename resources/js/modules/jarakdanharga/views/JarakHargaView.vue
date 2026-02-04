@@ -21,6 +21,7 @@
         </div>
 
         <JarakHargaModal />
+        <HitungUpahDriver />
     </div>
 </template>
 
@@ -29,6 +30,7 @@ import { onMounted } from 'vue';
 import { useJarakDanHarga } from '../composables/useJarakHarga';
 import JarakHargaTable from '../components/JarakHargaTable.vue';
 import JarakHargaModal from '../components/JarakHargaModal.vue';
+import HitungUpahDriver from '../components/HitungUpahDriver.vue';
 
 const { fetchJarakDanHarga } = useJarakDanHarga();
 

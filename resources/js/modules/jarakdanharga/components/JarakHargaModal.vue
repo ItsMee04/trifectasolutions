@@ -23,17 +23,26 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="col-md-12">
                             <div class="mb-4">
                                 <div class="form-group local-forms mb-3">
                                     <label>Harga Upah Driver <span class="login-danger">*</span></label>
-                                    <input v-model="formJarakDanHarga.hargaupah" type="text" class="form-control"
-                                        :class="{ 'is-invalid': errors.hargaupah }">
-                                    <div class="invalid-feedback" v-if="errors.hargaupah">
-                                        {{ Array.isArray(errors.hargaupah) ? errors.hargaupah[0] : errors.hargaupah
-                                        }}
+
+                                    <div class="input-group">
+                                        <input v-model="formJarakDanHarga.hargaupah" type="text" class="form-control"
+                                            :class="{ 'is-invalid': errors.hargaupah }"
+                                            readonly="">
+
+                                        <button class="btn btn-primary" type="button" @click="handleHitungUpahDriver">
+                                            <i class="fas fa-calculator me-1"></i> Hitung
+                                        </button>
+
+                                        <div class="invalid-feedback" v-if="errors.hargaupah" style="display: block;">
+                                            {{ Array.isArray(errors.hargaupah) ? errors.hargaupah[0] : errors.hargaupah
+                                            }}
+                                        </div>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
@@ -84,6 +93,7 @@ import '@vueform/multiselect/themes/default.css';
 import { useJarakDanHarga } from '../composables/useJarakHarga';
 
 const {
+    handleHitungUpahDriver,
     isEdit,
     formJarakDanHarga,
     errors,
