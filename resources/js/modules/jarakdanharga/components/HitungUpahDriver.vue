@@ -242,11 +242,11 @@
                                 <div class="mb-4">
                                     <div class="form-group local-forms mb-3">
                                         <label>UPAH HARIAN DRIVER<span class="login-danger">*</span></label>
-                                        <input v-model="formJarakDanHarga.upahharianinvoice" type="text" value="240"
-                                            class="form-control" :class="{ 'is-invalid': errors.upahharianinvoice }">
-                                        <div class="invalid-feedback" v-if="errors.upahharianinvoice">
-                                            {{ Array.isArray(errors.upahharianinvoice) ? errors.upahharianinvoice[0] :
-                                                errors.upahharianinvoice }}
+                                        <input v-model="formJarakDanHarga.upahhariandriver" type="text"
+                                            class="form-control" :class="{ 'is-invalid': errors.upahhariandriver }">
+                                        <div class="invalid-feedback" v-if="errors.upahhariandriver">
+                                            {{ Array.isArray(errors.upahhariandriver) ? errors.upahhariandriver[0] :
+                                                errors.upahhariandriver }}
                                         </div>
                                     </div>
                                 </div>
@@ -257,10 +257,10 @@
                                 <div class="mb-4">
                                     <div class="form-group local-forms mb-3">
                                         <label>UPAH DRIVER<span class="login-danger">*</span></label>
-                                        <input v-model="formJarakDanHarga.tonase" type="text" class="form-control"
-                                            :class="{ 'is-invalid': errors.tonase }">
-                                        <div class="invalid-feedback" v-if="errors.tonase">
-                                            {{ Array.isArray(errors.tonase) ? errors.tonase[0] : errors.tonase }}
+                                        <input v-model="formJarakDanHarga.upahdriver" type="text" class="form-control"
+                                            :class="{ 'is-invalid': errors.upahdriver }">
+                                        <div class="invalid-feedback" v-if="errors.upahdriver">
+                                            {{ Array.isArray(errors.upahdriver) ? errors.upahdriver[0] : errors.upahdriver }}
                                         </div>
                                     </div>
                                 </div>
@@ -269,11 +269,11 @@
                                 <div class="mb-4">
                                     <div class="form-group local-forms mb-3">
                                         <label>UPAH PER M3 INVOICE<span class="login-danger">*</span></label>
-                                        <input v-model="formJarakDanHarga.upahharianinvoice" type="text" value="240"
-                                            class="form-control" :class="{ 'is-invalid': errors.upahharianinvoice }">
-                                        <div class="invalid-feedback" v-if="errors.upahharianinvoice">
-                                            {{ Array.isArray(errors.upahharianinvoice) ? errors.upahharianinvoice[0] :
-                                                errors.upahharianinvoice }}
+                                        <input v-model="formJarakDanHarga.upahpermaterial" type="text" value="240"
+                                            class="form-control" :class="{ 'is-invalid': errors.upahpermaterial }">
+                                        <div class="invalid-feedback" v-if="errors.upahpermaterial">
+                                            {{ Array.isArray(errors.upahpermaterial) ? errors.upahpermaterial[0] :
+                                                errors.upahpermaterial }}
                                         </div>
                                     </div>
                                 </div>

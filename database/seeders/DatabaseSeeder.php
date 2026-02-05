@@ -42,5 +42,14 @@ class DatabaseSeeder extends Seeder
             'role_id'       =>  1,
             'status'        =>  1,
         ]);
+
+        $this->call([
+            DriverSeeder::class,
+            JenisKendaraanSeeder::class,
+            KendaraanSeeder::class,
+            KategoriSeeder::class,
+            MaterialSeeder::class,
+            BeratJenisSeeder::class,
+        ]);
     }
 }

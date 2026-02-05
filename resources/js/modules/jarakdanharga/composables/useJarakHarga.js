@@ -51,6 +51,8 @@ const formJarakDanHarga = reactive({
 
     solarjarak: '',
     upahhariandriver: '',
+    upahdriver: '',
+    upahpermaterial: ''
 
 
 });
@@ -163,12 +165,16 @@ export function useJarakDanHarga() {
         formJarakDanHarga.hargasolar = item.kegiatan_armada?.hargasolar || 0;
         formJarakDanHarga.jarakindexkm = 240;
         formJarakDanHarga.indexsolarkm = item.source?.kendaraan?.jeniskendaraan?.indexperkm || 0;
-        formJarakDanHarga.tonase = item.source?.volume || 0;
+        formJarakDanHarga.tonase = 1;
         formJarakDanHarga.upahharianinvoice = item.upahharianinvoice || 0;
 
         formJarakDanHarga.waktujarak = item.waktujarak || 0;
         formJarakDanHarga.waktubongkarmuatmaterial = item.waktubongkarmuatmaterial || 0;
         formJarakDanHarga.pembulatan = item.pembulatan || 0;
+
+        formJarakDanHarga.upahhariandriver = item.upahhariandriver || 0;
+        formJarakDanHarga.upahdriver = item.upahdriver || 0;
+        formJarakDanHarga.upahpermaterial = item.upahpermaterial || 0;
 
         const modal = new bootstrap.Modal(document.getElementById('modalJarak'));
         modal.show();
@@ -208,33 +214,81 @@ export function useJarakDanHarga() {
         () => formJarakDanHarga.jamkerja,
         () => formJarakDanHarga.waktubongkarmuatmaterial,
         () => formJarakDanHarga.jenisKendaraan,
-        () => formJarakDanHarga.kategoriMaterial
+        () => formJarakDanHarga.kategoriMaterial,
+        () => formJarakDanHarga.indexsolarkm,
+        () => formJarakDanHarga.hargasolar,
+        () => formJarakDanHarga.upahharian,
+        () => formJarakDanHarga.upahharianinvoice, // Tambahkan listener
+        () => formJarakDanHarga.pembulatan,        // Tambahkan listener
+        () => formJarakDanHarga.tonase             // Tambahkan listener
     ], () => {
         const jarak = parseFloat(formJarakDanHarga.jarak) || 0;
         const jam = parseFloat(formJarakDanHarga.jamkerja) || 0;
         const wBongkar = parseFloat(formJarakDanHarga.waktubongkarmuatmaterial) || 0;
+        const indexSolar = parseFloat(formJarakDanHarga.indexsolarkm) || 0;
+        const hargaSolar = parseFloat(formJarakDanHarga.hargasolar) || 0;
+        const upahHarian = parseFloat(formJarakDanHarga.upahharian) || 0;
+        const upahHarianInvoice = parseFloat(formJarakDanHarga.upahharianinvoice) || 0;
+        const pembulatan = parseFloat(formJarakDanHarga.pembulatan) || 0;
+        const tonase = parseFloat(formJarakDanHarga.tonase) || 0;
 
-        // 1. Hitung Waktu Jarak (Murni tanpa toFixed untuk perhitungan selanjutnya)
+        // 1. Hitung Waktu Jarak
         const isDT = formJarakDanHarga.jenisKendaraan?.toUpperCase() === 'DT';
         const isNotAspal = formJarakDanHarga.kategoriMaterial?.toUpperCase() !== 'ASPAL';
-
         let rawWaktuJarak = 0;
         if (isDT && isNotAspal) {
-            rawWaktuJarak = (jarak * 2) / 30; // Hasil murni: 0.7066666666666667
+            rawWaktuJarak = (jarak * 2) / 30;
         }
-        formJarakDanHarga.waktujarak = parseFloat(rawWaktuJarak.toFixed(3)); // Tampilan: 0.707
+        formJarakDanHarga.waktujarak = parseFloat(rawWaktuJarak.toFixed(3));
 
-        // 2. Hitung Kebutuhan Waktu (Gunakan rawWaktuJarak agar akurat)
-        const rawKebutuhan = rawWaktuJarak + wBongkar; // 0.7066... + 0.3 = 1.00666...
-        formJarakDanHarga.kebutuhanwaktujarakwaktubongkarmuat = parseFloat(rawKebutuhan.toFixed(3)); // Tampilan: 1.007
+        // 2. Hitung Kebutuhan Waktu
+        const rawKebutuhan = rawWaktuJarak + wBongkar;
+        formJarakDanHarga.kebutuhanwaktujarakwaktubongkarmuat = parseFloat(rawKebutuhan.toFixed(3));
 
-        // 3. Hitung Perkiraan Ritase (Gunakan rawKebutuhan agar identik dengan Excel)
+        // 3. Hitung Perkiraan Ritase
+        let currentRitase = 0;
         if (rawKebutuhan > 0) {
-            const rawRitase = jam / rawKebutuhan; // 8 / 1.00666... = 7.94705...
-            formJarakDanHarga.perkiraanperolehanritase = parseFloat(rawRitase.toFixed(3)); // Hasil: 7.947
+            currentRitase = parseFloat((jam / rawKebutuhan).toFixed(3));
+            formJarakDanHarga.perkiraanperolehanritase = currentRitase;
         } else {
             formJarakDanHarga.perkiraanperolehanritase = 0;
         }
+
+        // 4. Hitung Solar Jarak
+        let currentSolarJarak = 0;
+        if (indexSolar > 0) {
+            currentSolarJarak = Math.round(((jarak * 2) / indexSolar) * hargaSolar);
+            formJarakDanHarga.solarjarak = currentSolarJarak;
+        } else {
+            formJarakDanHarga.solarjarak = 0;
+        }
+
+        // 5. Hitung Upah Harian Driver
+        let currentUpahHarianDriver = 0;
+        if (currentRitase > 0) {
+            currentUpahHarianDriver = Math.round(upahHarian / currentRitase);
+            formJarakDanHarga.upahhariandriver = currentUpahHarianDriver;
+        } else {
+            formJarakDanHarga.upahhariandriver = 0;
+        }
+
+        // 6. Hitung Upah Driver
+        const currentUpahDriver = currentSolarJarak + currentUpahHarianDriver;
+        formJarakDanHarga.upahdriver = currentUpahDriver;
+
+        // 7. Hitung Upah Per Material (Rumus Excel Baru)
+        // Rumus: ((upahHarianInvoice / pembulatan) / tonase) + (upahDriver / tonase)
+        if (tonase > 0 && pembulatan > 0) {
+            const bagian1 = (upahHarianInvoice / pembulatan) / tonase;
+            const bagian2 = currentUpahDriver / tonase;
+            const rawUpahPerMaterial = bagian1 + bagian2;
+
+            // Simpan hasil (biasanya upah per m3/ton butuh desimal, misal 2 angka di belakang koma)
+            formJarakDanHarga.upahpermaterial = parseFloat(rawUpahPerMaterial.toFixed(2));
+        } else {
+            formJarakDanHarga.upahpermaterial = 0;
+        }
+
     }, { immediate: true });
 
     const handleRefresh = async () => {
