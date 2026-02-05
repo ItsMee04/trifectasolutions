@@ -106,22 +106,31 @@ export function useAMP() {
 
     // Logika Perhitungan Volume Otomatis
     watch(
-        () => [formAMP.beratmuatan, formAMP.beratjenis_id, formAMP.material_id],
+        // TAMBAHKAN selectedMaterialSatuan ke dalam dependency
+        () => [
+            formAMP.beratmuatan,
+            formAMP.beratjenis_id,
+            formAMP.material_id,
+            selectedMaterialSatuan.value // <--- Tambahkan ini
+        ],
         () => {
             const beratMuatan = parseFloat(formAMP.beratmuatan) || 0;
             const satuan = selectedMaterialSatuan.value;
 
-            // Cari nilai nominal berat jenis dari list berdasarkan ID yang dipilih
+            // Cari nilai nominal berat jenis
             const bjTerpilih = beratjenisList.value.find(b => b.value === formAMP.beratjenis_id);
             const nilaiBJ = bjTerpilih ? parseFloat(bjTerpilih.label) : 0;
 
-            if (satuan === 'm3') {
+            // Gunakan .toUpperCase() agar pengecekan tidak sensitif huruf besar/kecil
+            const currentSatuan = satuan.toUpperCase();
+
+            if (currentSatuan === 'M3') {
                 formAMP.volume = nilaiBJ > 0 ? (beratMuatan / nilaiBJ).toFixed(2) : 0;
-            } else if (satuan === 'kg') {
-                formAMP.volume = beratMuatan;
-            } else if (satuan === 'liter' || satuan === 'pcs') {
-                // Biarkan user input manual, jangan override jika sudah ada isinya
-                // kecuali jika baru pindah ke satuan ini
+            } else if (currentSatuan === 'KG') {
+                // Sekarang ini akan langsung berjalan saat satuan berubah menjadi KG
+                formAMP.volume = beratMuatan / 1000;
+            } else if (currentSatuan === 'LITER' || currentSatuan === 'PCS') {
+                // Biarkan user input manual
             } else {
                 formAMP.volume = 0;
             }

@@ -270,7 +270,7 @@
                             <div class="col-md-6">
                                 <div class="mb-4">
                                     <div class="form-group local-forms mb-3">
-                                        <label>UPAH PER M3 INVOICE<span class="login-danger">*</span></label>
+                                        <label>UPAH PER {{ formJarakDanHarga.satuanMaterial || '-' }} INVOICE<span class="login-danger">*</span></label>
                                         <input v-model="formJarakDanHarga.upahpermaterial" type="text" value="240"
                                             class="form-control" :class="{ 'is-invalid': errors.upahpermaterial }">
                                         <div class="invalid-feedback" v-if="errors.upahpermaterial">

@@ -24,10 +24,17 @@ class JarakDanHargaController extends Controller
                     \App\Models\Timbangan\AsphaltMixingPlant::class => ['material', 'material.kategori', 'kendaraan', 'kendaraan.jeniskendaraan', 'driver', 'suplier'],
                 ]);
             },
-            'kegiatanArmada' // <--- Tambahkan relasi ini di sini
+            'kegiatanArmada',
         ])
-            ->where('status', 1)
-            ->get();
+        ->where('status', 1)
+        /* Menyaring agar hanya mengambil JarakHarga yang sourcenya
+           berasal dari AsphaltMixingPlant
+        */
+        ->whereHasMorph('source', [\App\Models\Timbangan\AsphaltMixingPlant::class], function ($query) {
+            // Jika ingin filter source_id tertentu, tambahkan di sini:
+            // $query->where('id', 1);
+        })
+        ->get();
 
         if ($data->isEmpty()) {
             return response()->json([
