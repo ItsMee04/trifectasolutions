@@ -93,34 +93,21 @@ class JarakDanHargaController extends Controller
         }
 
         $request->validate([
-            'jarak'     => 'required|numeric',
-            'hargaupah' => 'required|integer',
-            'hargajasa' => 'required|integer',
-            'hargasolar' => 'required|integer', // Harga BBM per liter (misal 13000)
+            'upahdriver'        => 'required|integer',
+            'upahpermaterial'   => 'required|integer',
         ]);
-
-        // 2. Ambil data indexperkm dari relasi (Gunakan 1 sebagai default untuk menghindari pembagian dengan nol)
-        $indexPerKm = $jarakdanharga->source->kendaraan->jeniskendaraan->indexperkm ?? 0;
-
-        // 3. Hitung Biaya Bahan Bakar
-        // Rumus: (($jarak * 2) / indexperkm) * harga_bbm
-        $biayabahanbakar = 0;
-        if ($indexPerKm > 0) {
-            $biayabahanbakar = (($request->jarak * 2) / $indexPerKm) * $request->hargasolar;
-        }
 
         // 4. Update data
         $inserjarak = $jarakdanharga->update([
-            'jarak'             => $request->jarak,
-            'hargaupah'         => $request->hargaupah,
-            'hargajasa'         => $request->hargajasa,
+            'hargaupah'         => $request->upahdriver,
+            'hargajasa'         => $request->upahpermaterial,
         ]);
 
         if ($inserjarak) {
             KegiatanArmada::where('jarak_id', $request->id)
                 ->update([
                     'hargasolar'            => $request->hargasolar,
-                    'nominalbiayasolar'     => $biayabahanbakar
+                    'nominalbiayasolar'     => $request->solarjarak
                 ]);
         }
 
@@ -128,10 +115,7 @@ class JarakDanHargaController extends Controller
             'status'  => 200,
             'success' => true,
             'message' => 'Data berhasil dihitung dan diupdate.',
-            'data'    => [
-                'biayabahanbakar' => $biayabahanbakar,
-                'index_digunakan' => $indexPerKm
-            ]
+            'data'    => $jarakdanharga
         ]);
     }
 
