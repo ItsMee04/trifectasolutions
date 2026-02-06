@@ -34,7 +34,7 @@ const formJarakDanHarga = reactive({
     hargajasa: '',
     jenisKendaraan: '',
     kategoriMaterial: '',
-    satuanMaterial:'',
+    satuanMaterial: '',
     volume: '',
 
     upahharian: '',
@@ -197,8 +197,10 @@ export function useJarakDanHarga() {
             () => formJarakDanHarga.upahharian,
             () => formJarakDanHarga.upahharianinvoice,
             () => formJarakDanHarga.pembulatan,
-            () => formJarakDanHarga.tonase
+            () => formJarakDanHarga.tonase,
+            () => formJarakDanHarga.volume
         ], () => {
+            // 1. Inisialisasi Data Dasar
             const jarak = parseFloat(formJarakDanHarga.jarak) || 0;
             const jam = parseFloat(formJarakDanHarga.jamkerja) || 0;
             const indexSolar = parseFloat(formJarakDanHarga.indexsolarkm) || 0;
@@ -206,80 +208,73 @@ export function useJarakDanHarga() {
             const upahHarian = parseFloat(formJarakDanHarga.upahharian) || 0;
             const upahHarianInvoice = parseFloat(formJarakDanHarga.upahharianinvoice) || 0;
             const pembulatan = parseFloat(formJarakDanHarga.pembulatan) || 0;
-            const tonase = parseFloat(formJarakDanHarga.tonase) || 0;
 
             const kategori = formJarakDanHarga.kategoriMaterial?.toUpperCase();
             const kendaraan = formJarakDanHarga.jenisKendaraan?.toUpperCase();
 
+            // Variabel penampung hasil
             let resWaktuJarak = 0;
             let resRitase = 0;
             let resSolarJarak = 0;
             let resUpahHarianDriver = 0;
             let resUpahDriver = 0;
             let resUpahPerMaterial = 0;
+            let wBongkarAktif = parseFloat(formJarakDanHarga.waktubongkarmuatmaterial) || 0;
+            let tonaseAktif = parseFloat(formJarakDanHarga.tonase) || 0;
 
             // =========================================================================
-            // 1. SET PARAMETER KHUSUS ASPAL
+            // PEMBAGIAN KONDISI
             // =========================================================================
-            if (kategori === 'ASPAL' && kendaraan === 'DT') {
+
+            if (kategori !== 'ASPAL' && kendaraan === 'DT') {
+                console.log("Kondisi 1: Bukan Aspal & DT");
+                // Logika DT Normal
+                resWaktuJarak = (jarak * 2) / 30;
+                resRitase = (resWaktuJarak + wBongkarAktif) > 0 ? jam / (resWaktuJarak + wBongkarAktif) : 0;
+                resSolarJarak = indexSolar > 0 ? ((jarak * 2) / indexSolar) * hargaSolar : 0;
+                resUpahHarianDriver = resRitase > 0 ? upahHarian / resRitase : 0;
+
+                resUpahDriver = resSolarJarak + resUpahHarianDriver;
+                resUpahPerMaterial = (tonaseAktif > 0 && pembulatan > 0)
+                    ? ((upahHarianInvoice / pembulatan) / tonaseAktif) + (resUpahDriver / tonaseAktif)
+                    : 0;
+
+            } else if (kategori === 'ASPAL' && kendaraan === 'DT') {
+                console.log("Kondisi 2: Aspal & DT");
+                // Set Parameter Khusus Aspal
                 formJarakDanHarga.upahharianinvoice = 500000;
                 formJarakDanHarga.waktubongkarmuatmaterial = 2;
                 formJarakDanHarga.pembulatan = 1;
-                if (formJarakDanHarga.volume) {
-                    formJarakDanHarga.tonase = parseFloat(formJarakDanHarga.volume) || 0;
-                }
-            }
+                tonaseAktif = parseFloat(formJarakDanHarga.volume) || 0;
+                formJarakDanHarga.tonase = tonaseAktif;
+                wBongkarAktif = 2;
 
-            const wBongkarAktif = parseFloat(formJarakDanHarga.waktubongkarmuatmaterial) || 0;
-            const tonaseAktif = parseFloat(formJarakDanHarga.tonase) || 0;
-
-            // =========================================================================
-            // 2. LOGIKA PERHITUNGAN (DT)
-            // =========================================================================
-            if (kendaraan === 'DT') {
                 resWaktuJarak = (jarak * 2) / 30;
+                resRitase = (resWaktuJarak + wBongkarAktif) > 0 ? jam / (resWaktuJarak + wBongkarAktif) : 0;
+                resSolarJarak = indexSolar > 0 ? ((jarak * 2) / indexSolar) * hargaSolar : 0;
+                resUpahHarianDriver = resRitase > 0 ? upahHarian / resRitase : 0;
 
-                const rawKebutuhan = resWaktuJarak + wBongkarAktif;
-                if (rawKebutuhan > 0) {
-                    resRitase = jam / rawKebutuhan;
-                }
+                resUpahDriver = tonaseAktif > 0 ? (resSolarJarak + resUpahHarianDriver) / tonaseAktif : 0;
+                resUpahPerMaterial = (tonaseAktif > 0)
+                    ? ((500000 / 1) / tonaseAktif) + resUpahDriver
+                    : 0;
 
-                if (indexSolar > 0) {
-                    resSolarJarak = ((jarak * 2) / indexSolar) * hargaSolar;
-                }
+            } else if (kategori !== 'ASPAL' && kendaraan === 'DTT') {
+                console.log("Kondisi 3: Bukan Aspal & DTT");
+                // TODO: Masukkan rumus spesifik DTT Non-Aspal di sini
 
-                if (resRitase > 0) {
-                    resUpahHarianDriver = upahHarian / resRitase;
-                }
+            } else if (kategori === 'ASPAL' && kendaraan === 'DTT') {
+                console.log("Kondisi 4: Aspal & DTT");
+                // TODO: Masukkan rumus spesifik DTT Aspal di sini
 
-                // --- PERBEDAAN RUMUS UPAH DRIVER ---
-                const rawTotalUpahDriver = resSolarJarak + resUpahHarianDriver;
+            } else if (kendaraan === 'SL') {
+                console.log("Kondisi 5: Kendaraan SL");
+                // TODO: Masukkan rumus spesifik SL di sini
 
-                if (kategori === 'ASPAL') {
-                    // Rumus ASPAL: (Solar + Upah Harian) / Tonase
-                    resUpahDriver = tonaseAktif > 0 ? (rawTotalUpahDriver / tonaseAktif) : 0;
-                } else {
-                    // Rumus Normal: Solar + Upah Harian
-                    resUpahDriver = rawTotalUpahDriver;
-                }
-
-                // --- PERBEDAAN RUMUS UPAH PER MATERIAL ---
-                if (tonaseAktif > 0 && pembulatan > 0) {
-                    if (kategori === 'ASPAL') {
-                        // Rumus ASPAL: ((Invoice / Pembulatan) / Tonase) + UpahDriver (yang sudah dibagi tonase)
-                        const bagian1 = (upahHarianInvoice / pembulatan) / tonaseAktif;
-                        resUpahPerMaterial = bagian1 + resUpahDriver;
-                    } else {
-                        // Rumus Normal: ((Invoice / Pembulatan) / Tonase) + (UpahDriver / Tonase)
-                        const bagian1 = (upahHarianInvoice / pembulatan) / tonaseAktif;
-                        const bagian2 = resUpahDriver / tonaseAktif;
-                        resUpahPerMaterial = bagian1 + bagian2;
-                    }
-                }
             }
 
             // =========================================================================
-            // 3. FINALISASI KE STATE
+            // FINALISASI KE STATE (Satu pintu di akhir)
             // =========================================================================
             formJarakDanHarga.waktujarak = parseFloat(resWaktuJarak.toFixed(3));
             formJarakDanHarga.kebutuhanwaktujarakwaktubongkarmuat = parseFloat((resWaktuJarak + wBongkarAktif).toFixed(3));
@@ -287,9 +282,9 @@ export function useJarakDanHarga() {
             formJarakDanHarga.solarjarak = Math.round(resSolarJarak);
             formJarakDanHarga.upahhariandriver = Math.round(resUpahHarianDriver);
 
-            // Simpan hasil sesuai kondisi (ASPAL menggunakan desimal karena hasil bagi)
-            formJarakDanHarga.upahdriver = kategori === 'ASPAL' ? parseFloat(resUpahDriver.toFixed(0)) : Math.round(resUpahDriver);
-            formJarakDanHarga.upahpermaterial = parseFloat(resUpahPerMaterial.toFixed(0));
+            // ASPAL biasanya butuh presisi desimal jika sudah dibagi tonase
+            formJarakDanHarga.upahdriver = kategori === 'ASPAL' ? parseFloat(resUpahDriver.toFixed(2)) : Math.round(resUpahDriver);
+            formJarakDanHarga.upahpermaterial = Math.round(resUpahPerMaterial);
 
         }, { immediate: true });
     };
