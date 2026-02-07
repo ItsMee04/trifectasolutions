@@ -47,6 +47,7 @@ const formJarakDanHarga = reactive({
 
     waktujarak: '',
     waktubongkarmuatmaterial: '',
+    waktubongkar: '',
     kebutuhanwaktujarakwaktubongkarmuat: '',
     perkiraanperolehanritase: '',
     pembulatan: '',
@@ -57,11 +58,17 @@ const formJarakDanHarga = reactive({
     upahpermaterial: '',
 
     //DTT
+    upahharian2: '',
+    upahharianinvoice2: '',
     kecepatanratarataberangkat: '',
     kecepatanrataratakembali: '',
     waktumuat: '',
     waktuyangdiperlukanberangkat: '',
-    waktuyangdiperlukankembali: ''
+    waktuyangdiperlukankembali: '',
+    jumlahwaktuyangdiperlukan: '',
+    perkiraanperolehanritase2: '',
+    pembulatan2: '',
+    tonase2:''
 
 });
 
@@ -189,6 +196,7 @@ export function useJarakDanHarga() {
         formJarakDanHarga.kecepatanratarataberangkat = 30;
         formJarakDanHarga.kecepatanrataratakembali = 35;
         formJarakDanHarga.waktumuat = 0;
+        formJarakDanHarga.waktubongkar = 0;
         formJarakDanHarga.waktuyangdiperlukanberangkat = 0;
         formJarakDanHarga.waktuyangdiperlukankembali = 0;
 
@@ -202,6 +210,10 @@ export function useJarakDanHarga() {
         watch([
             () => formJarakDanHarga.jarak,
             () => formJarakDanHarga.waktumuat, // Input manual baru
+            () => formJarakDanHarga.waktubongkar, // TAMBAHKAN INI
+            () => formJarakDanHarga.waktujarak,
+            () => formJarakDanHarga.perkiraanperolehanritase2,
+            () => formJarakDanHarga.pembulatan2,
             () => formJarakDanHarga.kecepatanratarataberangkat, // Tambahan
             () => formJarakDanHarga.kecepatanrataratakembali,  // Tambahan
             () => formJarakDanHarga.jamkerja,
@@ -228,6 +240,10 @@ export function useJarakDanHarga() {
             const vKembali = parseFloat(formJarakDanHarga.kecepatanrataratakembali) || 0;
             const wMuat = parseFloat(formJarakDanHarga.waktumuat) || 0;
             const wBongkar = parseFloat(formJarakDanHarga.waktubongkarmuatmaterial) || 0;
+            const wBongkarManual = parseFloat(formJarakDanHarga.waktubongkar) || 0;
+            const ritase2 = parseFloat(formJarakDanHarga.perkiraanperolehanritase2) || 0;
+            const pembulatan2 = parseFloat(formJarakDanHarga.pembulatan2) || 0;
+            const waktujarak = parseFloat(formJarakDanHarga.waktujarak) || 0;
 
             const kategori = formJarakDanHarga.kategoriMaterial?.toUpperCase();
             const kendaraan = formJarakDanHarga.jenisKendaraan?.toUpperCase();
@@ -282,47 +298,53 @@ export function useJarakDanHarga() {
             } else if (kategori !== 'ASPAL' && kendaraan === 'DTT') {
                 console.log("Kondisi 3: Bukan Aspal & DTT");
 
-                // Parameter default
                 formJarakDanHarga.upahharianinvoice = 500000;
-                formJarakDanHarga.tonase = 20;
-                formJarakDanHarga.waktubongkarmuatmaterial = 0.2;
-                formJarakDanHarga.pembulatan = 4;
-                tonaseAktif = 20;
+                formJarakDanHarga.upahharian2 = 250000;
+                formJarakDanHarga.upahharianinvoice2 = 1500000;
+                formJarakDanHarga.tonase2 = 20;
 
-                // A. Hitung waktu tempuh otomatis (Jarak / Kecepatan)
+                // 1. Waktu Jarak (Indeks)
+                const jarakIndexKM = parseFloat(formJarakDanHarga.jarakindexkm) || 240;
+                resWaktuJarak = ((jarak * 2) * jam) / jarakIndexKM;
+
+                // 2. Kebutuhan Waktu (Waktu Jarak + Input Manual)
+                const totalKebutuhanWaktu = resWaktuJarak + wBongkar;
+                formJarakDanHarga.kebutuhanwaktujarakwaktubongkarmuat = parseFloat(totalKebutuhanWaktu.toFixed(3));
+
+                // 3. Ritase Utama & Pembulatan Utama (pembulatan)
+                resRitase = totalKebutuhanWaktu > 0 ? jam / totalKebutuhanWaktu : 0;
+                const pembulatanUtama = Math.round(resRitase);
+                formJarakDanHarga.pembulatan = pembulatanUtama;
+
+                // 4. Solar Jarak
+                resSolarJarak = indexSolar > 0 ? ((jarak * 2) / indexSolar) * hargaSolar : 0;
+
+                // 5. Waktu Perjalanan Real
                 const waktuBerangkat = vBerangkat > 0 ? jarak / vBerangkat : 0;
                 const waktuKembali = vKembali > 0 ? jarak / vKembali : 0;
-
-                // Simpan hasil hitungan waktu tempuh ke form (untuk dilihat di UI)
                 formJarakDanHarga.waktuyangdiperlukanberangkat = parseFloat(waktuBerangkat.toFixed(3));
                 formJarakDanHarga.waktuyangdiperlukankembali = parseFloat(waktuKembali.toFixed(3));
 
-                // B. Rumus Akumulasi 4 Komponen
-                // resWaktuJarak kita gunakan untuk menampung (Berangkat + Kembali)
-                resWaktuJarak = waktuBerangkat + waktuKembali;
+                // 6. Akumulasi SUM Waktu Real (jumlahwaktuyangdiperlukan)
+                const totalWaktuReal = wMuat + wBongkarManual + waktuBerangkat + waktuKembali;
+                formJarakDanHarga.jumlahwaktuyangdiperlukan = parseFloat(totalWaktuReal.toFixed(3));
 
-                // wBongkarAktif kita gunakan untuk menampung (Muat + Bongkar)
-                wBongkarAktif = wMuat + wBongkar;
-
-                // C. Hitung Ritase (Jam Kerja / Total Kebutuhan Waktu)
-                // Total Kebutuhan Waktu = (Berangkat + Kembali) + (Muat + Bongkar)
-                const totalKebutuhanWaktu = resWaktuJarak + wBongkarAktif;
-                resRitase = totalKebutuhanWaktu > 0 ? jam / totalKebutuhanWaktu : 0;
-
-                // // 3. Perhitungan Ritase & Upah
-                // resWaktuJarak = waktuBerangkat + waktuKembali;
-                // resRitase = (resWaktuJarak + wBongkarAktif) > 0 ? jam / (resWaktuJarak + wBongkarAktif) : 0;
-
-                resSolarJarak = indexSolar > 0 ? ((jarak * 2) / indexSolar) * hargaSolar : 0;
-                resUpahHarianDriver = (totalKebutuhanWaktu / jam) * upahHarian;
+                // 7. Upah Harian Driver & Upah Driver
+                resUpahHarianDriver = jam > 0 ? (totalWaktuReal / jam) * upahHarian : 0;
                 resUpahDriver = resSolarJarak + resUpahHarianDriver;
 
-                // // Rumus Upah Per Material
-                // resUpahPerMaterial = (tonaseAktif > 0 && pembulatan > 0)
-                //     ? ((500000 / pembulatan) / tonaseAktif) + (resUpahDriver / tonaseAktif)
-                //     : 0;
-                // TODO: Masukkan rumus spesifik DTT Non-Aspal di sini
+                // --- PERBAIKAN RUMUS FINAL UPAH PER MATERIAL ---
+                // Rumus: ((Invoice2 / Pembulatan) / Tonase) + (Upah Driver / Tonase)
+                const tonaseAktif2 = parseFloat(formJarakDanHarga.tonase2) || 20;
+                resUpahPerMaterial = (tonaseAktif2 > 0 && resRitase > 0)
+                    ? ((1500000 / resRitase) / tonaseAktif2) + (resUpahDriver / tonaseAktif2)
+                    : 0;
+                // -----------------------------------------------
 
+                // 9. Ritase 2 & Pembulatan 2
+                const perkiraanritase2 = totalWaktuReal > 0 ? jam / totalWaktuReal : 0;
+                formJarakDanHarga.perkiraanperolehanritase2 = parseFloat(perkiraanritase2.toFixed(2));
+                formJarakDanHarga.pembulatan2 = Math.round(perkiraanritase2);
             } else if (kategori === 'ASPAL' && kendaraan === 'DTT') {
                 console.log("Kondisi 4: Aspal & DTT");
                 // TODO: Masukkan rumus spesifik DTT Aspal di sini
@@ -338,7 +360,7 @@ export function useJarakDanHarga() {
             // =========================================================================
             formJarakDanHarga.waktujarak = parseFloat(resWaktuJarak.toFixed(3));
             formJarakDanHarga.kebutuhanwaktujarakwaktubongkarmuat = parseFloat((resWaktuJarak + wBongkarAktif).toFixed(3));
-            formJarakDanHarga.perkiraanperolehanritase = parseFloat(resRitase.toFixed(2));
+            formJarakDanHarga.perkiraanperolehanritase = parseFloat(resRitase.toFixed(1));
             formJarakDanHarga.solarjarak = Math.round(resSolarJarak);
             formJarakDanHarga.upahhariandriver = Math.round(resUpahHarianDriver);
 
@@ -378,26 +400,6 @@ export function useJarakDanHarga() {
             String(item.hargasolar || '').toLowerCase().includes(query)
         );
     }
-
-    // // --- FILTER UTAMA (Text + Date Range) ---
-    // const filteredJarakDanHarga = computed(() => {
-    //     const query = searchQuery.value.toLowerCase();
-
-    //     return JarakHarga.value.filter(item => {
-    //         const matchesSearch = searchMatch(item, query);
-
-    //         let matchesDate = true;
-    //         if (startDate.value && endDate.value) {
-    //             matchesDate = item.tanggal >= startDate.value && item.tanggal <= endDate.value;
-    //         } else if (startDate.value) {
-    //             matchesDate = item.tanggal >= startDate.value;
-    //         } else if (endDate.value) {
-    //             matchesDate = item.tanggal <= endDate.value;
-    //         }
-
-    //         return matchesSearch && matchesDate;
-    //     });
-    // });
 
     // --- FILTER UTAMA (Text + Date Range) ---
     const filteredJarakDanHarga = computed(() => {
