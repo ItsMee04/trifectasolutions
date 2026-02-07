@@ -68,7 +68,7 @@ const formJarakDanHarga = reactive({
     jumlahwaktuyangdiperlukan: '',
     perkiraanperolehanritase2: '',
     pembulatan2: '',
-    tonase2:''
+    tonase2: ''
 
 });
 
@@ -116,20 +116,97 @@ export function useJarakDanHarga() {
         return Object.keys(errors.value).length === 0;
     };
 
+    // const submitJarakDanHarga = async () => {
+    //     if (!validateForm()) return false;
+    //     isLoading.value = true;
+    //     try {
+    //         // Gabungkan data form utama dengan hasil kalkulasi dari watch
+    //         const payload = {
+    //             id: formJarakDanHarga.id,
+
+    //             // Field dari perhitungan otomatis (Watch)
+    //             upahdriver: formJarakDanHarga.upahdriver,
+    //             upahpermaterial: formJarakDanHarga.upahpermaterial,
+    //             hargasolar: formJarakDanHarga.hargasolar,
+    //             solarjarak: formJarakDanHarga.solarjarak,
+    //         };
+
+    //         let response;
+    //         if (isEdit.value) {
+    //             response = await jarakdanhargaService.updateJarakDanHarga(payload);
+    //         } else {
+    //             response = await jarakdanhargaService.storeJarakDanHarga(payload);
+    //         }
+
+    //         notify.success(response.message || 'Data berhasil disimpan');
+
+    //         // Tutup Modal
+    //         const modalElement = document.getElementById('modalJarak');
+    //         const modalInstance = bootstrap.Modal.getInstance(modalElement);
+    //         if (modalInstance) modalInstance.hide();
+
+    //         await fetchJarakDanHarga();
+    //         return true;
+    //     } catch (error) {
+    //         // ... handling error tetap sama ...
+    //     } finally {
+    //         isLoading.value = false;
+    //     }
+    // };
+
     const submitJarakDanHarga = async () => {
         if (!validateForm()) return false;
         isLoading.value = true;
-        try {
-            // Gabungkan data form utama dengan hasil kalkulasi dari watch
-            const payload = {
-                id: formJarakDanHarga.id,
 
-                // Field dari perhitungan otomatis (Watch)
-                upahdriver: formJarakDanHarga.upahdriver,
-                upahpermaterial: formJarakDanHarga.upahpermaterial,
+        try {
+            const kategori = formJarakDanHarga.kategoriMaterial?.toUpperCase();
+            const kendaraan = formJarakDanHarga.jenisKendaraan?.toUpperCase();
+
+            let payload = {
+                id: formJarakDanHarga.id,
+                // Field dasar yang selalu ada
+                jarak: formJarakDanHarga.jarak,
                 hargasolar: formJarakDanHarga.hargasolar,
                 solarjarak: formJarakDanHarga.solarjarak,
             };
+
+            // KONDISI A: Bukan Aspal & DT
+            if (kategori !== 'ASPAL' && kendaraan === 'DT') {
+                payload = {
+                    ...payload,
+                    upahdriver: formJarakDanHarga.upahdriver,
+                    upahpermaterial: formJarakDanHarga.upahpermaterial,
+                    tonase: formJarakDanHarga.tonase,
+                    upahharian: formJarakDanHarga.upahharian,
+                    upahharianinvoice: formJarakDanHarga.upahharianinvoice,
+                    pembulatan: formJarakDanHarga.pembulatan
+                };
+            }
+            // KONDISI B: Aspal & DT
+            else if (kategori === 'ASPAL' && kendaraan === 'DT') {
+                payload = {
+                    ...payload,
+                    upahdriver: formJarakDanHarga.upahdriver,
+                    upahpermaterial: formJarakDanHarga.upahpermaterial,
+                    volume: formJarakDanHarga.volume, // Biasanya aspal pakai volume/m3
+                    upahharianinvoice: 500000, // Hardcoded sesuai logika hitungOtomatis Anda
+                    waktubongkarmuatmaterial: 2
+                };
+            }
+            // KONDISI C: Bukan Aspal & DTT
+            else if (kategori !== 'ASPAL' && kendaraan === 'DTT') {
+                payload = {
+                    ...payload,
+                    upahdriver: formJarakDanHarga.upahdriver,
+                    upahpermaterial: formJarakDanHarga.upahpermaterial,
+                    tonase2: formJarakDanHarga.tonase2,
+                    upahharian2: formJarakDanHarga.upahharian2,
+                    upahharianinvoice2: formJarakDanHarga.upahharianinvoice2,
+                    pembulatan2: formJarakDanHarga.pembulatan2,
+                    jumlahwaktuyangdiperlukan: formJarakDanHarga.jumlahwaktuyangdiperlukan,
+                    perkiraanperolehanritase2: formJarakDanHarga.perkiraanperolehanritase2
+                };
+            }
 
             let response;
             if (isEdit.value) {
@@ -140,15 +217,16 @@ export function useJarakDanHarga() {
 
             notify.success(response.message || 'Data berhasil disimpan');
 
-            // Tutup Modal
             const modalElement = document.getElementById('modalJarak');
             const modalInstance = bootstrap.Modal.getInstance(modalElement);
             if (modalInstance) modalInstance.hide();
 
             await fetchJarakDanHarga();
             return true;
+
         } catch (error) {
-            // ... handling error tetap sama ...
+            console.error("Submission error:", error);
+            notify.error(error.response?.data?.message || 'Gagal menyimpan data');
         } finally {
             isLoading.value = false;
         }
@@ -371,10 +449,6 @@ export function useJarakDanHarga() {
         }, { immediate: true });
     };
 
-    const hitungUpahInvoice = () => {
-        console.log("kilik ")
-    }
-
     const handleRefresh = async () => {
         await fetchJarakDanHarga();
     }
@@ -541,6 +615,5 @@ export function useJarakDanHarga() {
         resetDateFilter,
         columnFilters,
         resetColumnFilters,
-        hitungUpahInvoice,
     };
 }
