@@ -16,7 +16,7 @@
                         </span>
                         <span class="badge bg-warning-light text-secondary">
                             <i class="fas fa-box me-1"></i> Kategori Material: {{ formJarakDanHarga.kategoriMaterial ||
-                            '-' }}
+                                '-' }}
                         </span>
                     </div>
                 </div>
@@ -106,6 +106,39 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="row" v-if="formJarakDanHarga.jenisKendaraan === 'DTT'">
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <div class="form-group local-forms mb-3">
+                                        <label>Kecepatan Rata Rata DTT (Berangkat)<span
+                                                class="login-danger">*</span></label>
+                                        <input v-model="formJarakDanHarga.kecepatanratarataberangkat" type="text"
+                                            class="form-control"
+                                            :class="{ 'is-invalid': errors.kecepatanratarataberangkat }" readonly="">
+                                        <div class="invalid-feedback" v-if="errors.kecepatanratarataberangkat">
+                                            {{ Array.isArray(errors.kecepatanratarataberangkat) ?
+                                                errors.kecepatanratarataberangkat[0] : errors.kecepatanratarataberangkat }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <div class="form-group local-forms mb-3">
+                                        <label>Kecepatan Rata Rata DTT (Kembali)<span
+                                                class="login-danger">*</span></label>
+                                        <input v-model="formJarakDanHarga.kecepatanrataratakembali" type="text"
+                                            class="form-control"
+                                            :class="{ 'is-invalid': errors.kecepatanrataratakembali }" readonly="">
+                                        <div class="invalid-feedback" v-if="errors.kecepatanrataratakembali">
+                                            {{ Array.isArray(errors.kecepatanrataratakembali) ?
+                                                errors.kecepatanrataratakembali[0] :
+                                            errors.kecepatanrataratakembali }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-4">
@@ -143,7 +176,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="mb-4">
+                                <div class="mb-4" v-if="formJarakDanHarga.jenisKendaraan !== 'DTT'">
                                     <div class="form-group local-forms mb-3">
                                         <label>WAKTU JARAK<span class="login-danger">*</span></label>
                                         <input v-model="formJarakDanHarga.waktujarak" type="text" class="form-control"
@@ -151,6 +184,17 @@
                                         <div class="invalid-feedback" v-if="errors.waktujarak">
                                             {{ Array.isArray(errors.waktujarak) ? errors.waktujarak[0] :
                                                 errors.waktujarak }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-4" v-else>
+                                    <div class="form-group local-forms mb-3">
+                                        <label>WAKTU MUAT<span class="login-danger">*</span></label>
+                                        <input v-model="formJarakDanHarga.waktumuat" type="text" class="form-control"
+                                            :class="{ 'is-invalid': errors.waktumuat }">
+                                        <div class="invalid-feedback" v-if="errors.waktumuat">
+                                            {{ Array.isArray(errors.waktumuat) ? errors.waktumuat[0] :
+                                                errors.waktumuat }}
                                         </div>
                                     </div>
                                 </div>
@@ -166,6 +210,40 @@
                                             {{ Array.isArray(errors.waktubongkarmuatmaterial) ?
                                                 errors.waktubongkarmuatmaterial[0] :
                                                 errors.waktubongkarmuatmaterial }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" v-if="formJarakDanHarga.jenisKendaraan === 'DTT'">
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <div class="form-group local-forms mb-3">
+                                        <label>WAKTU YANG DIPERLUKAN (BERANGKAT)<span
+                                                class="login-danger">*</span></label>
+                                        <input v-model="formJarakDanHarga.waktuyangdiperlukanberangkat" type="text"
+                                            class="form-control"
+                                            :class="{ 'is-invalid': errors.waktuyangdiperlukanberangkat }">
+                                        <div class="invalid-feedback" v-if="errors.waktuyangdiperlukanberangkat">
+                                            {{ Array.isArray(errors.waktuyangdiperlukanberangkat) ?
+                                                errors.waktuyangdiperlukanberangkat[0] :
+                                                errors.waktuyangdiperlukanberangkat }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <div class="form-group local-forms mb-3">
+                                        <label>WAKTU YANG DIPERLUKAN (KEMBALI)<span
+                                                class="login-danger">*</span></label>
+                                        <input v-model="formJarakDanHarga.waktuyangdiperlukankembali" type="text"
+                                            value="240" class="form-control"
+                                            :class="{ 'is-invalid': errors.waktuyangdiperlukankembali }">
+                                        <div class="invalid-feedback" v-if="errors.waktuyangdiperlukankembali">
+                                            {{ Array.isArray(errors.waktuyangdiperlukankembali) ?
+                                                errors.waktuyangdiperlukankembali[0] :
+                                                errors.waktuyangdiperlukankembali }}
                                         </div>
                                     </div>
                                 </div>
@@ -262,15 +340,36 @@
                                             :class="{ 'is-invalid': errors.upahdriver }">
                                         <div class="invalid-feedback" v-if="errors.upahdriver">
                                             {{ Array.isArray(errors.upahdriver) ? errors.upahdriver[0] :
-                                            errors.upahdriver }}
+                                                errors.upahdriver }}
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6" v-if="formJarakDanHarga.jenisKendaraan == 'DTT' || formJarakDanHarga.jenisKendaraan == 'SL'">
                                 <div class="mb-4">
                                     <div class="form-group local-forms mb-3">
-                                        <label>UPAH PER {{ formJarakDanHarga.satuanMaterial || '-' }} INVOICE<span class="login-danger">*</span></label>
+                                        <label>UPAH PER {{ formJarakDanHarga.satuanMaterial || '-' }} INVOICE<span
+                                                class="login-danger">*</span></label>
+                                        <div class="input-group">
+                                            <input v-model="formJarakDanHarga.upahpermaterial" type="text"
+                                                class="form-control" :class="{ 'is-invalid': errors.upahpermaterial }">
+                                            <button class="btn btn-primary" type="button"
+                                                @click="handleHitungUpahInvoice">
+                                                <i class="fas fa-calculator"></i> Hitung
+                                            </button>
+                                            <div class="invalid-feedback" v-if="errors.upahpermaterial">
+                                                {{ Array.isArray(errors.upahpermaterial) ? errors.upahpermaterial[0] :
+                                                errors.upahpermaterial }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" v-else>
+                                <div class="mb-4">
+                                    <div class="form-group local-forms mb-3">
+                                        <label>UPAH PER {{ formJarakDanHarga.satuanMaterial || '-' }} INVOICE<span
+                                                class="login-danger">*</span></label>
                                         <input v-model="formJarakDanHarga.upahpermaterial" type="text" value="240"
                                             class="form-control" :class="{ 'is-invalid': errors.upahpermaterial }">
                                         <div class="invalid-feedback" v-if="errors.upahpermaterial">
@@ -302,7 +401,7 @@ import '@vueform/multiselect/themes/default.css';
 import { useJarakDanHarga } from '../composables/useJarakHarga';
 
 const {
-    handleHitungUpahDriver,
+    hitungUpahInvoice,
     isEdit,
     formJarakDanHarga,
     errors,
@@ -312,5 +411,9 @@ const {
 
 const handleSubmit = async () => {
     await submitJarakDanHarga();
+}
+
+const handleHitungUpahInvoice = async () => {
+    hitungUpahInvoice();
 }
 </script>
