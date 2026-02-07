@@ -313,7 +313,7 @@
                                         <label>KEBUTUHAN WAKTU JARAK+BONGKAR MUAT<span
                                                 class="login-danger">*</span></label>
                                         <input v-model="formJarakDanHarga.kebutuhanwaktujarakwaktubongkarmuat"
-                                            type="text" class="form-control">
+                                            type="text" class="form-control" readonly="">
                                     </div>
                                 </div>
                             </div>
@@ -322,13 +322,7 @@
                                     <div class="form-group local-forms mb-3">
                                         <label>PERKIRAAN PEROLEHAN RITASE<span class="login-danger">*</span></label>
                                         <input v-model="formJarakDanHarga.perkiraanperolehanritase" type="text"
-                                            class="form-control"
-                                            :class="{ 'is-invalid': errors.perkiraanperolehanritase }">
-                                        <div class="invalid-feedback" v-if="errors.perkiraanperolehanritase">
-                                            {{ Array.isArray(errors.perkiraanperolehanritase) ?
-                                                errors.perkiraanperolehanritase[0] :
-                                                errors.perkiraanperolehanritase }}
-                                        </div>
+                                            class="form-control" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -337,12 +331,7 @@
                             <div class="mb-4">
                                 <div class="form-group local-forms mb-3">
                                     <label>PEMBULATAN<span class="login-danger">*</span></label>
-                                    <input v-model="formJarakDanHarga.pembulatan" type="text" class="form-control"
-                                        :class="{ 'is-invalid': errors.pembulatan }">
-                                    <div class="invalid-feedback" v-if="errors.pembulatan">
-                                        {{ Array.isArray(errors.pembulatan) ? errors.pembulatan[0] :
-                                            errors.pembulatan }}
-                                    </div>
+                                    <input v-model="formJarakDanHarga.pembulatan" type="text" class="form-control" readonly>
                                 </div>
                             </div>
                         </div>
@@ -359,7 +348,7 @@
                                 <div class="mb-4">
                                     <div class="form-group local-forms mb-3">
                                         <label>SOLAR JARAK<span class="login-danger">*</span></label>
-                                        <input v-model="formJarakDanHarga.solarjarak" type="text" class="form-control">
+                                        <input v-model="formJarakDanHarga.solarjarak" type="text" class="form-control" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -368,11 +357,7 @@
                                     <div class="form-group local-forms mb-3">
                                         <label>UPAH HARIAN DRIVER<span class="login-danger">*</span></label>
                                         <input v-model="formJarakDanHarga.upahhariandriver" type="text"
-                                            class="form-control" :class="{ 'is-invalid': errors.upahhariandriver }">
-                                        <div class="invalid-feedback" v-if="errors.upahhariandriver">
-                                            {{ Array.isArray(errors.upahhariandriver) ? errors.upahhariandriver[0] :
-                                                errors.upahhariandriver }}
-                                        </div>
+                                            class="form-control" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -382,12 +367,7 @@
                                 <div class="mb-4">
                                     <div class="form-group local-forms mb-3">
                                         <label>UPAH DRIVER<span class="login-danger">*</span></label>
-                                        <input v-model="formJarakDanHarga.upahdriver" type="text" class="form-control"
-                                            :class="{ 'is-invalid': errors.upahdriver }">
-                                        <div class="invalid-feedback" v-if="errors.upahdriver">
-                                            {{ Array.isArray(errors.upahdriver) ? errors.upahdriver[0] :
-                                                errors.upahdriver }}
-                                        </div>
+                                        <input v-model="formJarakDanHarga.upahdriver" type="text" class="form-control" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -410,11 +390,7 @@
                                         <label>UPAH PER {{ formJarakDanHarga.satuanMaterial || '-' }} INVOICE<span
                                                 class="login-danger">*</span></label>
                                         <input v-model="formJarakDanHarga.upahpermaterial" type="text"
-                                            class="form-control" :class="{ 'is-invalid': errors.upahpermaterial }">
-                                        <div class="invalid-feedback" v-if="errors.upahpermaterial">
-                                            {{ Array.isArray(errors.upahpermaterial) ? errors.upahpermaterial[0] :
-                                                errors.upahpermaterial }}
-                                        </div>
+                                            class="form-control" readonly>
                                     </div>
                                 </div>
                             </div>
