@@ -291,24 +291,46 @@ export function useJarakDanHarga() {
             // PEMBAGIAN KONDISI
             // =========================================================================
 
-            if(materialDipilih === 'PATCHING' && kendaraan === 'DT') {
+            if (materialDipilih === 'PATCHING' && kendaraan === 'DT') {
                 console.log("Kondisi 2a: Material Aspal & Kategori Patching & DT");
-                // Set Parameter Khusus Aspal Patching
+
+                // Parameter yang tetap di-set otomatis
                 formJarakDanHarga.upahharianinvoice = 500000;
                 formJarakDanHarga.tonase = 10;
-                tonaseAktif = parseFloat(formJarakDanHarga.tonase) || 10;
+                tonaseAktif = 10;
 
-                resWaktuJarak = ((formJarakDanHarga.jarak * 2)* jam) / 240;
-                formJarakDanHarga.kebutuhanwaktujarakwaktubongkarmuat = resWaktuJarak + wBongkar;
-                resRitase = (jam / formJarakDanHarga.kebutuhanwaktujarakwaktubongkarmuat);
+                // AMBIL INPUT MANUAL:
+                // Gunakan nilai yang ada di form (hasil ketikan user)
+                const hargaSolarManual = parseFloat(formJarakDanHarga.hargasolar) || 0;
+                const wBongkarManualInput = parseFloat(formJarakDanHarga.waktubongkarmuatmaterial) || 0;
 
+                // 1. Waktu Jarak (Indeks)
+                resWaktuJarak = ((jarak * 2) * jam) / 240;
+
+                // 2. Kebutuhan Waktu (Menggunakan wBongkarManualInput dari input user)
+                const totalKebutuhan = resWaktuJarak + wBongkarManualInput;
+                formJarakDanHarga.kebutuhanwaktujarakwaktubongkarmuat = parseFloat(totalKebutuhan.toFixed(3));
+
+                // 3. Ritase & Pembulatan
+                resRitase = totalKebutuhan > 0 ? (jam / totalKebutuhan) : 0;
                 formJarakDanHarga.pembulatan = Math.round(resRitase);
 
-                resSolarJarak = ((jarak * 2) / indexSolar) * hargaSolar;
-                resUpahHarianDriver = (upahHarian / formJarakDanHarga.pembulatan);
-                resUpahDriver = (resSolarJarak + resUpahHarianDriver) / tonaseAktif;
-                resUpahPerMaterial = ((500000 / formJarakDanHarga.pembulatan) / tonaseAktif) + resUpahDriver;
+                // 4. Solar Jarak (Menggunakan hargaSolarManual dari input user)
+                resSolarJarak = indexSolar > 0 ? ((jarak * 2) / indexSolar) * hargaSolarManual : 0;
 
+                // 5. Upah Harian Driver
+                // Pastikan pembulatan tidak nol untuk menghindari Infinity
+                const pembulatanAktif = formJarakDanHarga.pembulatan || 1;
+                resUpahHarianDriver = upahHarian / pembulatanAktif;
+
+                // 6. Upah Driver (Per Ton)
+                resUpahDriver = (resSolarJarak + resUpahHarianDriver) / tonaseAktif;
+
+                // 7. Upah Per Material
+                resUpahPerMaterial = ((500000 / pembulatanAktif) / tonaseAktif) + resUpahDriver;
+
+                // Note: Kita TIDAK melakukan "formJarakDanHarga.hargasolar = ..."
+                // agar ketikan user tidak hilang/tertimpa saat watch berjalan.
             } else if (kategori !== 'ASPAL' && kendaraan === 'DT') {
                 console.log("Kondisi 1: Bukan Aspal & DT");
                 // Logika DT Normal
@@ -342,7 +364,7 @@ export function useJarakDanHarga() {
                     ? ((500000 / 1) / tonaseAktif) + resUpahDriver
                     : 0;
 
-            }  else if (kategori !== 'ASPAL' && kendaraan === 'DTT') {
+            } else if (kategori !== 'ASPAL' && kendaraan === 'DTT') {
                 console.log("Kondisi 3: Bukan Aspal & DTT");
 
                 formJarakDanHarga.upahharianinvoice = 500000;
@@ -394,7 +416,49 @@ export function useJarakDanHarga() {
                 formJarakDanHarga.pembulatan2 = Math.round(perkiraanritase2);
             } else if (kategori === 'ASPAL' && kendaraan === 'DTT') {
                 console.log("Kondisi 4: Aspal & DTT");
-                // TODO: Masukkan rumus spesifik DTT Aspal di sini
+
+                // 1. Set Parameter Default
+                formJarakDanHarga.kecepatanratarataberangkat = 20;
+                formJarakDanHarga.kecepatanrataratakembali = 30;
+                tonaseAktif = parseFloat(formJarakDanHarga.volume);
+                formJarakDanHarga.tonase = tonaseAktif;
+                formJarakDanHarga.upahharianinvoice = 1500000;
+
+                // 2. Kalkulasi Waktu Perjalanan Real
+                const waktuBerangkat = vBerangkat > 0 ? jarak / vBerangkat : 0;
+                const waktuKembali = vKembali > 0 ? jarak / vKembali : 0;
+                formJarakDanHarga.waktuyangdiperlukanberangkat = parseFloat(waktuBerangkat.toFixed(2));
+                formJarakDanHarga.waktuyangdiperlukankembali = parseFloat(waktuKembali.toFixed(2));
+
+                // 3. Kalkulasi Waktu Jarak (Indeks)
+                resWaktuJarak = ((jarak * 2) * jam) / 240;
+
+                // SINKRONISASI FIELD KEBUTUHAN WAKTU
+                // Kita isi field ini agar bisa digunakan sebagai pembagi resRitase
+                formJarakDanHarga.kebutuhanwaktujarakwaktubongkarmuat = parseFloat((resWaktuJarak + wBongkarAktif).toFixed(3));
+
+                // 4. PERHITUNGAN RITASE (Sesuai Permintaan: Jam Kerja / Kebutuhan Waktu)
+                if (formJarakDanHarga.kebutuhanwaktujarakwaktubongkarmuat > 0) {
+                    // Mengambil nilai jam langsung dan pembagi dari form yang baru di-update di atas
+                    resRitase = jam / formJarakDanHarga.kebutuhanwaktujarakwaktubongkarmuat;
+                } else {
+                    resRitase = 0;
+                }
+
+                // 5. Kalkulasi Tambahan & Upah
+                const totalWaktuReal = wMuat + wBongkarManual + waktuBerangkat + waktuKembali;
+                formJarakDanHarga.jumlahwaktuyangdiperlukan = parseFloat(totalWaktuReal.toFixed(3));
+
+                formJarakDanHarga.pembulatan = Math.round(resRitase);
+
+                resSolarJarak = indexSolar > 0 ? ((jarak * 2) / indexSolar) * hargaSolar : 0;
+
+                // Upah Harian Driver (Berdasarkan waktu real)
+                resUpahHarianDriver = (totalWaktuReal/jam) * upahHarian;
+                resUpahDriver = (resSolarJarak + resUpahHarianDriver);
+
+                const pembulatanAktif = formJarakDanHarga.pembulatan;
+                resUpahPerMaterial = (formJarakDanHarga.upahharianinvoice / pembulatanAktif) / tonaseAktif + (resRitase / tonaseAktif);
 
             } else if (kendaraan === 'SL') {
                 console.log("Kondisi 5: Kendaraan SL");
@@ -407,7 +471,7 @@ export function useJarakDanHarga() {
             // =========================================================================
             formJarakDanHarga.waktujarak = parseFloat(resWaktuJarak.toFixed(3));
             formJarakDanHarga.kebutuhanwaktujarakwaktubongkarmuat = parseFloat((resWaktuJarak + wBongkarAktif).toFixed(3));
-            formJarakDanHarga.perkiraanperolehanritase = parseFloat(resRitase.toFixed(2));
+            formJarakDanHarga.perkiraanperolehanritase = parseFloat(resRitase.toFixed(1));
             formJarakDanHarga.solarjarak = Math.round(resSolarJarak);
             formJarakDanHarga.upahhariandriver = Math.round(resUpahHarianDriver);
 

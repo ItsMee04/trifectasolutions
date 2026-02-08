@@ -215,7 +215,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6" v-if="formJarakDanHarga.kategoriMaterial !== 'ASPAL'">
                                 <div class="mb-4">
                                     <div class="form-group local-forms mb-3">
                                         <label>PERKIRAAN PEROLEHAN RITASE<span class="login-danger">*</span></label>
@@ -225,7 +225,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-12" v-if="formJarakDanHarga.jenisKendaraan == 'DTT'">
+                        <div class="col-md-12" v-if="formJarakDanHarga.jenisKendaraan == 'DTT' && formJarakDanHarga.kategoriMaterial !== 'ASPAL'">
                             <div class="mb-4">
                                 <div class="form-group local-forms mb-3">
                                     <label>PEMBULATAN<span class="login-danger">*</span></label>
@@ -233,14 +233,14 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="d-flex align-items-center my-4" v-if="formJarakDanHarga.jenisKendaraan == 'DTT'">
+                        <div class="d-flex align-items-center my-4" v-if="formJarakDanHarga.jenisKendaraan == 'DTT' && formJarakDanHarga.kategoriMaterial !== 'ASPAL'">
                             <hr class="flex-grow-1 m-0">
                             <span class="mx-3 fw-bold text-secondary" style="font-size: 0.85rem; letter-spacing: 1px;">
                                 MATERIAL INVOICE
                             </span>
                             <hr class="flex-grow-1 m-0">
                         </div>
-                        <div class="row" v-if="formJarakDanHarga.jenisKendaraan == 'DTT'">
+                        <div class="row" v-if="formJarakDanHarga.jenisKendaraan == 'DTT' && formJarakDanHarga.kategoriMaterial !== 'ASPAL'">
                             <div class="col-md-6">
                                 <div class="mb-4">
                                     <div class="form-group local-forms mb-3">
@@ -260,7 +260,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-12" v-if="formJarakDanHarga.jenisKendaraan == 'DTT'">
+                        <div class="col-md-12" v-if="formJarakDanHarga.jenisKendaraan == 'DTT' && formJarakDanHarga.kategoriMaterial !== 'ASPAL'">
                             <div class="mb-4">
                                 <div class="form-group local-forms mb-3">
                                     <label>TONASE <span class="login-danger">*</span></label>
