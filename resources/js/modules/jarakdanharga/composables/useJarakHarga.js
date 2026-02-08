@@ -35,6 +35,7 @@ const formJarakDanHarga = reactive({
     jenisKendaraan: '',
     kategoriMaterial: '',
     satuanMaterial: '',
+    materialdipilih: '',
     volume: '',
 
     upahharian: '',
@@ -116,44 +117,6 @@ export function useJarakDanHarga() {
         return Object.keys(errors.value).length === 0;
     };
 
-    // const submitJarakDanHarga = async () => {
-    //     if (!validateForm()) return false;
-    //     isLoading.value = true;
-    //     try {
-    //         // Gabungkan data form utama dengan hasil kalkulasi dari watch
-    //         const payload = {
-    //             id: formJarakDanHarga.id,
-
-    //             // Field dari perhitungan otomatis (Watch)
-    //             upahdriver: formJarakDanHarga.upahdriver,
-    //             upahpermaterial: formJarakDanHarga.upahpermaterial,
-    //             hargasolar: formJarakDanHarga.hargasolar,
-    //             solarjarak: formJarakDanHarga.solarjarak,
-    //         };
-
-    //         let response;
-    //         if (isEdit.value) {
-    //             response = await jarakdanhargaService.updateJarakDanHarga(payload);
-    //         } else {
-    //             response = await jarakdanhargaService.storeJarakDanHarga(payload);
-    //         }
-
-    //         notify.success(response.message || 'Data berhasil disimpan');
-
-    //         // Tutup Modal
-    //         const modalElement = document.getElementById('modalJarak');
-    //         const modalInstance = bootstrap.Modal.getInstance(modalElement);
-    //         if (modalInstance) modalInstance.hide();
-
-    //         await fetchJarakDanHarga();
-    //         return true;
-    //     } catch (error) {
-    //         // ... handling error tetap sama ...
-    //     } finally {
-    //         isLoading.value = false;
-    //     }
-    // };
-
     const submitJarakDanHarga = async () => {
         if (!validateForm()) return false;
         isLoading.value = true;
@@ -226,6 +189,7 @@ export function useJarakDanHarga() {
         // 1. ISI SYARAT KONDISI TERLEBIH DAHULU (PENTING)
         // Sesuaikan path 'item.source...' dengan response API asli Anda
         formJarakDanHarga.jenisKendaraan = item.source?.kendaraan?.jeniskendaraan?.jenis || '';
+        formJarakDanHarga.materialdipilih = item.source?.material?.material || '';
         formJarakDanHarga.kategoriMaterial = item.source?.material?.kategori?.kategori || '';
         formJarakDanHarga.satuanMaterial = item.source?.material?.satuan || '';
 
@@ -266,7 +230,6 @@ export function useJarakDanHarga() {
         formJarakDanHarga.waktuyangdiperlukankembali = 0;
 
         hitungOtomatis();
-
         const modal = new bootstrap.Modal(document.getElementById('modalJarak'));
         modal.show();
     };
@@ -312,6 +275,7 @@ export function useJarakDanHarga() {
 
             const kategori = formJarakDanHarga.kategoriMaterial?.toUpperCase();
             const kendaraan = formJarakDanHarga.jenisKendaraan?.toUpperCase();
+            const materialDipilih = formJarakDanHarga.materialdipilih?.toUpperCase();
 
             // Variabel penampung hasil
             let resWaktuJarak = 0;
@@ -327,7 +291,25 @@ export function useJarakDanHarga() {
             // PEMBAGIAN KONDISI
             // =========================================================================
 
-            if (kategori !== 'ASPAL' && kendaraan === 'DT') {
+            if(materialDipilih === 'PATCHING' && kendaraan === 'DT') {
+                console.log("Kondisi 2a: Material Aspal & Kategori Patching & DT");
+                // Set Parameter Khusus Aspal Patching
+                formJarakDanHarga.upahharianinvoice = 500000;
+                formJarakDanHarga.tonase = 10;
+                tonaseAktif = parseFloat(formJarakDanHarga.tonase) || 10;
+
+                resWaktuJarak = ((formJarakDanHarga.jarak * 2)* jam) / 240;
+                formJarakDanHarga.kebutuhanwaktujarakwaktubongkarmuat = resWaktuJarak + wBongkar;
+                resRitase = (jam / formJarakDanHarga.kebutuhanwaktujarakwaktubongkarmuat);
+
+                formJarakDanHarga.pembulatan = Math.round(resRitase);
+
+                resSolarJarak = ((jarak * 2) / indexSolar) * hargaSolar;
+                resUpahHarianDriver = (upahHarian / formJarakDanHarga.pembulatan);
+                resUpahDriver = (resSolarJarak + resUpahHarianDriver) / tonaseAktif;
+                resUpahPerMaterial = ((500000 / formJarakDanHarga.pembulatan) / tonaseAktif) + resUpahDriver;
+
+            } else if (kategori !== 'ASPAL' && kendaraan === 'DT') {
                 console.log("Kondisi 1: Bukan Aspal & DT");
                 // Logika DT Normal
                 resWaktuJarak = (jarak * 2) / 30;
@@ -341,7 +323,7 @@ export function useJarakDanHarga() {
                     : 0;
 
             } else if (kategori === 'ASPAL' && kendaraan === 'DT') {
-                console.log("Kondisi 2: Aspal & DT");
+                // console.log("Kondisi 2: Aspal & DT");
                 // Set Parameter Khusus Aspal
                 formJarakDanHarga.upahharianinvoice = 500000;
                 formJarakDanHarga.waktubongkarmuatmaterial = 2;
@@ -360,7 +342,7 @@ export function useJarakDanHarga() {
                     ? ((500000 / 1) / tonaseAktif) + resUpahDriver
                     : 0;
 
-            } else if (kategori !== 'ASPAL' && kendaraan === 'DTT') {
+            }  else if (kategori !== 'ASPAL' && kendaraan === 'DTT') {
                 console.log("Kondisi 3: Bukan Aspal & DTT");
 
                 formJarakDanHarga.upahharianinvoice = 500000;
@@ -425,12 +407,12 @@ export function useJarakDanHarga() {
             // =========================================================================
             formJarakDanHarga.waktujarak = parseFloat(resWaktuJarak.toFixed(3));
             formJarakDanHarga.kebutuhanwaktujarakwaktubongkarmuat = parseFloat((resWaktuJarak + wBongkarAktif).toFixed(3));
-            formJarakDanHarga.perkiraanperolehanritase = parseFloat(resRitase.toFixed(1));
+            formJarakDanHarga.perkiraanperolehanritase = parseFloat(resRitase.toFixed(2));
             formJarakDanHarga.solarjarak = Math.round(resSolarJarak);
             formJarakDanHarga.upahhariandriver = Math.round(resUpahHarianDriver);
 
             // ASPAL biasanya butuh presisi desimal jika sudah dibagi tonase
-            formJarakDanHarga.upahdriver = kategori === 'ASPAL' ? parseFloat(resUpahDriver.toFixed(2)) : Math.round(resUpahDriver);
+            formJarakDanHarga.upahdriver = kategori === 'ASPAL' ? parseFloat(resUpahDriver.toFixed(0)) : Math.round(resUpahDriver);
             formJarakDanHarga.upahpermaterial = Math.round(resUpahPerMaterial);
 
         }, { immediate: true });
