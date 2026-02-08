@@ -260,7 +260,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-12">
+                        <div class="col-md-12" v-if="formJarakDanHarga.jenisKendaraan == 'DTT'">
                             <div class="mb-4">
                                 <div class="form-group local-forms mb-3">
                                     <label>TONASE <span class="login-danger">*</span></label>

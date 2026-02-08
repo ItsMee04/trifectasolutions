@@ -53,43 +53,6 @@ class JarakDanHargaController extends Controller
         ], 200);
     }
 
-    // public function updateJarakDanHarga(Request $request)
-    // {
-    //     $jarakdanharga = JarakHarga::find($request->id);
-
-    //     if (!$jarakdanharga) {
-    //         return response()->json([
-    //             'status' => 404,
-    //             'success' => false,
-    //             'message' => 'Data jarak & harga tidak ditemukan.',
-    //         ]);
-    //     }
-
-    //     // Kita gunakan optional() atau null safe operator agar tidak error jika relasi kosong
-    //     $indexPerKm = $jarakdanharga->source->kendaraan->bahanbakar->indexperkm ?? 0;
-
-
-
-    //     $request->validate([
-    //         'jarak'         => 'required',
-    //         'hargaupah'     => 'required|integer',
-    //         'hargajasa'     => 'required|integer',
-    //     ]);
-
-    //     $jarakdanharga->update([
-    //         'jarak'         => $request->jarak,
-    //         'hargaupah'     => $request->hargaupah,
-    //         'hargajasa'     => $request->hargajasa,
-    //     ]);
-
-    //     return response()->json([
-    //         'status' => 200,
-    //         'success' => true,
-    //         'message' => 'Data jarak & harga berhasil diubah.',
-    //         'data' => $jarakdanharga
-    //     ], 200);
-    // }
-
     public function updateJarakDanHarga(Request $request)
     {
         // 1. Eager Load relasi sampai ke tabel BahanBakar

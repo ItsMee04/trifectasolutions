@@ -175,11 +175,7 @@ export function useJarakDanHarga() {
                 payload = {
                     ...payload,
                     upahdriver: formJarakDanHarga.upahdriver,
-                    upahpermaterial: formJarakDanHarga.upahpermaterial,
-                    tonase: formJarakDanHarga.tonase,
-                    upahharian: formJarakDanHarga.upahharian,
-                    upahharianinvoice: formJarakDanHarga.upahharianinvoice,
-                    pembulatan: formJarakDanHarga.pembulatan
+                    upahpermaterial: formJarakDanHarga.upahpermaterial
                 };
             }
             // KONDISI B: Aspal & DT
@@ -188,9 +184,6 @@ export function useJarakDanHarga() {
                     ...payload,
                     upahdriver: formJarakDanHarga.upahdriver,
                     upahpermaterial: formJarakDanHarga.upahpermaterial,
-                    volume: formJarakDanHarga.volume, // Biasanya aspal pakai volume/m3
-                    upahharianinvoice: 500000, // Hardcoded sesuai logika hitungOtomatis Anda
-                    waktubongkarmuatmaterial: 2
                 };
             }
             // KONDISI C: Bukan Aspal & DTT
@@ -199,12 +192,6 @@ export function useJarakDanHarga() {
                     ...payload,
                     upahdriver: formJarakDanHarga.upahdriver,
                     upahpermaterial: formJarakDanHarga.upahpermaterial,
-                    tonase2: formJarakDanHarga.tonase2,
-                    upahharian2: formJarakDanHarga.upahharian2,
-                    upahharianinvoice2: formJarakDanHarga.upahharianinvoice2,
-                    pembulatan2: formJarakDanHarga.pembulatan2,
-                    jumlahwaktuyangdiperlukan: formJarakDanHarga.jumlahwaktuyangdiperlukan,
-                    perkiraanperolehanritase2: formJarakDanHarga.perkiraanperolehanritase2
                 };
             }
 
