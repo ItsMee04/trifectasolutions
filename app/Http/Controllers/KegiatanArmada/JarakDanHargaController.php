@@ -34,6 +34,7 @@ class JarakDanHargaController extends Controller
             // Jika ingin filter source_id tertentu, tambahkan di sini:
             // $query->where('id', 1);
         })
+        ->orderBy('kode', 'asc')
         ->get();
 
         if ($data->isEmpty()) {

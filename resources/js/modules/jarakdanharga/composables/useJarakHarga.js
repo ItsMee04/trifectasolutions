@@ -158,6 +158,15 @@ export function useJarakDanHarga() {
                 };
             }
 
+            // KONDISI D: Aspal & DTT
+            else if (kategori === 'ASPAL' && kendaraan === 'DTT') {
+                payload = {
+                    ...payload,
+                    upahdriver: formJarakDanHarga.upahdriver,
+                    upahpermaterial: formJarakDanHarga.upahpermaterial,
+                };
+            }
+
             let response;
             if (isEdit.value) {
                 response = await jarakdanhargaService.updateJarakDanHarga(payload);
