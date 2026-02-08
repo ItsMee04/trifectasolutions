@@ -454,11 +454,17 @@ export function useJarakDanHarga() {
                 resSolarJarak = indexSolar > 0 ? ((jarak * 2) / indexSolar) * hargaSolar : 0;
 
                 // Upah Harian Driver (Berdasarkan waktu real)
-                resUpahHarianDriver = (totalWaktuReal/jam) * upahHarian;
+                resUpahHarianDriver = (totalWaktuReal / jam) * upahHarian;
                 resUpahDriver = (resSolarJarak + resUpahHarianDriver);
 
-                const pembulatanAktif = formJarakDanHarga.pembulatan;
-                resUpahPerMaterial = (formJarakDanHarga.upahharianinvoice / pembulatanAktif) / tonaseAktif + (resRitase / tonaseAktif);
+                const pembulatanAktif = formJarakDanHarga.pembulatan; // Ini tetap untuk tampilan UI
+
+                // Rumus yang menghasilkan 29.230:
+                if (resRitase > 0 && tonaseAktif > 0) {
+                    resUpahPerMaterial = ((formJarakDanHarga.upahharianinvoice / resRitase) / tonaseAktif) + (resUpahDriver / tonaseAktif);
+                } else {
+                    resUpahPerMaterial = 0;
+                }
 
             } else if (kendaraan === 'SL') {
                 console.log("Kondisi 5: Kendaraan SL");
