@@ -36,10 +36,6 @@
         }
     },
     "scripts": {
-        "dev": [
-            "Composer\\Config::disableProcessTimeout",
-            "npx concurrently -k -p \"[{name}]\" -n \"PHP,Vite\" -c \"magenta,cyan\" \"php artisan serve\" \"npm run dev\""
-        ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
