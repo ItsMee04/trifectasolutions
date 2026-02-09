@@ -26,16 +26,17 @@ class JarakDanHargaController extends Controller
             },
             'kegiatanArmada',
         ])
-        ->where('status', 1)
-        /* Menyaring agar hanya mengambil JarakHarga yang sourcenya
+            ->where('status', 1)
+            /* Menyaring agar hanya mengambil JarakHarga yang sourcenya
            berasal dari AsphaltMixingPlant
         */
-        ->whereHasMorph('source', [\App\Models\Timbangan\AsphaltMixingPlant::class], function ($query) {
-            // Jika ingin filter source_id tertentu, tambahkan di sini:
-            // $query->where('id', 1);
-        })
-        ->orderBy('kode', 'asc')
-        ->get();
+            ->whereHasMorph('source', [
+                \App\Models\Timbangan\StoneCrusher::class,
+                \App\Models\Timbangan\ConcreteBatchingPlant::class,
+                \App\Models\Timbangan\AsphaltMixingPlant::class
+            ])
+            ->orderBy('kode', 'asc')
+            ->get();
 
         if ($data->isEmpty()) {
             return response()->json([
