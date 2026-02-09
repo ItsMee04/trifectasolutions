@@ -75,11 +75,15 @@ const formJarakDanHarga = reactive({
 
 export function useJarakDanHarga() {
 
-    const fetchJarakDanHarga = async () => {
+    const fetchJarakDanHarga = async (type) => {
         isLoading.value = true;
 
+        const payload = {
+            type: type
+        }
+
         try {
-            const response = await jarakdanhargaService.getJarakDanHarga();
+            const response = await jarakdanhargaService.getJarakDanHarga(payload);
             JarakHarga.value = Array.isArray(response) ? response : (response.data || []);
         } catch (error) {
             console.error("Gagal mengambil data Jarak & Harga:", error);
@@ -87,6 +91,8 @@ export function useJarakDanHarga() {
         } finally {
             isLoading.value = false;
         }
+
+        console.log("Fetch Jarak Dan Harga called with type:", type);
     };
 
     const validateForm = () => {

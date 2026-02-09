@@ -2,9 +2,9 @@
 import apiClient from '../../../helper/apiClient';
 
 export const jarakdanhargaService = {
-    async getJarakDanHarga() {
-        const response = await apiClient.get('/jarakdanharga/getJarakDanHarga');
-        return response.data; // Sesuaikan dengan struktur JSON Laravel Anda
+    async getJarakDanHarga(payload) {
+        const response = await apiClient.post('/jarakdanharga/getJarakDanHarga', payload);
+        return response.data;
     },
 
     async storeJarakDanHarga(payload) {

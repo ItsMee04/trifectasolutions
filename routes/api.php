@@ -114,7 +114,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('asphaltmixingplant/deleteAsphaltMixingPlant', [AsphaltMixingPlantController::class, 'deleteAsphaltMixingPlant']);
 
     //API JARAK & HARGA
-    Route::get('jarakdanharga/getJarakDanHarga', [JarakDanHargaController::class, 'getJarakDanHarga']);
+    Route::post('jarakdanharga/getJarakDanHarga', [JarakDanHargaController::class, 'getJarakDanHarga']);
     Route::post('jarakdanharga/storeJarakDanHarga', [JarakDanHargaController::class, 'storeJarakDanHarga']);
     Route::post('jarakdanharga/updateJarakDanHarga', [JarakDanHargaController::class, 'updateJarakDanHarga']);
     Route::post('jarakdanharga/deleteJarakDanHarga', [JarakDanHargaController::class, 'deleteJarakDanHarga']);

@@ -110,10 +110,11 @@ const routes = [
                     import("@/modules/amp/views/AMPView.vue"),
             },
             {
-                path: "jarakdanharga",
+                path: "/jarakdanharga/:type",
                 name: "jarakdanharga",
                 component: () =>
                     import("@/modules/jarakdanharga/views/JarakHargaView.vue"),
+                props: true,
             },
             {
                 path: "kegiatanarmada",

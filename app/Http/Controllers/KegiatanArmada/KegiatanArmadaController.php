@@ -18,9 +18,9 @@ class KegiatanArmadaController extends Controller
             ->with([
                 'jarak.source' => function ($morphTo) {
                     $morphTo->morphWith([
-                        StoneCrusher::class => ['material', 'kendaraan', 'driver', 'suplier'],
-                        ConcreteBatchingPlant::class => ['material', 'kendaraan', 'driver', 'suplier'],
-                        AsphaltMixingPlant::class => ['material', 'kendaraan', 'driver', 'suplier'],
+                        StoneCrusher::class => ['material', 'material.kategori', 'kendaraan', 'driver', 'suplier'],
+                        ConcreteBatchingPlant::class => ['material', 'material.kategori', 'kendaraan', 'driver', 'suplier'],
+                        AsphaltMixingPlant::class => ['material', 'material.kategori', 'kendaraan', 'driver', 'suplier'],
                     ]);
                 }
             ])

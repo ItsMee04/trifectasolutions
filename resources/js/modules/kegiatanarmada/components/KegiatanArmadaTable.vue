@@ -102,7 +102,7 @@
                                 <td>{{ item.jarak?.source?.kendaraan?.kode }}</td>
                                 <td>{{ item.jarak?.source?.driver?.nama }}</td>
                                 <td>{{ item.rit }}</td>
-                                <td>{{ item.satuan }}</td>
+                                <td>{{ item.jarak?.source?.material?.kategori?.kategori }}</td>
                                 <td>{{ item.jarak?.source?.volume }}</td>
                                 <td>{{ item.jarak?.pengambilan }}</td>
                                 <td>{{ item.jarak?.tujuan }}</td>

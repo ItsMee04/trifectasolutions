@@ -12,20 +12,14 @@
                     </li>
 
                     <li class="submenu" :class="{ active: isMasterActive }">
-                        <a
-                            href="javascript:void(0);"
-                            @click="toggleMenu('master')"
-                            :class="{ 'subdrop': openMenu === 'master' }"
-                        >
+                        <a href="javascript:void(0);" @click="toggleMenu('master')"
+                            :class="{ 'subdrop': openMenu === 'master' }">
                             <i class="fas fa-server"></i> <span> Master</span>
                             <span class="menu-arrow"></span>
                         </a>
                         <ul :class="['submenu-list', { 'is-open': openMenu === 'master' }]">
                             <li v-for="item in masterItems" :key="item.path">
-                                <router-link
-                                    :to="item.path"
-                                    :class="{ active: $route.path === item.path }"
-                                >
+                                <router-link :to="item.path" :class="{ active: $route.path === item.path }">
                                     {{ item.name }}
                                 </router-link>
                             </li>
@@ -33,45 +27,62 @@
                     </li>
 
                     <li class="submenu" :class="{ active: isTimbanganActive }">
-                        <a
-                            href="javascript:void(0);"
-                            @click="toggleMenu('timbangan')"
-                            :class="{ 'subdrop': openMenu === 'timbangan' }"
-                        >
+                        <a href="javascript:void(0);" @click="toggleMenu('timbangan')"
+                            :class="{ 'subdrop': openMenu === 'timbangan' }">
                             <i class="fas fa-balance-scale"></i> <span> Timbangan</span>
                             <span class="menu-arrow"></span>
                         </a>
                         <ul :class="['submenu-list', { 'is-open': openMenu === 'timbangan' }]">
                             <li v-for="item in timbanganItems" :key="item.path">
-                                <router-link
-                                    :to="item.path"
-                                    :class="{ active: $route.path === item.path }"
-                                >
+                                <router-link :to="item.path" :class="{ active: $route.path === item.path }">
                                     {{ item.name }}
                                 </router-link>
                             </li>
                         </ul>
                     </li>
 
-                    <li class="submenu" :class="{ active: isKegiatanArmadaActive }">
-                        <a
-                            href="javascript:void(0);"
-                            @click="toggleMenu('kegiatan')"
-                            :class="{ 'subdrop': openMenu === 'kegiatan' }"
-                        >
-                            <i class="fas fa-truck"></i> <span> Kegiatan Armada</span>
+
+
+                    <li class="submenu" :class="{ active: isJarakDanHargaActive }">
+                        <a href="javascript:void(0);" @click="toggleMenu('jarakdanharga')"
+                            :class="{ 'subdrop': openMenu === 'kegiatan' }">
+                            <i class="fas fa-route"></i> <span> Jarak & Harga</span>
                             <span class="menu-arrow"></span>
                         </a>
-                        <ul :class="['submenu-list', { 'is-open': openMenu === 'kegiatan' }]">
-                            <li v-for="item in kegiatanArmadaItems" :key="item.path">
-                                <router-link
-                                    :to="item.path"
-                                    :class="{ active: $route.path === item.path }"
-                                >
+                        <ul :class="['submenu-list', { 'is-open': openMenu === 'jarakdanharga' }]">
+                            <li v-for="item in jarakdanhargaItems" :key="item.path">
+                                <router-link :to="item.path" :class="{ active: $route.path === item.path }">
                                     {{ item.name }}
                                 </router-link>
                             </li>
                         </ul>
+                    </li>
+
+                    <li :class="{ active: $route.name === 'kegiatanarmada' }">
+                        <router-link to="/kegiatanarmada">
+                            <i class="fas fa-truck"></i> <span> Kegiatan Armada</span>
+                        </router-link>
+                    </li>
+
+                    <li class="submenu" :class="{ active: isInvoiceActive }">
+                        <a href="javascript:void(0);" @click="toggleMenu('invoice')"
+                            :class="{ 'subdrop': openMenu === 'kegiatan' }">
+                            <i class="fas fa-file-invoice"></i> <span> Invoice</span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <ul :class="['submenu-list', { 'is-open': openMenu === 'invoice' }]">
+                            <li v-for="item in invoiceItems" :key="item.path">
+                                <router-link :to="item.path" :class="{ active: $route.path === item.path }">
+                                    {{ item.name }}
+                                </router-link>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li :class="{ active: $route.name === 'penjualan' }">
+                        <router-link to="/penjualan">
+                            <i class="fas fa-coins"></i> <span> Penjualan</span>
+                        </router-link>
                     </li>
                 </ul>
             </div>
@@ -92,7 +103,7 @@ const masterItems = [
     { name: 'Users', path: '/users' },
     { name: 'Driver', path: '/driver' },
     { name: 'Suplier / Customer', path: '/suplier' },
-    { name: 'Jenis Kendaraan', path: '/jeniskendaraan'},
+    { name: 'Jenis Kendaraan', path: '/jeniskendaraan' },
     { name: 'Kendaraan', path: '/kendaraan' },
     { name: 'Kategori', path: '/kategori' },
     { name: 'Material', path: '/material' },
@@ -105,22 +116,29 @@ const timbanganItems = [
     { name: 'AMP', path: '/asphaltmixingplant' },
 ];
 
-const kegiatanArmadaItems = [
-    { name: 'Jarak & Harga', path: '/jarakdanharga' },
-    { name: 'Kegiatan Armada', path: '/kegiatanarmada' },
+const jarakdanhargaItems = [
+    { name: 'Jarak & Harga AMP', path: '/jarakdanharga/amp' },
+    { name: 'Jarak & Harga CBP', path: '/jarakdanharga/cbp' },
+    { name: 'Jarak & Harga SC', path: '/jarakdanharga/sc' },
+];
+
+const invoiceItems = [
     { name: 'Invoice & Upah', path: '/invoice' },
+    { name: 'Invoice TM', path: '/invoice/tm' },
 ];
 
 
 const isMasterActive = computed(() => masterItems.some(item => route.path === item.path));
 const isTimbanganActive = computed(() => timbanganItems.some(item => route.path === item.path));
-const isKegiatanArmadaActive = computed(() => kegiatanArmadaItems.some(item => route.path === item.path));
+const isJarakDanHargaActive = computed(() => jarakdanhargaItems.some(item => route.path === item.path));
+const isInvoiceActive = computed(() => invoiceItems.some(item => route.path === item.path));
 
 // Fungsi untuk menentukan menu mana yang harus terbuka berdasarkan rute aktif
 const updateMenuState = () => {
     if (isMasterActive.value) openMenu.value = 'master';
     else if (isTimbanganActive.value) openMenu.value = 'timbangan';
-    else if (isKegiatanArmadaActive.value) openMenu.value = 'kegiatan';
+    else if (isJarakDanHargaActive.value) openMenu.value = 'jarakdanharga';
+    else if (isInvoiceActive.value) openMenu.value = 'invoice';
     else openMenu.value = ''; // Menutup menu jika tidak ada anak yang aktif (ex: Dashboard)
 };
 
@@ -160,19 +178,23 @@ const toggleMenu = (menuName) => {
 
 /* Base style link submenu */
 .sidebar-menu ul ul li a {
-    padding: 10px 15px 10px 45px !important; /* Indentasi teks ke kanan */
+    padding: 10px 15px 10px 45px !important;
+    /* Indentasi teks ke kanan */
     display: block;
     font-size: 14px;
     color: #6c757d;
     transition: all 0.2s ease;
-    border-radius: 10px; /* Sudut tumpul */
-    margin: 2px 15px 2px 25px; /* Memberi jarak agar block tidak menempel pinggir */
+    border-radius: 10px;
+    /* Sudut tumpul */
+    margin: 2px 15px 2px 25px;
+    /* Memberi jarak agar block tidak menempel pinggir */
 }
 
 /* Hover & Active State (Ukuran harus sama) */
 .sidebar-menu ul ul li a:hover,
 .sidebar-menu ul ul li a.active {
-    background-color: #3d5ee1 !important; /* Warna biru template */
+    background-color: #3d5ee1 !important;
+    /* Warna biru template */
     color: #ffffff !important;
 }
 
@@ -180,6 +202,7 @@ const toggleMenu = (menuName) => {
 .menu-arrow {
     transition: transform 0.3s ease-in-out !important;
 }
+
 .subdrop .menu-arrow {
     transform: rotate(90deg) !important;
 }

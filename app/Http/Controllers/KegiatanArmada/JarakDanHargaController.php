@@ -14,8 +14,31 @@ use App\Models\Timbangan\ConcreteBatchingPlant;
 
 class JarakDanHargaController extends Controller
 {
-    public function getJarakDanHarga()
+    public function getJarakDanHarga(Request $request)
     {
+        // 1. Mengambil 'type' dari body payload POST (misal: 'amp')
+        $type = $request->input('type');
+
+        // 2. Mapping String dari Payload ke Class Model Laravel
+        // Gunakan strtolower untuk menghindari error jika payload dikirim huruf besar
+        $modelClass = match (strtolower($type)) {
+            'amp' => \App\Models\Timbangan\AsphaltMixingPlant::class,
+            'cbp' => \App\Models\Timbangan\ConcreteBatchingPlant::class,
+            'sc'  => \App\Models\Timbangan\StoneCrusher::class,
+            default => null,
+        };
+
+        // 3. Jika payload 'type' tidak sesuai dengan mapping di atas
+        if (!$modelClass) {
+            return response()->json([
+                'status'  => 400,
+                'success' => false,
+                'message' => "Payload type '{$type}' tidak valid atau tidak ditemukan.",
+                'data'    => []
+            ], 400);
+        }
+
+        // 4. Jalankan Query berdasarkan Model yang dipilih dari payload
         $data = JarakHarga::with([
             'source' => function ($morphTo) {
                 $morphTo->morphWith([
@@ -27,31 +50,17 @@ class JarakDanHargaController extends Controller
             'kegiatanArmada',
         ])
             ->where('status', 1)
-            /* Menyaring agar hanya mengambil JarakHarga yang sourcenya
-           berasal dari AsphaltMixingPlant
-        */
-            ->whereHasMorph('source', [
-                \App\Models\Timbangan\StoneCrusher::class,
-                \App\Models\Timbangan\ConcreteBatchingPlant::class,
-                \App\Models\Timbangan\AsphaltMixingPlant::class
-            ])
+            // Filter inilah yang menggunakan modelClass hasil payload tadi
+            ->whereHasMorph('source', [$modelClass])
             ->orderBy('kode', 'asc')
             ->get();
 
-        if ($data->isEmpty()) {
-            return response()->json([
-                'status'    => 404,
-                'success'   => false,
-                'message'   => 'Data Jarak dan Harga tidak ditemukan.',
-                'data'      => [],
-            ]);
-        }
-
+        // 5. Response Berhasil
         return response()->json([
-            'status'    => 200,
-            'success'   => true,
-            'message'   => 'Data Jarak dan Harga berhasil diambil.',
-            'data'      => $data,
+            'status'  => 200,
+            'success' => true,
+            'message' => "Data Jarak Harga " . strtoupper($type) . " berhasil diambil.",
+            'data'    => $data,
         ], 200);
     }
 
