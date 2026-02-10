@@ -8,9 +8,24 @@ const TruckMixers = ref([]);
 const isLoading = ref(false);
 const searchQuery = ref('');
 const currentPage = ref(1);
+const startDate = ref(''); // State Baru
+const endDate = ref('');   // State Baru
 const itemsPerPage = 10;
 const isEdit = ref(false);
-const errors = ref({}); // Error ditaruh di shared state agar sinkron dengan modal
+const errors = ref({});
+
+const columnFilters = reactive({
+    material: '',
+    tanggal: '',
+    kode: '',
+    kendaraan: '',
+    driver: '',
+    suplier: '',
+    volume: '',
+    berattotal: '',
+    beratkendaraan: '',
+    beratmuatan: ''
+});
 
 export function useTruckMixer() {
 
@@ -94,14 +109,14 @@ export function useTruckMixer() {
     //     modal.show();
     // };
 
-    // const handleEdit = (item) => {
-    //     isEdit.value = true;
-    //     errors.value = {};
-    //     formKategori.id = item.id;
-    //     formKategori.kategori = item.kategori;
-    //     const modal = new bootstrap.Modal(document.getElementById('modalKategori'));
-    //     modal.show();
-    // };
+    const handleEdit = (item) => {
+        isEdit.value = true;
+        errors.value = {};
+        formKategori.id = item.id;
+        formKategori.kategori = item.kategori;
+        const modal = new bootstrap.Modal(document.getElementById('modalKategori'));
+        modal.show();
+    };
 
     // const handleDelete = async (item) => {
     //     const result = await Swal.fire({
@@ -142,14 +157,96 @@ export function useTruckMixer() {
         await fetchTruckMixer();
     }
 
-    const totalPages = computed(() => {
-        const query = searchQuery.value.toLowerCase(); // Ambil string pencarian
-        const filteredCount = TruckMixers.value.filter(item =>
-            (item.kategori || '').toLowerCase().includes(query)
-        ).length;
+    const formatNumber = (value, decimals = 0) => {
+        if (value === null || value === undefined || value === '') return "0";
+        return new Intl.NumberFormat("id-ID", {
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals
+        }).format(value);
+    };
 
-        return Math.ceil(filteredCount / itemsPerPage) || 1;
+    // --- HELPER UNTUK SEARCH MATCH ---
+    const searchMatch = (item, query) => {
+        return (
+            String(item.tanggal || '').toLowerCase().includes(query) ||
+            String(item.jarak?.tujuan || '').toLowerCase().includes(query) ||
+            String(item.jarak?.source?.volume || '').toLowerCase().includes(query) ||
+            String(item.jarak?.jarak || '').toLowerCase().includes(query)
+        );
+    }
+
+    // --- FILTER UTAMA (Text + Date Range) ---
+    const filteredTruckMixer = computed(() => {
+        const query = searchQuery.value.toLowerCase();
+
+        return TruckMixers.value.filter(item => {
+            // 1. FILTER SEARCH GLOBAL (Cari di semua field)
+            const matchesSearch = searchMatch(item, query);
+
+            // 2. FILTER TANGGAL (Range)
+            let matchesDate = true;
+            if (startDate.value && endDate.value) {
+                matchesDate = item.tanggal >= startDate.value && item.tanggal <= endDate.value;
+            } else if (startDate.value) {
+                matchesDate = item.tanggal >= startDate.value;
+            } else if (endDate.value) {
+                matchesDate = item.tanggal <= endDate.value;
+            }
+
+            // 3. FILTER PER KOLOM (Spesifik)
+            // .every() memastikan SEMUA inputan kolom yang diisi harus terpenuhi
+            const matchesColumns = Object.keys(columnFilters).every(key => {
+                const filterVal = columnFilters[key].toLowerCase();
+                if (!filterVal) return true; // Jika filter kosong, loloskan data
+
+                switch (key) {
+                    case 'tanggal':
+                        return String(item.tanggal || '').toLowerCase().includes(filterVal);
+                    case 'tujuan':
+                        return String(item.jarak?.tujuan || '').toLowerCase().includes(filterVal);
+                    case 'volume':
+                        return String(item.jarak?.source?.volume || '').toLowerCase().includes(filterVal);
+                    case 'jarak':
+                        return String(item.jarak?.jarak || '').toLowerCase().includes(filterVal);
+                    // ... case kolom lainnya
+                    default: return true;
+                }
+            });
+
+            // KEMBALIKAN DATA HANYA JIKA SEMUA KONDISI TRUE
+            return matchesSearch && matchesDate && matchesColumns;
+        });
     });
+
+    const totalFooter = computed(() => {
+        return filteredTruckMixer.value.reduce((acc, item) => {
+            acc.volumeTotal += parseFloat(item.jarak?.source?.volume || 0);
+            acc.jarakTotal += parseFloat(item.jarak?.jarak || 0);
+            acc.beratKendaraan += Number(item.beratkendaraan || 0);
+            acc.beratMuatan += Number(item.beratmuatan || 0);
+            return acc;
+        }, { volumeTotal: 0, jarakTotal: 0, beratKendaraan: 0, beratMuatan: 0 });
+    });
+
+    const totalPages = computed(() => {
+        return Math.ceil(filteredTruckMixer.value.length / itemsPerPage) || 1;
+    });
+
+    const paginatedTruckMixer = computed(() => {
+        const start = (currentPage.value - 1) * itemsPerPage;
+        return filteredTruckMixer.value.slice(start, start + itemsPerPage);
+    });
+
+    const resetDateFilter = () => {
+        startDate.value = '';
+        endDate.value = '';
+        currentPage.value = 1;
+    };
+
+    // Tambahkan reset filter kolom
+    const resetColumnFilters = () => {
+        Object.keys(columnFilters).forEach(key => columnFilters[key] = '');
+    };
 
     const displayedPages = computed(() => {
         const total = totalPages.value;
@@ -176,34 +273,21 @@ export function useTruckMixer() {
         isLoading,
         searchQuery,
         currentPage,
+        startDate,
+        endDate,
+        displayedPages,
         isEdit,
-        // formKategori,
         errors,
         totalPages,
-        displayedPages, // Pastikan ini di-return,
-        filtereTruckMixer: computed(() => {
-            const query = searchQuery.value.toLowerCase();
-            return TruckMixers.value.filter(item => {
-                return (
-                    (item.jarak?.source?.material.material || '').toLowerCase().includes(query) // Pastikan path relasi role benar
-                );
-            });
-        }),
-        paginatedTruckMixer: computed(() => {
-            const query = searchQuery.value.toLowerCase();
-            const filtered = TruckMixers.value.filter(item => {
-                return (
-                    (item.jarak?.source?.material.material || '').toLowerCase().includes(query)
-                );
-            });
-            const start = (currentPage.value - 1) * itemsPerPage;
-            return filtered.slice(start, start + itemsPerPage);
-        }),
+        totalFooter,
+        columnFilters,
+        resetColumnFilters,
+        formatNumber,
+        filteredTruckMixer,
+        paginatedTruckMixer,
         fetchTruckMixer,
-        // handleCreate,
-        // handleEdit,
-        // handleDelete,
+        handleEdit,
         handleRefresh,
-        // submitKategori
+        resetDateFilter
     };
 }
