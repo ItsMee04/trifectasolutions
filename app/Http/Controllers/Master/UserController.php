@@ -50,15 +50,24 @@ class UserController extends Controller
             $rules['email'] = 'required|email|unique:users,email,' . $user->id;
         }
 
-        // Jika password diisi
+        // Jika password diisi (tidak null dan tidak string kosong)
         if (!empty($request->password)) {
-            if (Hash::check($request->password, $user->password)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Password baru tidak boleh sama dengan password lama.'
-                ], 422); // Gunakan 422 agar ditangkap errors.value di Vue
-            }
+            // 1. Tambahkan rule validasi minimal karakter
             $rules['password'] = 'min:6';
+
+            // 2. Lakukan pengecekan hash hanya jika password lama di DB valid formatnya
+            // Ini mencegah error "Bcrypt algorithm" jika ada data user lama yang belum ter-hash
+            try {
+                if (Hash::check($request->password, $user->password)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Password baru tidak boleh sama dengan password lama.'
+                    ], 422);
+                }
+            } catch (\Exception $e) {
+                // Jika format password di DB bukan hash, abaikan pengecekan "Password sama"
+                // Agar user tetap bisa update password lamanya yang plain text ke format hash
+            }
         }
 
         // Jalankan validasi

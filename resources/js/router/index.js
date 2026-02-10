@@ -128,6 +128,12 @@ const routes = [
                 component: () =>
                     import("@/modules/invoice/views/InvoiceView.vue"),
             },
+            {
+                path: "upahtruckmixer",
+                name: "upahtruckmixer",
+                component: () =>
+                    import("@/modules/truckmixer/views/TruckMixerView.vue"),
+            },
             // Tambahkan rute modular lainnya di sini
         ],
     },

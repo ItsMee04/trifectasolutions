@@ -2,6 +2,7 @@ import { ref, computed, reactive, watch } from 'vue';
 import { jarakdanhargaService } from '../services/jarakdanhargaService';
 import { notify } from '../../../helper/notification';
 import Swal from 'sweetalert2';
+import { useRoute } from 'vue-router';
 
 // Shared State
 const JarakHarga = ref([]);
@@ -70,10 +71,13 @@ const formJarakDanHarga = reactive({
     perkiraanperolehanritase2: '',
     pembulatan2: '',
     tonase2: ''
-
 });
 
 export function useJarakDanHarga() {
+
+
+    // Di dalam setup/composable
+    const route = useRoute()
 
     const fetchJarakDanHarga = async (type) => {
         isLoading.value = true;
@@ -195,7 +199,9 @@ export function useJarakDanHarga() {
             const modalInstance = bootstrap.Modal.getInstance(modalElement);
             if (modalInstance) modalInstance.hide();
 
-            await fetchJarakDanHarga();
+            // Ambil type dari route parameter sebelum melakukan fetch ulang
+            const currentType = route.params.type;
+            await fetchJarakDanHarga(currentType);
             return true;
 
         } catch (error) {

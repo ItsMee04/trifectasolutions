@@ -124,7 +124,7 @@ const jarakdanhargaItems = [
 
 const invoiceItems = [
     { name: 'Invoice & Upah', path: '/invoice' },
-    { name: 'Invoice TM', path: '/invoice/tm' },
+    { name: 'Upah TM', path: '/upahtruckmixer' },
 ];
 
 
