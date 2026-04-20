@@ -1,15 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Master\RoleController;
-use App\Http\Controllers\Master\UserController;
-use App\Http\Controllers\Master\DriverController;
-use App\Http\Controllers\Master\PegawaiController;
-use App\Http\Controllers\Master\SuplierController;
-use App\Http\Controllers\Master\KategoriController;
-use App\Http\Controllers\Master\MaterialController;
-use App\Http\Controllers\Master\KendaraanController;
 use App\Http\Controllers\Authentication\AuthController;
 use App\Http\Controllers\KegiatanArmada\InvoiceController;
 use App\Http\Controllers\KegiatanArmada\JarakDanHargaController;
@@ -17,10 +7,21 @@ use App\Http\Controllers\KegiatanArmada\KegiatanArmadaController;
 use App\Http\Controllers\KegiatanArmada\TruckMixerController;
 use App\Http\Controllers\Master\BahanBakarController;
 use App\Http\Controllers\Master\BeratJenisController;
+use App\Http\Controllers\Master\DriverController;
 use App\Http\Controllers\Master\JenisKendaraanController;
+use App\Http\Controllers\Master\KategoriController;
+use App\Http\Controllers\Master\KendaraanController;
+use App\Http\Controllers\Master\MaterialController;
+use App\Http\Controllers\Master\PegawaiController;
+use App\Http\Controllers\Master\RoleController;
+use App\Http\Controllers\Master\SuplierController;
+use App\Http\Controllers\Master\UserController;
+use App\Http\Controllers\Penjualan\PenjualanController;
 use App\Http\Controllers\Timbangan\AsphaltMixingPlantController;
 use App\Http\Controllers\Timbangan\ConcreteBatchingPlantController;
 use App\Http\Controllers\Timbangan\StoneCrusherController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -131,6 +132,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // API INVOICE TRUCK MIXER
     Route::get('truckmixer/getInvoiceTruckMixer', [TruckMixerController::class, 'getInvoceTruckMixer']);
+
+    // API PENJUALAN
+    Route::get('penjualan/getPenjualan', [PenjualanController::class, 'getPenjualan']);
+    Route::post('penjualan/storePenjualan', [PenjualanController::class, 'storePenjualan']);
+    Route::post('penjualan/updatePenjualan', [PenjualanController::class, 'updatePenjualan']);
+    Route::post('penjualan/deletePenjualan', [PenjualanController::class, 'deletePenjualan']);
 
     Route::post('/logout', [AuthController::class, 'logout']);
 });

@@ -11,8 +11,7 @@
                 </div>
                 <form @submit.prevent="handleSubmit">
                     <div class="modal-body p-4">
-                        <div class="row">
-                            <div class="col-md-6">
+                        <div class="col-md-12">
                                 <div class="mb-4">
                                     <div class="form-group local-forms mb-3">
                                         <label>RIT <span class="login-danger">*</span></label>
@@ -24,19 +23,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="mb-4">
-                                    <div class="form-group local-forms mb-3">
-                                        <label>Satuan <span class="login-danger">*</span></label>
-                                        <input v-model="formKegiatanArmada.satuan" type="text" class="form-control"
-                                            :class="{ 'is-invalid': errors.satuan }">
-                                        <div class="invalid-feedback" v-if="errors.satuan">
-                                            {{ Array.isArray(errors.satuan) ? errors.satuan[0] : errors.satuan }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-4">

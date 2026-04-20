@@ -4,7 +4,7 @@
             <div class="page-header">
                 <div class="row align-items-center">
                     <div class="col">
-                        <h5 class="card-title">Daftar Kegiatan Armada</h5>
+                        <h5 class="card-title">Daftar Penjualan</h5>
                     </div>
 
                     <div class="col-auto d-flex align-items-center flex-wrap gap-2">
@@ -50,9 +50,8 @@
                     </div>
                 </div>
             </div>
-
             <div class="table-responsive">
-                <table class="table table-nowrap table-hover mb-0">
+                <table class="table table-hover table-vcenter table-nowrap mb-0">
                     <thead class="bg-light">
                         <tr class="text-center">
                             <th style="width: 5%">#</th>
@@ -67,14 +66,7 @@
                             <th style="width: 20%">Volume</th>
                             <th style="width: 20%">Pengambilan</th>
                             <th style="width: 20%">Tujuan</th>
-                            <th style="width: 20%">Upah Harian Kenet</th>
-                            <th style="width: 20%">UM Luar Kota Telah Terbayar</th>
-                            <th style="width: 20%">UM Pengajuan</th>
-                            <th style="width: 20%">Insentif / Lembur</th>
-                            <th style="width: 20%">Upah</th>
-                            <th style="width: 20%">Jumlah</th>
-                            <th style="width: 20%">Solar (L)</th>
-                            <th style="width: 20%">Biaya Solar</th>
+                            <th style="width: 20%">Penjualan</th>
                             <th style="width: 20%">Status</th>
                             <th style="width: 20%">Action</th>
                         </tr>
@@ -87,12 +79,12 @@
                             </td>
                         </tr>
 
-                        <tr v-else-if="!paginatedKegiatanArmada || paginatedKegiatanArmada.length === 0">
+                        <tr v-else-if="!paginatedPenjualans || paginatedPenjualans.length === 0">
                             <td colspan="23" class="text-center p-5">Tidak ada data.</td>
                         </tr>
 
                         <template v-else>
-                            <tr v-for="(item, index) in paginatedKegiatanArmada" :key="item.id" class="text-center">
+                            <tr v-for="(item, index) in paginatedPenjualans" :key="item.id" class="text-center">
                                 <td>{{ ((currentPage - 1) * 10) + (index + 1) }}</td>
                                 <td>{{ item.jarak?.jarak }}</td>
                                 <td>{{ formatNumber(item.jarak?.hargajasa) }}</td>
@@ -105,14 +97,7 @@
                                 <td>{{ item.jarak?.source?.volume }}</td>
                                 <td>{{ item.jarak?.pengambilan }}</td>
                                 <td>{{ item.jarak?.tujuan }}</td>
-                                <td>{{ formatNumber(item.upahhariankenet) }}</td>
-                                <td>{{ formatNumber(item.umluarkotatelahterbayar) }}</td>
-                                <td>{{ formatNumber(item.umpengajuan) }}</td>
-                                <td>{{ formatNumber(item.insentifataulembur) }}</td>
-                                <td>{{ formatNumber(item.upah) }}</td>
-                                <td>{{ formatNumber(item.jumlah) }}</td>
-                                <td>{{ formatNumber(item.hargasolar) }}</td>
-                                <td>{{ formatNumber(item.nominalbiayasolar) }}</td>
+                                <td>{{ formatNumber(item.penjualan) }}</td>
                                 <td>
                                     <span v-if="item.status == 1" class="badge bg-success">
                                         ACTIVE
@@ -132,7 +117,7 @@
                         </template>
                     </tbody>
 
-                    <tfoot v-if="!isLoading && paginatedKegiatanArmada.length > 0">
+                    <tfoot v-if="!isLoading && paginatedPenjualans.length > 0">
                         <tr class="text-center fw-bold bg-light">
                             <td colspan="1" class="text-end">TOTAL</td>
                             <td>{{ formatNumber(totalFooter.jarakTotal, 2) }}</td>
@@ -142,26 +127,19 @@
                             <td colspan="1" class="text-end"></td>
                             <td>{{ formatNumber(totalFooter.volumeTotal, 2) }}</td>
                             <td colspan="2" class="text-end"></td>
-                            <td>{{ formatNumber(totalFooter.upahkenetTotal) }}</td>
-                            <td>{{ formatNumber(totalFooter.umluarkotatelahterbayarTotal) }}</td>
-                            <td>{{ formatNumber(totalFooter.umpengajuanTotal) }}</td>
-                            <td>{{ formatNumber(totalFooter.insentifataulemburTotal) }}</td>
-                            <td>{{ formatNumber(totalFooter.upahTotal) }}</td>
-                            <td>{{ formatNumber(totalFooter.jumlahTotal) }}</td>
-                            <td>{{ formatNumber(totalFooter.hargasolarTotal) }}</td>
-                            <td>{{ formatNumber(totalFooter.nominalbiayasolarTotal) }}</td>
+                            <td>{{ formatNumber(totalFooter.penjualanTotal) }}</td>
                             <td colspan="2"></td>
                         </tr>
                     </tfoot>
                 </table>
             </div>
 
-            <div v-if="filteredKegiatanArmada.length > 0" class="d-flex justify-content-between align-items-center p-3">
+            <div v-if="filteredPenjualans.length > 0" class="d-flex justify-content-between align-items-center p-3">
 
                 <div class="text-muted small">
                     Showing {{ ((currentPage - 1) * 10) + 1 }}
-                    to {{ Math.min(currentPage * 10, filteredKegiatanArmada.length) }}
-                    of {{ filteredKegiatanArmada.length }} entries
+                    to {{ Math.min(currentPage * 10, filteredPenjualans.length) }}
+                    of {{ filteredPenjualans.length }} entries
                 </div>
 
                 <ul class="pagination mb-0">
@@ -201,25 +179,23 @@
         </div>
     </div>
 </template>
-
 <script setup>
-import { useKegiatanArmada } from '../composables/useKegiatanArmada';
-// Destructure semua yang dibutuhkan dari composable
-const {
-    handleEdit,
-    handleRefresh,
-    formatNumber,
+import { usePenjualan} from '../composables/usePenjualan';
 
-    displayedPages,
+const {
     startDate,
     endDate,
-    resetDateFilter,
-    totalFooter,
-    filteredKegiatanArmada,
-    paginatedKegiatanArmada,
     searchQuery,
-    isLoading,
     currentPage,
-    totalPages
-} = useKegiatanArmada();
+    totalPages,
+    paginatedPenjualans,
+    totalFooter,
+    isLoading,
+    filteredPenjualans,
+    displayedPages,
+    formatNumber,
+    resetDateFilter,
+    handleRefresh,
+    handleEdit,
+} = usePenjualan();
 </script>

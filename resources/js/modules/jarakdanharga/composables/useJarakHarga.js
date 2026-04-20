@@ -165,6 +165,8 @@ export function useJarakDanHarga() {
                     ...payload,
                     upahdriver: formJarakDanHarga.upahdriver,
                     upahpermaterial: formJarakDanHarga.upahpermaterial,
+                    // PAYLOAD TAMBAHAN DARI HASIL HITUNGAN TADI
+                    upah_kegiatan_armada: formJarakDanHarga.upahhariandriver,
                 };
             }
 
@@ -394,7 +396,8 @@ export function useJarakDanHarga() {
                     ? ((500000 / 1) / tonaseAktif) + resUpahDriver
                     : 0;
 
-            } else if (kategori !== 'ASPAL' && kendaraan === 'DTT') {
+            } // Di dalam hitungOtomatis -> Kondisi 3: Bukan Aspal & DTT
+            else if (kategori !== 'ASPAL' && kendaraan === 'DTT') {
                 console.log("Kondisi 3: Bukan Aspal & DTT");
 
                 formJarakDanHarga.upahharianinvoice = 500000;
@@ -402,48 +405,45 @@ export function useJarakDanHarga() {
                 formJarakDanHarga.upahharianinvoice2 = 1500000;
                 formJarakDanHarga.tonase2 = 20;
 
-                // 1. Waktu Jarak (Indeks)
                 const jarakIndexKM = parseFloat(formJarakDanHarga.jarakindexkm) || 240;
                 resWaktuJarak = ((jarak * 2) * jam) / jarakIndexKM;
 
-                // 2. Kebutuhan Waktu (Waktu Jarak + Input Manual)
                 const totalKebutuhanWaktu = resWaktuJarak + wBongkar;
                 formJarakDanHarga.kebutuhanwaktujarakwaktubongkarmuat = parseFloat(totalKebutuhanWaktu.toFixed(3));
 
-                // 3. Ritase Utama & Pembulatan Utama (pembulatan)
                 resRitase = totalKebutuhanWaktu > 0 ? jam / totalKebutuhanWaktu : 0;
-                const pembulatanUtama = Math.round(resRitase);
-                formJarakDanHarga.pembulatan = pembulatanUtama;
+                formJarakDanHarga.pembulatan = Math.round(resRitase);
 
-                // 4. Solar Jarak
+                // --- TAMBAHAN HITUNGAN YANG DIMINTA ---
+                // (Upah Harian / Perkiraan Perolehan Ritase)
+                const resUpahKegiatanArmada = resRitase > 0 ? upahHarian / resRitase : 0;
+                formJarakDanHarga.upahhariandriver = Math.round(resUpahKegiatanArmada);
+                // --------------------------------------
+
                 resSolarJarak = indexSolar > 0 ? ((jarak * 2) / indexSolar) * hargaSolar : 0;
 
-                // 5. Waktu Perjalanan Real
                 const waktuBerangkat = vBerangkat > 0 ? jarak / vBerangkat : 0;
                 const waktuKembali = vKembali > 0 ? jarak / vKembali : 0;
                 formJarakDanHarga.waktuyangdiperlukanberangkat = parseFloat(waktuBerangkat.toFixed(3));
                 formJarakDanHarga.waktuyangdiperlukankembali = parseFloat(waktuKembali.toFixed(3));
 
-                // 6. Akumulasi SUM Waktu Real (jumlahwaktuyangdiperlukan)
                 const totalWaktuReal = wMuat + wBongkarManual + waktuBerangkat + waktuKembali;
                 formJarakDanHarga.jumlahwaktuyangdiperlukan = parseFloat(totalWaktuReal.toFixed(3));
 
-                // 7. Upah Harian Driver & Upah Driver
                 resUpahHarianDriver = jam > 0 ? (totalWaktuReal / jam) * upahHarian : 0;
                 resUpahDriver = resSolarJarak + resUpahHarianDriver;
 
-                // --- PERBAIKAN RUMUS FINAL UPAH PER MATERIAL ---
-                // Rumus: ((Invoice2 / Pembulatan) / Tonase) + (Upah Driver / Tonase)
                 const tonaseAktif2 = parseFloat(formJarakDanHarga.tonase2) || 20;
                 resUpahPerMaterial = (tonaseAktif2 > 0 && resRitase > 0)
                     ? ((1500000 / resRitase) / tonaseAktif2) + (resUpahDriver / tonaseAktif2)
                     : 0;
-                // -----------------------------------------------
 
-                // 9. Ritase 2 & Pembulatan 2
                 const perkiraanritase2 = totalWaktuReal > 0 ? jam / totalWaktuReal : 0;
                 formJarakDanHarga.perkiraanperolehanritase2 = parseFloat(perkiraanritase2.toFixed(2));
                 formJarakDanHarga.pembulatan2 = Math.round(perkiraanritase2);
+
+                // Simpan ritase ke form agar bisa dibaca payload
+                formJarakDanHarga.perkiraanperolehanritase = parseFloat(resRitase.toFixed(1));
             } else if (kategori === 'ASPAL' && kendaraan === 'DTT') {
                 console.log("Kondisi 4: Aspal & DTT");
 

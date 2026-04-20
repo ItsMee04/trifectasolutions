@@ -88,7 +88,8 @@ class JarakDanHargaController extends Controller
             KegiatanArmada::where('jarak_id', $request->id)
                 ->update([
                     'hargasolar'            => $request->hargasolar,
-                    'nominalbiayasolar'     => $request->solarjarak
+                    'nominalbiayasolar'     => $request->solarjarak,
+                    'upah'                  => $request->upah_kegiatan_armada,
                 ]);
         }
 

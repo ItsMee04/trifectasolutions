@@ -21,7 +21,6 @@ const formKegiatanArmada = reactive({
     kendaraan_id: null,
     driver_id: null,
     rit: '',
-    satuan: '',
     volume: '',
     upahhariankenet: '',
     umluarkotatelahterbayar: '',
@@ -52,10 +51,6 @@ export function useKegiatanArmada() {
             errors.value.rit = 'RIT tidak boleh kosong.';
         }
 
-        if (!formKegiatanArmada.satuan || formKegiatanArmada.satuan.trim() === '') {
-            errors.value.satuan = 'Satuan tidak boleh kosong.';
-        }
-
         return Object.keys(errors.value).length === 0;
     };
 
@@ -66,7 +61,6 @@ export function useKegiatanArmada() {
             const payload = {
                 id: formKegiatanArmada.id,
                 rit: formKegiatanArmada.rit,
-                satuan: formKegiatanArmada.satuan,
                 upahhariankenet: formKegiatanArmada.upahhariankenet,
                 umluarkotatelahterbayar: formKegiatanArmada.umluarkotatelahterbayar,
                 umpengajuan: formKegiatanArmada.umpengajuan,
@@ -103,7 +97,6 @@ export function useKegiatanArmada() {
         errors.value = {};
         formKegiatanArmada.id = item.id;
         formKegiatanArmada.rit = item.rit;
-        formKegiatanArmada.satuan = item.satuan;
         formKegiatanArmada.upahhariankenet = item.upahhariankenet;
         formKegiatanArmada.umluarkotatelahterbayar = item.umluarkotatelahterbayar;
         formKegiatanArmada.umpengajuan = item.umpengajuan;
@@ -172,7 +165,7 @@ export function useKegiatanArmada() {
     const totalFooter = computed(() => {
         return filteredKegiatanArmada.value.reduce((acc, item) => {
             acc.jarakTotal += Number(item.jarak?.jarak || 0);
-            acc.hargaTotal += Number(item.jarak?.hargaupah || 0);
+            acc.hargaTotal += Number(item.jarak?.hargajasa || 0);
             acc.ritTotal += Number(item.rit || 0);
             acc.volumeTotal += Number(item.jarak?.source.volume || 0);
             acc.upahkenetTotal += Number(item.upahhariankenet || 0);

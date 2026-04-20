@@ -48,7 +48,6 @@ class KegiatanArmadaController extends Controller
         $request->validate([
             'id'                        => 'required|exists:kegiatanarmada,id',
             'rit'                       => 'required|numeric',
-            'satuan'                    => 'required',
             'upahhariankenet'           => 'required|numeric',
             'umluarkotatelahterbayar'   => 'required|numeric',
             'umpengajuan'               => 'required|numeric',
@@ -67,40 +66,21 @@ class KegiatanArmadaController extends Controller
             ], 404);
         }
 
-        $jarakKegiatan = $kegiatan->jarak;
-        $upahDriver = $jarakKegiatan->hargaupah;
-        $hargaJasaAngkut = $jarakKegiatan->hargajasa;
-
-        // 3. Ambil Volume dari source (SC/CBP/AMP)
-        // Gunakan (float) dan pastikan source tidak null
-        $volume = 0;
-        if ($jarakKegiatan->source) {
-            $volume = (float) $jarakKegiatan->source->volume;
-        }
-
         // 4. Hitung UPAH & JUMLAH
-        $upah = $upahDriver * $request->rit;
-        $jumlah = $upah + $request->insentifataulembur + $request->umpengajuan + $request->upahhariankenet;
+        $upah = $kegiatan->upah;
+        $jumlah =  $upah + $request->insentifataulembur + $request->umpengajuan;
 
-        // 5. Hitung PENJUALAN
-        if ($request->satuan == "RIT") {
-            $penjualan = $hargaJasaAngkut * $request->rit;
-        } else {
-            // Jika satuan selain RIT (misal M3), gunakan Volume dari source
-            $penjualan = $hargaJasaAngkut * $request->rit * $volume;
-        }
+
 
         // 6. Update data ke database
         $kegiatan->update([
             'rit'                       => $request->rit,
-            'satuan'                    => strtoupper($request->satuan),
             'upahhariankenet'           => $request->upahhariankenet,
             'umluarkotatelahterbayar'   => $request->umluarkotatelahterbayar,
             'umpengajuan'               => $request->umpengajuan,
             'insentifataulembur'        => $request->insentifataulembur,
             'upah'                      => $upah,
-            'jumlah'                    => $jumlah,
-            'penjualan'                 => $penjualan, // Mengupdate volume di kegiatan jika ada kolomnya
+            'jumlah'                    => $jumlah, // Mengupdate volume di kegiatan jika ada kolomnya
         ]);
 
         return response()->json([
